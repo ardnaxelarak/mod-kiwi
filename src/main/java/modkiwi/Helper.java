@@ -1,18 +1,18 @@
 package modkiwi;
 
-import modkiwi.data.*;
-import modkiwi.net.*;
+import modkiwi.data.ThreadInfo;
+import modkiwi.net.GAEConnection;
+import modkiwi.net.RequestBuilder;
+import modkiwi.net.WebConnection;
+import modkiwi.net.WebRequest;
+import modkiwi.net.WebResponse;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.util.regex.*;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.urlfetch.*;
-
-import org.jsoup.*;
-import org.jsoup.nodes.*;
 
 public class Helper
 {
@@ -24,9 +24,9 @@ public class Helper
         conn = new GAEConnection();
     }
 
-    public Helper(PrintWriter pw)
+    public Helper(WebConnection conn)
     {
-        conn = new GAEConnection(pw);
+        this.conn = conn;
     }
 
     public synchronized WebResponse login() throws IOException

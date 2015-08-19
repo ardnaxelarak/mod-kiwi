@@ -1,20 +1,16 @@
 package modkiwi;
 
-import modkiwi.data.*;
+import modkiwi.data.ArticleInfo;
+import modkiwi.data.ThreadInfo;
 import modkiwi.net.WebResponse;
+import modkiwi.net.GAEConnection;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.util.logging.*;
+import java.io.IOException;
+import java.io.PrintWriter;
 import javax.servlet.http.*;
-
-import com.google.appengine.api.urlfetch.*;
 
 public class AdminServlet extends HttpServlet
 {
-    private static final Logger LOG = Logger.getLogger(AdminServlet.class.getName());
-
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
         throws IOException
@@ -22,7 +18,7 @@ public class AdminServlet extends HttpServlet
         resp.setContentType("text/plain");
         PrintWriter pw = resp.getWriter();
         pw.println("Creating Helper...");
-        Helper h = new Helper(pw);
+        Helper h = new Helper(new GAEConnection(pw));
 
         h.testCookies();
 
@@ -32,13 +28,7 @@ public class AdminServlet extends HttpServlet
 
         /*
         pw.println("Sending geekmail...");
-        HTTPResponse response = h.geekmail("Kiwi13cubed", "Test", "silly fruits!");
-        */
-
-        /*
-        Scanner sc = new Scanner(new ByteArrayInputStream(response.getContent()));
-        while (sc.hasNextLine())
-            pw.println(sc.nextLine());
+        WebResponse response = h.geekmail("Kiwi13cubed", "Test", "silly fruits!");
         */
 
         pw.println("geekmail sent...");
