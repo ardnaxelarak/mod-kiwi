@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+<!--Webjars Servlet-->
+<servlet>
+    <servlet-name>WebjarsServlet</servlet-name>
+    <servlet-class>org.webjars.servlet.WebjarsServlet</servlet-class>
+    <load-on-startup>2</load-on-startup>
+</servlet>
+<servlet-mapping>
+    <servlet-name>WebjarsServlet</servlet-name>
+    <url-pattern>/webjars/*</url-pattern>
+</servlet-mapping>
+
+<servlet>
+    <servlet-name>CreateGameServlet</servlet-name>
+    <servlet-class>modkiwi.CreateGameServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>CreateGameServlet</servlet-name>
+    <url-pattern>/a/create</url-pattern>
+</servlet-mapping>
+
+<security-constraint>
+    <web-resource-collection>
+       <web-resource-name>admin</web-resource-name>
+        <url-pattern>/admin/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+        <role-name>admin</role-name>
+    </auth-constraint>
+</security-constraint>
+
+<servlet>
+    <servlet-name>AdminServlet</servlet-name>
+    <servlet-class>modkiwi.AdminServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>AdminServlet</servlet-name>
+    <url-pattern>/admin</url-pattern>
+</servlet-mapping>
+
+<servlet>
+    <servlet-name>CredentialsServlet</servlet-name>
+    <servlet-class>modkiwi.CredentialsServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>CredentialsServlet</servlet-name>
+    <url-pattern>/admin/credentials</url-pattern>
+</servlet-mapping>
+
+<servlet>
+    <servlet-name>ScanServlet</servlet-name>
+    <servlet-class>modkiwi.ScanServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>ScanServlet</servlet-name>
+    <url-pattern>/scan</url-pattern>
+</servlet-mapping>
+
+</web-app>
