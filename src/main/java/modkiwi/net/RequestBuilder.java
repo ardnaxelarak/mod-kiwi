@@ -1,20 +1,22 @@
 package modkiwi.net;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RequestBuilder
 {
-    private static final String DEFAULT_CHARSET = java.nio.charset.StandardCharsets.UTF_8.name();
-    private Hashtable<String, String> params;
+    private static final String DEFAULT_CHARSET = StandardCharsets.UTF_8.name();
+    private Map<String, String> params;
     private String url;
     private String requestType;
     private String charset;
 
     private RequestBuilder(String requestType)
     {
-        params = new Hashtable<String, String>();
+        params = new HashMap<String, String>();
         url = null;
         this.requestType = requestType;
         charset = DEFAULT_CHARSET;
@@ -42,7 +44,7 @@ public class RequestBuilder
         return this;
     }
 
-    public Request build() throws IOException
+    public WebRequest build() throws IOException
     {
         String query = "";
         for (Map.Entry<String, String> entry : params.entrySet())
@@ -53,6 +55,6 @@ public class RequestBuilder
                         URLEncoder.encode(entry.getKey(), charset),
                         URLEncoder.encode(entry.getValue(), charset));
         }
-        return new Request(url, query, requestType, charset);
+        return new WebRequest(url, query, requestType, charset);
     }
 }

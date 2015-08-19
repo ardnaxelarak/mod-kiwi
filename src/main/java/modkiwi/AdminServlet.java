@@ -1,6 +1,7 @@
 package modkiwi;
 
 import modkiwi.data.*;
+import modkiwi.net.WebResponse;
 
 import java.io.*;
 import java.net.*;
@@ -26,10 +27,8 @@ public class AdminServlet extends HttpServlet
         h.testCookies();
 
         pw.println("Logging in...");
-        HTTPResponse response = h.login();
-        Scanner sc = new Scanner(new ByteArrayInputStream(response.getContent()));
-        while (sc.hasNextLine())
-            pw.println(sc.nextLine());
+        WebResponse response = h.login();
+        pw.println(response.getResponseBody());
 
         /*
         pw.println("Sending geekmail...");
