@@ -1,13 +1,24 @@
 package modkiwi;
 
-import modkiwi.data.*;
+import modkiwi.data.ArticleInfo;
+import modkiwi.data.ThreadInfo;
 import modkiwi.net.NetConnection;
 
-import com.google.appengine.api.datastore.*;
-import com.google.appengine.api.datastore.Query.*;
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.Filter;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
+import com.google.appengine.api.datastore.Query.SortDirection;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Collections;
+import java.util.List;
+
 import javax.servlet.http.*;
 
 public class ScanServlet extends HttpServlet
@@ -17,6 +28,9 @@ public class ScanServlet extends HttpServlet
         throws IOException
     {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+        resp.setContentType("text/plain");
+        PrintWriter pw = resp.getWriter();
 
         Helper h = new Helper(new NetConnection());
         h.login();
@@ -52,7 +66,7 @@ public class ScanServlet extends HttpServlet
 
             List<String> players = (List<String>)e.getProperty("players");
             if (players == null)
-                players = new LinkedList<String>();
+                players = Collections.emptyList();
             boolean changed = false;
 
             ArticleInfo[] articles = ti.getArticles();
