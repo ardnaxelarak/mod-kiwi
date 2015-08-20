@@ -34,7 +34,8 @@ public class CreateGameServlet extends HttpServlet
 
         try
         {
-            Entity ent = new Entity("Game", generateId());
+            String id = generateId();
+            Entity ent = new Entity("Game", id);
             ent.setProperty("gametype", req.getParameter("gametype"));
             ent.setProperty("index", req.getParameter("index"));
             ent.setProperty("title", req.getParameter("name"));
@@ -48,6 +49,7 @@ public class CreateGameServlet extends HttpServlet
             ent.setProperty("game_status", "signups");
             datastore.put(ent);
             txn.commit();
+            resp.sendRedirect("/game/" + id);
         }
         finally
         {
