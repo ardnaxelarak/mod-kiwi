@@ -1,11 +1,16 @@
 package modkiwi;
 
-import modkiwi.data.*;
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Transaction;
 
-import com.google.appengine.api.datastore.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Random;
 
-import java.io.*;
-import java.util.*;
 import javax.servlet.http.*;
 
 public class CreateGameServlet extends HttpServlet
@@ -27,7 +32,8 @@ public class CreateGameServlet extends HttpServlet
         PrintWriter pw = resp.getWriter();
         resp.setContentType("text/plain");
 
-        try {
+        try
+        {
             Entity ent = new Entity("Game", generateId());
             ent.setProperty("gametype", req.getParameter("gametype"));
             ent.setProperty("index", req.getParameter("index"));
@@ -42,11 +48,13 @@ public class CreateGameServlet extends HttpServlet
             ent.setProperty("current_status", req.getParameter("status"));
             ent.setProperty("history", req.getParameter("history"));
             ent.setProperty("players", new ArrayList<String>());
-            ent.setProperty("data", new EmbeddedEntity());
+            ent.setProperty("data", null);
             ent.setProperty("game_status", "signups");
             datastore.put(ent);
             txn.commit();
-        } finally {
+        }
+        finally
+        {
             if (txn.isActive())
                 txn.rollback();
         }
