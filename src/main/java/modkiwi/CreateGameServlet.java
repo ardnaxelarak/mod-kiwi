@@ -40,15 +40,11 @@ public class CreateGameServlet extends HttpServlet
             ent.setProperty("title", req.getParameter("name"));
             ent.setProperty("acronym", req.getParameter("acronym"));
             ent.setProperty("thread", req.getParameter("thread"));
-            if (req.getParameter("mods") == null)
-                ent.setProperty("mods", new ArrayList<String>());
-            else
+            if (req.getParameter("mods") != null)
                 ent.setProperty("mods", Arrays.asList(req.getParameter("mods").split(",")));
-            ent.setProperty("signup", req.getParameter("signup"));
-            ent.setProperty("current_status", req.getParameter("status"));
-            ent.setProperty("history", req.getParameter("history"));
-            ent.setProperty("players", new ArrayList<String>());
-            ent.setProperty("data", null);
+            ent.setProperty("signup_post", req.getParameter("signup"));
+            ent.setProperty("status_post", req.getParameter("status"));
+            ent.setProperty("history_post", req.getParameter("history"));
             ent.setProperty("game_status", "signups");
             datastore.put(ent);
             txn.commit();

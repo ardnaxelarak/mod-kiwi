@@ -3,34 +3,49 @@ package modkiwi.data;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EmbeddedEntity;
 
 import org.apache.commons.lang3.StringUtils;
 
 public class GameInfo
 {
     private String id, acronym, statusPost, gameStatus, historyPost, signupPost, thread, gametype, index, title, lastScanned;
-    private List<String> mods, players;
+    private List<String> mods, players, moves;
+    private EmbeddedEntity data;
+    private final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
     public GameInfo(Entity ent)
     {
         id = ent.getKey().getName();
         acronym = (String)ent.getProperty("acronym");
-        statusPost = (String)ent.getProperty("current_status");
+        statusPost = (String)ent.getProperty("status_post");
         gameStatus = (String)ent.getProperty("game_status");
         historyPost = (String)ent.getProperty("history_post");
-        signupPost = (String)ent.getProperty("signup");
+        signupPost = (String)ent.getProperty("signup_post");
         thread = (String)ent.getProperty("thread");
         gametype = (String)ent.getProperty("gametype");
         index = (String)ent.getProperty("index");
         title = (String)ent.getProperty("title");
         lastScanned = (String)ent.getProperty("last_scanned");
+
         mods = (List<String>)ent.getProperty("mods");
         if (mods == null)
             mods = new LinkedList<String>();
+
         players = (List<String>)ent.getProperty("players");
         if (players == null)
             players = new LinkedList<String>();
+
+        moves = (List<String>)ent.getProperty("moves");
+        if (moves == null)
+            moves = new LinkedList<String>();
+
+        data = (EmbeddedEntity)ent.getProperty("data");
+        if (data == null)
+            data = new EmbeddedEntity();
     }
 
     public String getId()
@@ -111,5 +126,28 @@ public class GameInfo
     public String getModeratorList()
     {
         return StringUtils.join(getMods(), ", ");
+    }
+
+    public void save()
+    {
+        Entity ent = new Entity("Game", id);
+        ent.setProperty("acronym", acronym);
+        ent.setProperty("game_status", gameStatus);
+        ent.setProperty("status_post", statusPost);
+        ent.setProperty("history_post", historyPost);
+        ent.setProperty("signup_post", signupPost);
+        ent.setProperty("thread", thread);
+        ent.setProperty("gametype", gametype);
+        ent.setProperty("index", index);
+        ent.setProperty("title", title);
+        ent.setProperty("last_scanned", lastScanned);
+
+        ent.setProperty("mods", mods);
+        ent.setProperty("players", players);
+        ent.setProperty("moves", moves);
+
+        ent.setProperty("data", data);
+
+        datastore.put(ent);
     }
 }
