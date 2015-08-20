@@ -10,6 +10,13 @@ import javax.servlet.http.*;
 
 public class CreateGameServlet extends HttpServlet
 {
+    private static final Random rand = new Random();
+
+    private String generateId()
+    {
+        return Integer.toHexString(rand.nextInt());
+    }
+
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp)
         throws IOException
@@ -17,12 +24,14 @@ public class CreateGameServlet extends HttpServlet
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         Transaction txn = datastore.beginTransaction();
 
+        PrintWriter pw = resp.getWriter();
+        resp.setContentType("text/plain");
+
         try {
-            Key key = datastore.allocateIds("Game", 1).getStart();
-            Entity ent = new Entity("Game", key);
+            Entity ent = new Entity("Game", generateId());
             ent.setProperty("gametype", req.getParameter("gametype"));
             ent.setProperty("index", req.getParameter("index"));
-            ent.setProperty("name", req.getParameter("name"));
+            ent.setProperty("title", req.getParameter("name"));
             ent.setProperty("acronym", req.getParameter("acronym"));
             ent.setProperty("thread", req.getParameter("thread"));
             if (req.getParameter("mods") == null)
