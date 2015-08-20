@@ -86,7 +86,7 @@ public class GAEConnection implements WebConnection
             req.setPayload(request.getQuery().getBytes(request.getCharset()));
         }
 
-        HTTPResponse resp = fetcher.fetch(req);
+        resp = fetcher.fetch(req);
 
         if (resp.getResponseCode() != HttpURLConnection.HTTP_OK)
             throw new IOException("Unexpected response code: " + resp.getResponseCode());

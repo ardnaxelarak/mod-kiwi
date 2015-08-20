@@ -2,8 +2,9 @@ package modkiwi;
 
 import modkiwi.data.ArticleInfo;
 import modkiwi.data.ThreadInfo;
-import modkiwi.net.WebResponse;
 import modkiwi.net.GAEConnection;
+import modkiwi.net.NetConnection;
+import modkiwi.net.WebResponse;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -15,21 +16,20 @@ public class AdminServlet extends HttpServlet
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
         throws IOException
     {
+        WebResponse response;
+
         resp.setContentType("text/plain");
         PrintWriter pw = resp.getWriter();
         pw.println("Creating Helper...");
-        Helper h = new Helper(new GAEConnection(pw));
-
-        h.testCookies();
+        Helper h = new Helper(new NetConnection(pw));
 
         pw.println("Logging in...");
-        WebResponse response = h.login();
-        pw.println(response.getResponseBody());
+        response = h.login();
+        pw.println(response.getFinalUrl());
 
-        /*
         pw.println("Sending geekmail...");
-        WebResponse response = h.geekmail("Kiwi13cubed", "Test", "silly fruits!");
-        */
+        response = h.geekmail("Kiwi13cubed", "Test", "silly fruits!");
+        pw.println(response.getFinalUrl());
 
         pw.println("geekmail sent...");
         /*

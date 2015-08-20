@@ -9,10 +9,12 @@ import java.util.Map;
 public class CookieMap implements Iterable<String>
 {
     private Map<String, String> cookies;
+    private List<String> order;
 
     public CookieMap()
     {
         cookies = new HashMap<String, String>();
+        order = new LinkedList<String>();
     }
 
     public void add(String cookie)
@@ -33,6 +35,9 @@ public class CookieMap implements Iterable<String>
         }
 
         cookies.put(key, value);
+        
+        order.remove(key);
+        order.add(key);
     }
 
     public void addAll(List<String> cookieList)
@@ -45,12 +50,30 @@ public class CookieMap implements Iterable<String>
     {
         List<String> list = new LinkedList<String>();
 
-        for (Map.Entry<String, String> entry : cookies.entrySet())
+        for (String key : order)
         {
-            list.add(entry.getKey() + "=" + entry.getValue());
+            list.add(key + "=" + cookies.get(key));
         }
 
         return list;
+    }
+
+    public String getCookie()
+    {
+        String total = null;
+        for (String cookie : getCookies())
+        {
+            if (total == null)
+                total = cookie;
+            else
+                total += "; " + cookie;
+        }
+        return total;
+    }
+
+    public boolean isEmpty()
+    {
+        return cookies.isEmpty();
     }
 
     @Override

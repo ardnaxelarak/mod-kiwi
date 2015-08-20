@@ -51,7 +51,9 @@ public class Helper
                 .addParameter("password", password)
                 .build();
 
-        return conn.execute(request);
+        WebResponse resp = conn.execute(request);
+        conn.saveCookies();
+        return resp;
     }
 
     public String getUsername()

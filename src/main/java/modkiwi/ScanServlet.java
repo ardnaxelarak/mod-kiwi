@@ -1,6 +1,7 @@
 package modkiwi;
 
 import modkiwi.data.*;
+import modkiwi.net.NetConnection;
 
 import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.datastore.Query.*;
@@ -17,7 +18,7 @@ public class ScanServlet extends HttpServlet
     {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-        Helper h = new Helper();
+        Helper h = new Helper(new NetConnection());
         h.login();
 
         Filter statusFilter = new FilterPredicate("game_status",
@@ -61,7 +62,7 @@ public class ScanServlet extends HttpServlet
                     continue;
                 for (String command : article.getCommands())
                 {
-                    if (command.equals("signup"))
+                    if (command.equalsIgnoreCase("signup"))
                     {
                         if (!players.contains(username))
                         {
@@ -69,7 +70,7 @@ public class ScanServlet extends HttpServlet
                             changed = true;
                         }
                     }
-                    if (command.equals("remove"))
+                    if (command.equalsIgnoreCase("remove"))
                     {
                         if (players.remove(username))
                             changed = true;

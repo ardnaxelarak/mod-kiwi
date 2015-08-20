@@ -2,6 +2,7 @@ package modkiwi.net;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
@@ -14,6 +15,7 @@ public class NetConnection implements WebConnection
 {
     private HttpURLConnection connection;
     private CookieMap cookies;
+    private PrintWriter pw = null;
 
     private static final class Response extends WebResponse
     {
@@ -47,19 +49,30 @@ public class NetConnection implements WebConnection
         cookies = new CookieMap();
     }
 
-    @Override
-    public WebResponse execute(WebRequest request) throws IOException
+    public NetConnection(PrintWriter pw)
     {
-        String url = request.getUrl();
+        this();
+        this.pw = pw;
+    }
 
+    public WebResponse execute(WebRequest request, URL url) throws IOException
+    {
         if (request.getRequestType().equals("GET"))
-            url = url + "?" + request.getQuery();
+            url = new URL(url.toString() + "?" + request.getQuery());
 
-        connection = (HttpURLConnection)(new URL(url).openConnection());
+        connection = (HttpURLConnection)(url.openConnection());
+        connection.setInstanceFollowRedirects(false);
 
-        for (String cookie : cookies)
-            connection.addRequestProperty("Cookie", cookie);
+        if (!cookies.isEmpty())
+        {
+            if (pw != null)
+                pw.println(cookies.getCookie());
+            connection.addRequestProperty("Cookie", cookies.getCookie());
+        }
 
+        connection.addRequestProperty("User-Agent", "Mozilla");
+        connection.addRequestProperty("Accept-Language", "en-US,en;q=0.8");
+        connection.addRequestProperty("Referer", "google.com");
         connection.setRequestProperty("Accept-Charset", request.getCharset());
         connection.setRequestMethod(request.getRequestType());
 
@@ -75,10 +88,31 @@ public class NetConnection implements WebConnection
 
         connection.connect();
 
-        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK)
-            throw new IOException("Unexpected response code: " + connection.getResponseCode());
+        int status = connection.getResponseCode();
 
-        return new NetConnection.Response(connection);
+        if (pw != null)
+            pw.printf("Response code %d\n", status);
+
+        if (status == HttpURLConnection.HTTP_MOVED_TEMP ||
+            status == HttpURLConnection.HTTP_MOVED_PERM ||
+            status == HttpURLConnection.HTTP_SEE_OTHER)
+        {
+            return execute(request, new URL(url, connection.getHeaderField("Location")));
+        }
+        else if (status != HttpURLConnection.HTTP_OK)
+        {
+            throw new IOException("Unexpected response code: " + connection.getResponseCode());
+        }
+        else
+        {
+            return new NetConnection.Response(connection);
+        }
+    }
+
+    @Override
+    public WebResponse execute(WebRequest request) throws IOException
+    {
+        return execute(request, new URL(request.getUrl()));
     }
 
     @Override
@@ -89,6 +123,11 @@ public class NetConnection implements WebConnection
 
         for (Map.Entry<String, List<String>> entry : connection.getHeaderFields().entrySet())
         {
+            if (pw != null)
+                pw.printf("%s: %s\n", entry.getKey(), entry.getValue());
+
+            if (entry.getKey() == null)
+                continue;
             if (entry.getKey().toLowerCase().startsWith("set-cookie"))
             {
                 cookies.addAll(entry.getValue());
