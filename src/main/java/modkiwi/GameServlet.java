@@ -1,10 +1,13 @@
 package modkiwi;
 
-import modkiwi.data.*;
-import modkiwi.net.NetConnection;
+import modkiwi.data.GameInfo;
 
-import com.google.appengine.api.datastore.*;
-import com.google.appengine.api.datastore.Query.*;
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -46,12 +49,7 @@ public class GameServlet extends HttpServlet
             return;
         }
 
-        req.setAttribute("gametype", ent.getProperty("gametype"));
-        req.setAttribute("index", ent.getProperty("index"));
-        req.setAttribute("title", ent.getProperty("title"));
-        req.setAttribute("players", ent.getProperty("players"));
-        req.setAttribute("mods", ent.getProperty("mods"));
-        req.setAttribute("game_status", ent.getProperty("game_status"));
+        req.setAttribute("gameInfo", new GameInfo(ent));
         try
         {
             req.getRequestDispatcher("/WEB-INF/game.jsp").forward(req, resp);

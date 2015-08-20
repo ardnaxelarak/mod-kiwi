@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="modkiwi.data.GameInfo" %>
 <%@ page import="com.google.appengine.api.users.User" %>
 <%@ page import="com.google.appengine.api.users.UserService" %>
 <%@ page import="com.google.appengine.api.users.UserServiceFactory" %>
@@ -7,9 +8,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <%
-List<String> players = (List<String>)request.getAttribute("players");
-if (players == null)
-    players = new LinkedList<String>();
+GameInfo game = (GameInfo)request.getAttribute("gameInfo");
 %>
 
 <html>
@@ -19,13 +18,13 @@ if (players == null)
 </head>
 
 <body>
-    <h1><div id='name_span'>${gametype} #${index}: ${title}</div></h1>
+    <h1><div id='name_span'><%= game.getFullTitle() %></h1>
     <div id='player_table'>
         <table border="0" class="forum_table" cellpadding="4" cellspacing="2">
             <tr>
-                <th>Players (<%= players.size() %>)</th>
+                <th>Players (<%= game.getPlayers().size() %>)</th>
             </tr>
-            <% for (String player : players) { %>
+            <% for (String player : game.getPlayers()) { %>
             <tr>
                 <td><%= player %></td>
             </tr>
