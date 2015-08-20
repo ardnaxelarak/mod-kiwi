@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.google.appengine.api.datastore.Entity;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class GameInfo
 {
     private String id, acronym, statusPost, gameStatus, historyPost, signupPost, thread, gametype, index, title, lastScanned;
@@ -31,7 +33,7 @@ public class GameInfo
             players = new LinkedList<String>();
     }
 
-    public String getID()
+    public String getId()
     {
         return id;
     }
@@ -99,5 +101,15 @@ public class GameInfo
     public String getFullTitle()
     {
         return String.format("%s #%s: %s", gametype, index, title);
+    }
+
+    public String getPlayerList()
+    {
+        return StringUtils.join(getPlayers(), ", ");
+    }
+
+    public String getModeratorList()
+    {
+        return StringUtils.join(getMods(), ", ");
     }
 }
