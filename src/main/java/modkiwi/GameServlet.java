@@ -11,8 +11,8 @@ import com.google.appengine.api.datastore.KeyFactory;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.*;
-import javax.servlet.*;
+
+import javax.servlet.ServletException;
 import javax.servlet.http.*;
 
 public class GameServlet extends HttpServlet
