@@ -15,10 +15,11 @@ GameInfo game = (GameInfo)request.getAttribute("gameInfo");
 <head>
     <link type="text/css" rel="stylesheet" href="../bgg.css" />
     <script src="../webjars/jquery/2.1.4/jquery.min.js"> </script>
+    <title>Modkiwi - <%= game.getFullTitle() %></title>
 </head>
 
 <body>
-    <h1><div id='name_span'><%= game.getFullTitle() %></h1>
+    <h1><div id='name_span'><%= game.getFullTitle() %></div></h1>
     <div id='player_table'>
         <table border="0" class="forum_table" cellpadding="4" cellspacing="2">
             <tr>
