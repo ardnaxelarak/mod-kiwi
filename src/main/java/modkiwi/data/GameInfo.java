@@ -8,8 +8,6 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EmbeddedEntity;
 
-import org.apache.commons.lang3.StringUtils;
-
 public class GameInfo
 {
     private String id, acronym, statusPost, gameStatus, historyPost, signupPost, thread, gametype, index, title, lastScanned;
@@ -120,12 +118,36 @@ public class GameInfo
 
     public String getPlayerList()
     {
-        return StringUtils.join(getPlayers(), ", ");
+        if (getPlayers() == null)
+            return "";
+
+        String list = null;
+        for (String player : getPlayers())
+        {
+            if (list == null)
+                list = player;
+            else
+                list += ", " + player;
+        }
+
+        return list;
     }
 
     public String getModeratorList()
     {
-        return StringUtils.join(getMods(), ", ");
+        if (getMods() == null)
+            return "";
+
+        String list = null;
+        for (String mod : getMods())
+        {
+            if (list == null)
+                list = mod;
+            else
+                list += ", " + mod;
+        }
+
+        return list;
     }
 
     public void save()
