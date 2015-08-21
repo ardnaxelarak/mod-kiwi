@@ -13,6 +13,7 @@ public class GameInfo
     private String id, acronym, statusPost, gameStatus, historyPost, signupPost, thread, gametype, index, title, lastScanned;
     private List<String> mods, players, moves;
     private EmbeddedEntity data;
+    private int maxPlayers;
     private final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
     public GameInfo(Entity ent)
@@ -28,6 +29,11 @@ public class GameInfo
         index = (String)ent.getProperty("index");
         title = (String)ent.getProperty("title");
         lastScanned = (String)ent.getProperty("last_scanned");
+
+        if (ent.getProperty("max_players") != null)
+            maxPlayers = (int)ent.getProperty("max_players");
+        else
+            maxPlayers = -1;
 
         mods = (List<String>)ent.getProperty("mods");
         if (mods == null)
@@ -99,6 +105,11 @@ public class GameInfo
     public String getLastScanned()
     {
         return lastScanned;
+    }
+
+    public int getMaxPlayers()
+    {
+        return maxPlayers;
     }
 
     public List<String> getMods()

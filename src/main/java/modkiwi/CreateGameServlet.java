@@ -46,6 +46,16 @@ public class CreateGameServlet extends HttpServlet
             ent.setProperty("signup_post", req.getParameter("signup"));
             ent.setProperty("status_post", req.getParameter("status"));
             ent.setProperty("history_post", req.getParameter("history"));
+            if (req.getParameter("max_players") != null)
+            {
+                try
+                {
+                    ent.setProperty("max_players", Integer.parseInt(req.getParameter("max_players")));
+                }
+                catch (NumberFormatException e)
+                {
+                }
+            }
             ent.setProperty("game_status", "signups");
             datastore.put(ent);
             txn.commit();
