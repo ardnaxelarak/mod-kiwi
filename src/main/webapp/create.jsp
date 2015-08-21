@@ -16,12 +16,14 @@
         Game Type:
         <select name="gametype">
             <option value="TB">Time Bomb</option>
+            <option value="KNG">Kingdoms</option>
         </select>
         <br>
         Index: <input type="text" name="index"><br>
         Name: <input type="text" name="name"><br>
         Acronym: <input type="text" name="acronym"><br>
         Thread: <input type="text" name="thread"><br>
+        Player Count: <input type="text" name="max_players"><br>
         Moderator(s): <input type="text" name="mods"><br>
         Signup Post: <input type="text" name="signup"><br>
         Status Post: <input type="text" name="status"><br>
