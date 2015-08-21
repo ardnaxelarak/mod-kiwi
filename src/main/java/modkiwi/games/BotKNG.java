@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -148,7 +149,7 @@ public class BotKNG extends GameBot
     {
         round = round + 1;
 
-        deck = (List<String>)game.getData().getProperty(String.format("round%ddeck", round));
+        deck = new LinkedList<String>((List<String>)game.getData().getProperty(String.format("round%ddeck", round)));
 
         for (int i = 0; i < NoP; i++)
         {
@@ -226,12 +227,12 @@ public class BotKNG extends GameBot
             if (hand[turn] != null)
                 message += "\n[b]hand [i]location[/i][/b]";
             if (hasCastles(turn))
-                message += "\n[b]castle [i]size[/i] [i]location[/i]";
+                message += "\n[b]castle [i]size[/i] [i]location[/i][/b]";
             message += "[/color]";
         }
         else if (step.equals("drawn"))
         {
-            message = String.format("[color=#008800]%s draws %s[/color]\n%s\n\n[color=#008800]Please [b]place [i]location[/i][/b][/color]", players[turn], deck.get(0), getImage(hand[turn], "original"));
+            message = String.format("[color=#008800]%s draws %s[/color]\n%s\n\n[color=#008800]Please [b]place [i]location[/i][/b][/color]", players[turn], deck.get(0), getImage(deck.get(0), "original"));
         }
         else if (step.equals("colors"))
         {
@@ -243,12 +244,13 @@ public class BotKNG extends GameBot
                 if (revColors.get(color) == null)
                     message += "\n[b]choose " + color + "[/b]";
             }
+            message += "[/color]";
         }
         else
         {
             LOGGER.warning("Unrecognized step '%s'", step);
         }
-        
+
         if (message != null)
         {
             try
@@ -298,6 +300,20 @@ public class BotKNG extends GameBot
         board[r][c] = tile;
     }
 
+    private String getTile(String location)
+    {
+        if (location.length() != 2)
+            return null;
+
+        int r = location.charAt(0) - 'A';
+        int c = location.charAt(1) - '1';
+
+        if (r < 0 || r > board.length || c < 0 || c > board[r].length)
+            return null;
+
+        return board[r][c];
+    }
+
     private void advanceTurn(boolean fresh)
     {
         turn++;
@@ -341,7 +357,7 @@ public class BotKNG extends GameBot
         if (step.equals("colors") && first.equals("choose"))
         {
             colors[turn] = move[1];
-            revColors.put(first, turn);
+            revColors.put(move[1], turn);
             advanceTurn(fresh);
         }
         else if (step.equals("place"))
@@ -350,7 +366,9 @@ public class BotKNG extends GameBot
                 step = "drawn";
             else if (first.equals("castle"))
             {
+                int size = Integer.parseInt(move[1]);
                 placeTile(colors[turn] + move[1], move[2]);
+                castles[turn][size - 1]--;
                 advanceTurn(fresh);
             }
             else if (first.equals("hand"))
@@ -368,6 +386,7 @@ public class BotKNG extends GameBot
         {
             String tile = deck.remove(0);
             placeTile(tile, move[1]);
+            step = "place";
             advanceTurn(fresh);
         }
         else
@@ -379,6 +398,123 @@ public class BotKNG extends GameBot
     @Override
     public void processCommand(String username, String command)
     {
+        if (step.equals("colors"))
+        {
+            if (!username.equals(players[turn]))
+                return;
+
+            if (command.toLowerCase().startsWith("choose "))
+            {
+                String color = command.toLowerCase().substring(7);
+                if (revColors.get(color) != null)
+                {
+                    LOGGER.info("%s tried to claim %s, which was taken by %s", players[turn], color, players[revColors.get(color)]);
+                    return;
+                }
+                else if (Arrays.binarySearch(ALL_COLORS, color) > 0)
+                {
+                    processAndAddMove("choose", color);
+                }
+                else
+                {
+                    LOGGER.info("%s tried to claim '%s', an invalid color", players[turn], color);
+                }
+            }
+        }
+        else if (step.equals("place"))
+        {
+            if (!username.equals(players[turn]))
+                return;
+
+            if (command.toLowerCase().equals("draw"))
+            {
+                processAndAddMove("draw");
+            }
+            else if (command.toLowerCase().startsWith("hand "))
+            {
+                String location = command.substring(5);
+                String tile = getTile(location.toUpperCase());
+                if (tile == null)
+                {
+                    LOGGER.info("%s tried to place a tile at invalid location '%s'", players[turn], location);
+                }
+                else if (!tile.equals("empty"))
+                {
+                    LOGGER.info("%s tried to place a tile at occupied location '%s'", players[turn], location);
+                }
+                else
+                {
+                    processAndAddMove("hand", location);
+                }
+            }
+            else if (command.toLowerCase().startsWith("castle "))
+            {
+                String[] pieces = command.substring(7).split(" ");
+                if (pieces.length != 2)
+                    return;
+                String sizeStr = pieces[0];
+                String location = pieces[1];
+                int size;
+
+                try
+                {
+                    size = Integer.parseInt(sizeStr);
+                    if (size < 1 || size > 4)
+                    {
+                        LOGGER.info("%s tried to place a castle of invalid size '%s'", players[turn], sizeStr);
+                        return;
+                    }
+                }
+                catch (NumberFormatException e)
+                {
+                    LOGGER.info("%s tried to place a castle of invalid size '%s'", players[turn], sizeStr);
+                    return;
+                }
+
+                if (castles[turn][size - 1] == 0)
+                {
+                    LOGGER.info("%s tried to place a castle of size '%s' but has none remaining", players[turn], sizeStr);
+                    return;
+                }
+
+                String tile = getTile(location.toUpperCase());
+                if (tile == null)
+                {
+                    LOGGER.info("%s tried to place a tile at invalid location '%s'", players[turn], location);
+                }
+                else if (!tile.equals("empty"))
+                {
+                    LOGGER.info("%s tried to place a tile at occupied location '%s'", players[turn], location);
+                }
+                else
+                {
+                    processAndAddMove("castle", sizeStr, location);
+                }
+            }
+        }
+        else if (step.equals("drawn"))
+        {
+            if (!username.equals(players[turn]))
+                return;
+
+            if (command.toLowerCase().startsWith("place "))
+            {
+                String location = command.substring(6);
+                String tile = getTile(location.toUpperCase());
+                if (tile == null)
+                {
+                    LOGGER.info("%s tried to place a tile at invalid location '%s'", players[turn], location);
+                }
+                else if (!tile.equals("empty"))
+                {
+                    LOGGER.info("%s tried to place a tile at occupied location '%s'", players[turn], location);
+                }
+                else
+                {
+                    processAndAddMove("place", location);
+                }
+            }
+        }
     }
 
     @Override
@@ -399,6 +535,8 @@ public class BotKNG extends GameBot
             }
         }
 
+        message += "\n";
+
         // print scores and castles
         for (int i = 0; i < NoP; i++)
         {
@@ -412,10 +550,15 @@ public class BotKNG extends GameBot
                 if (castles[i][j] > 0)
                     message += "\n";
                 for (int k = 0; k < castles[i][j]; k++)
+                {
+
                     message += getImage(colors[i] + (j + 1), "original", "inline");
+                }
             }
             message += "[/floatleft]";
         }
+
+        message += "[clear]";
 
         return message;
     }
