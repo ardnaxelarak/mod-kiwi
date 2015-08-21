@@ -57,7 +57,12 @@ public class CreateGameServlet extends HttpServlet
                 }
                 catch (NumberFormatException e)
                 {
+                    LOGGER.warning("max_players: cannot parse '%s'", req.getParameter("max_players"));
                 }
+            }
+            else
+            {
+                LOGGER.info("no value for max_players");
             }
             ent.setProperty("game_status", "signups");
             datastore.put(ent);
