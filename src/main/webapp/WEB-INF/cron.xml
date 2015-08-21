@@ -2,7 +2,7 @@
 <cronentries>
     <cron>
         <url>/scan</url>
-        <description>Scan active games every 5 minutes</description>
-        <schedule>every 5 minutes</schedule>
+        <description>Scan active games every 2 minutes</description>
+        <schedule>every 2 minutes</schedule>
     </cron>
 </cronentries>
