@@ -37,7 +37,11 @@ public class ScanServlet extends HttpServlet
 
             for (GameInfo game : DatastoreUtils.gamesByStatus("signups"))
             {
+<<<<<<< HEAD
                 LOGGER.info("Scanning %s (in signups)", game.getFullTitle());
+=======
+                LOGGER.info("Scanning %s", game.getFullTitle());
+>>>>>>> 234cf07bca2cbf3d6831eb83243d0eb1daddf8e3
                 GameBot bot = BotManager.getBot(game);
 
                 ThreadInfo ti;
