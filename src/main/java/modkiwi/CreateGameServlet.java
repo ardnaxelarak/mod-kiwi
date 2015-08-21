@@ -1,5 +1,7 @@
 package modkiwi;
 
+import modkiwi.util.Logger;
+
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -15,6 +17,7 @@ import javax.servlet.http.*;
 
 public class CreateGameServlet extends HttpServlet
 {
+    private static final Logger LOGGER = new Logger(CreateGameServlet.class);
     private static final Random rand = new Random();
 
     private String generateId()
