@@ -544,7 +544,7 @@ public class BotKNG extends GameBot
             if (i == 2)
                 message += "[clear]";
 
-            message += String.format("[floatleft][size=16][center]%s: %d[/center][/size]", players[i], scores[i]);
+            message += String.format("[floatleft][center][size=16]%s\n[c]%d[/c][/size]", players[i], scores[i]);
             for (int j = 0; j < castles[i].length; j++)
             {
                 if (castles[i][j] > 0)
@@ -555,7 +555,7 @@ public class BotKNG extends GameBot
                     message += getImage(colors[i] + (j + 1), "original", "inline");
                 }
             }
-            message += "[/floatleft]";
+            message += "[/center][/floatleft]";
         }
 
         message += "[clear]";
