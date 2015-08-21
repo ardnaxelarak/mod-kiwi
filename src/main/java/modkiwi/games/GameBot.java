@@ -139,6 +139,8 @@ public abstract class GameBot
         game.setGameStatus("progress");
         updatePlayerList();
         createGame();
+        initialize(true);
+        update();
     }
 
     public void loadGame()
