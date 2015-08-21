@@ -55,11 +55,11 @@ public class ArticleInfo
             int index = 0;
             while (m.find(index))
             {
-                list.add(m.group(1));
+                list.add(m.group(1).trim());
                 index = m.end();
             }
             if (!m.matches())
-                list.add(text);
+                list.add(text.trim());
         }
         return list;
     }
