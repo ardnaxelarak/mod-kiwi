@@ -83,7 +83,14 @@ public class ScanServlet extends HttpServlet
                 }
 
                 if (game.readyToStart())
+                {
+                    LOGGER.info("%s is full! Beginning game.", game.getFullTitle());
                     bot.startGame();
+                }
+                else if (game.getMaxPlayers() > 0)
+                {
+                    LOGGER.info("%s has %d / %d players.", game.getFullTitle(), game.getPlayers().size(), game.getMaxPlayers());
+                }
 
                 game.setLastScanned(articles[articles.length - 1].getId());
                 game.save();
