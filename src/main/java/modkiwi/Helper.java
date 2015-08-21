@@ -1,7 +1,7 @@
 package modkiwi;
 
 import modkiwi.data.ThreadInfo;
-import modkiwi.net.GAEConnection;
+import modkiwi.net.NetConnection;
 import modkiwi.net.RequestBuilder;
 import modkiwi.net.WebConnection;
 import modkiwi.net.WebRequest;
@@ -21,7 +21,7 @@ public class Helper
 
     public Helper()
     {
-        conn = new GAEConnection();
+        conn = new NetConnection();
     }
 
     public Helper(WebConnection conn)
