@@ -111,9 +111,24 @@ public class GameInfo
         return players;
     }
 
+    public List<String> getMoves()
+    {
+        return moves;
+    }
+
+    public EmbeddedEntity getData()
+    {
+        return data;
+    }
+
     public String getFullTitle()
     {
         return String.format("%s #%s: %s", gametype, index, title);
+    }
+
+    public String getPrefix()
+    {
+        return String.format("%s #%s", gametype, index);
     }
 
     public String getPlayerList()
@@ -171,5 +186,15 @@ public class GameInfo
         ent.setProperty("data", data);
 
         datastore.put(ent);
+    }
+
+    public void setGameStatus(String status)
+    {
+        gameStatus = status;
+    }
+
+    public void setLastScanned(String id)
+    {
+        lastScanned = id;
     }
 }
