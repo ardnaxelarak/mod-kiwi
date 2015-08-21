@@ -181,7 +181,7 @@ public class BotKNG extends GameBot
 
     private void endRound(boolean fresh)
     {
-        // do scoring stuff here
+        scoreRound(fresh);
 
         if (round == 3)
         {
@@ -192,6 +192,11 @@ public class BotKNG extends GameBot
         {
             newRound(fresh);
         }
+    }
+
+    private void scoreRound(boolean fresh)
+    {
+
     }
 
     private boolean hasCastles(int player)
@@ -280,9 +285,13 @@ public class BotKNG extends GameBot
         for (String player : game.getPlayers())
             players[k++] = player;
 
+        for (String[] row : board)
+            Arrays.fill(row, "empty");
+
         for (int i = 0; i < NoP; i++)
         {
             scores[i] = 50;
+            castles[i][1] = 6 - NoP;
             castles[i][1] = 3;
             castles[i][2] = 2;
             castles[i][3] = 1;
@@ -300,6 +309,15 @@ public class BotKNG extends GameBot
         board[r][c] = tile;
     }
 
+    private String getTile(int row, int col)
+    {
+        if (row < 0 || row > board.length ||
+            col < 0 || col > board[row].length)
+            return null;
+
+        return board[row][col];
+    }
+
     private String getTile(String location)
     {
         if (location.length() != 2)
@@ -308,10 +326,7 @@ public class BotKNG extends GameBot
         int r = location.charAt(0) - 'A';
         int c = location.charAt(1) - '1';
 
-        if (r < 0 || r > board.length || c < 0 || c > board[r].length)
-            return null;
-
-        return board[r][c];
+        return getTile(r, c);
     }
 
     private void advanceTurn(boolean fresh)
@@ -520,9 +535,17 @@ public class BotKNG extends GameBot
     @Override
     public String getCurrentStatus()
     {
-        String message = "";
         if (step.equals("colors"))
             return null;
+
+        String message = getCurrentBoard() + "\n" + getCurrentCastles();
+
+        return message;
+    }
+
+    private String getCurrentBoard()
+    {
+        String message = "";
 
         // print board
         message += getImage("header", "original", "inline");
@@ -535,7 +558,12 @@ public class BotKNG extends GameBot
             }
         }
 
-        message += "\n";
+        return message;
+    }
+
+    private String getCurrentCastles()
+    {
+        String message = "";
 
         // print scores and castles
         for (int i = 0; i < NoP; i++)
