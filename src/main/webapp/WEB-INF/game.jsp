@@ -32,5 +32,12 @@ GameInfo game = (GameInfo)request.getAttribute("gameInfo");
             <% } %>
         </table>
     </div>
+    <form action="https://boardgamegeek.com/article/save" method="post">
+        <input type="hidden" name="action" value="save">
+        <input type="hidden" name="replytoid" value="<%= game.getSignupPost() %>">
+        <input type="hidden" name="subject" value="test">
+        <input type="hidden" name="body" value="[b]draw[/b]">
+        <input type="submit" value="Draw">
+    </form>
 </body>
 </html>
