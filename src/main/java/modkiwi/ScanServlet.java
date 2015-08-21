@@ -37,7 +37,7 @@ public class ScanServlet extends HttpServlet
 
             for (GameInfo game : DatastoreUtils.gamesByStatus("signups"))
             {
-                LOGGER.info("Scanning %s (in signups)", game.getFullTitle());
+                LOGGER.fine("Scanning %s (in signups)", game.getFullTitle());
                 GameBot bot = BotManager.getBot(game);
 
                 ThreadInfo ti;
@@ -50,7 +50,7 @@ public class ScanServlet extends HttpServlet
                     ti = h.getThread(game.getThread());
                 }
 
-                LOGGER.fine("%d new articles for %s", ti.getArticles().length, game.getFullTitle());
+                LOGGER.finer("%d new articles for %s", ti.getArticles().length, game.getFullTitle());
 
                 if (ti.getArticles().length == 0)
                     continue;
@@ -84,12 +84,12 @@ public class ScanServlet extends HttpServlet
 
                 if (game.readyToStart())
                 {
-                    LOGGER.info("%s is full! Beginning game.", game.getFullTitle());
+                    LOGGER.config("%s is full! Beginning game.", game.getFullTitle());
                     bot.startGame();
                 }
                 else if (game.getMaxPlayers() > 0)
                 {
-                    LOGGER.info("%s has %d / %d players.", game.getFullTitle(), game.getPlayers().size(), game.getMaxPlayers());
+                    LOGGER.config("%s has %d / %d players.", game.getFullTitle(), game.getPlayers().size(), game.getMaxPlayers());
                 }
 
                 game.setLastScanned(articles[articles.length - 1].getId());
@@ -98,7 +98,7 @@ public class ScanServlet extends HttpServlet
 
             for (GameInfo game : DatastoreUtils.gamesByStatus("progress"))
             {
-                LOGGER.info("Scanning %s (in progress)", game.getFullTitle());
+                LOGGER.fine("Scanning %s (in progress)", game.getFullTitle());
                 GameBot bot = BotManager.getBot(game);
                 bot.loadGame();
 
@@ -112,7 +112,7 @@ public class ScanServlet extends HttpServlet
                     ti = h.getThread(game.getThread());
                 }
 
-                LOGGER.fine("%d new articles for %s", ti.getArticles().length, game.getFullTitle());
+                LOGGER.finer("%d new articles for %s", ti.getArticles().length, game.getFullTitle());
 
                 if (ti.getArticles().length == 0)
                     continue;
