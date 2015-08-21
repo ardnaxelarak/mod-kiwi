@@ -444,7 +444,7 @@ public class BotKNG extends GameBot
                 }
                 else
                 {
-                    processAndAddMove("hand", location);
+                    processAndAddMove("hand", location.toUpperCase());
                 }
             }
             else if (command.toLowerCase().startsWith("castle "))
@@ -488,7 +488,7 @@ public class BotKNG extends GameBot
                 }
                 else
                 {
-                    processAndAddMove("castle", sizeStr, location);
+                    processAndAddMove("castle", sizeStr, location.toUpperCase());
                 }
             }
         }
@@ -511,7 +511,7 @@ public class BotKNG extends GameBot
                 }
                 else
                 {
-                    processAndAddMove("place", location);
+                    processAndAddMove("place", location.toUpperCase());
                 }
             }
         }
