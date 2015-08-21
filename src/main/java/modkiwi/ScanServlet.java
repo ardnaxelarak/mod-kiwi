@@ -37,7 +37,7 @@ public class ScanServlet extends HttpServlet
 
             for (GameInfo game : DatastoreUtils.gamesByStatus("signups"))
             {
-                LOGGER.info("Scanning %s", game.getFullTitle());
+                LOGGER.info("Scanning %s (in signups)", game.getFullTitle());
                 GameBot bot = BotManager.getBot(game);
 
                 ThreadInfo ti;
@@ -84,6 +84,45 @@ public class ScanServlet extends HttpServlet
 
                 if (game.readyToStart())
                     bot.startGame();
+
+                game.setLastScanned(articles[articles.length - 1].getId());
+                game.save();
+            }
+
+            for (GameInfo game : DatastoreUtils.gamesByStatus("progress"))
+            {
+                LOGGER.info("Scanning %s (in progress)", game.getFullTitle());
+                GameBot bot = BotManager.getBot(game);
+                bot.loadGame();
+
+                ThreadInfo ti;
+                if (game.getLastScanned() != null)
+                {
+                    ti = h.getThread(game.getThread(), Integer.toString(Integer.parseInt(game.getLastScanned()) + 1));
+                }
+                else
+                {
+                    ti = h.getThread(game.getThread());
+                }
+
+                LOGGER.fine("%d new articles for %s", ti.getArticles().length, game.getFullTitle());
+
+                if (ti.getArticles().length == 0)
+                    continue;
+
+                boolean changed = false;
+
+                ArticleInfo[] articles = ti.getArticles();
+                for (ArticleInfo article : articles)
+                {
+                    String username = article.getUsername();
+                    if (username.equals(h.getUsername()))
+                        continue;
+                    for (String command : article.getCommands())
+                    {
+                        bot.processCommand(username, command);
+                    }
+                }
 
                 game.setLastScanned(articles[articles.length - 1].getId());
                 game.save();
