@@ -6,8 +6,10 @@ import modkiwi.net.RequestBuilder;
 import modkiwi.net.WebConnection;
 import modkiwi.net.WebRequest;
 import modkiwi.net.WebResponse;
+import modkiwi.util.Utils;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
