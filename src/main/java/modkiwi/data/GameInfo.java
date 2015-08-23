@@ -190,6 +190,9 @@ public class GameInfo
         ent.setProperty("title", title);
         ent.setProperty("last_scanned", lastScanned);
 
+        if (maxPlayers > 0)
+            ent.setProperty("max_players", maxPlayers);
+
         ent.setProperty("mods", mods);
         ent.setProperty("players", players);
         ent.setProperty("moves", moves);
