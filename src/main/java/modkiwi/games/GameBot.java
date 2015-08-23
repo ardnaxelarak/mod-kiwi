@@ -16,12 +16,28 @@ public abstract class GameBot
 
     protected GameInfo game;
     protected final Helper helper;
+    protected int NoP;
+    protected String[] players;
 
     protected GameBot(GameInfo game) throws IOException
     {
         this.game = game;
         helper = new Helper();
         helper.login();
+
+        getPlayerData();
+
+        if (game.getStatus().equals("progress"))
+            loadGame();
+    }
+
+    private void getPlayerData()
+    {
+        NoP = game.getPlayers().size();
+        players = new String[NoP];
+        int k = 0;
+        for (String name : game.getPlayers())
+            players[k++] = name;
     }
 
     public abstract void createGame();
@@ -138,6 +154,7 @@ public abstract class GameBot
         Collections.shuffle(game.getPlayers());
         game.setGameStatus("progress");
         updatePlayerList();
+        getPlayerData();
         createGame();
         initialize(true);
         update();
