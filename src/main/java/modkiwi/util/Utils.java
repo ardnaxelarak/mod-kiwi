@@ -60,7 +60,7 @@ public final class Utils
         int index = 0;
         for (String user : list)
         {
-            if (username.equals(user))
+            if (username.equalsIgnoreCase(user))
                 return index;
 
             index++;
