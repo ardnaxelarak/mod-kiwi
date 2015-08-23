@@ -216,4 +216,14 @@ public class GameInfo
     {
         return maxPlayers > 0 && players.size() == maxPlayers;
     }
+
+    public void setDataProperty(String key, Object value)
+    {
+        data.setProperty(key, value);
+    }
+
+    public Object getDataProperty(String key)
+    {
+        return data.getProperty(key);
+    }
 }
