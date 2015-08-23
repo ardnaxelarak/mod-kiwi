@@ -76,6 +76,16 @@ public class Helper
         return conn.execute(request);
     }
 
+    public synchronized WebResponse geekmail(List<String> users, String subject, String content) throws IOException
+    {
+        if (users == null || users.size() == 0)
+            return null;
+
+        String userString = Utils.join(users, ",");
+
+        return geekmail(userString, subject, content);
+    }
+
     public synchronized void thumb(String article) throws IOException
     {
         WebRequest request = RequestBuilder.post()
