@@ -46,7 +46,7 @@ List<GameInfo> progress = (List<GameInfo>)request.getAttribute("progress");
                     </tr>
                     <% for (GameInfo game : signups) { %>
                     <tr>
-                        <td><a href='game/<%= game.getId() %>'><%= game.getFullTitle() %> (<%= game.getPlayers().size() %>)</td>
+                        <td><a href='game/<%= game.getId() %>'><%= game.getFullTitle() %> (<%= game.getPlayers().size() + (game.getMaxPlayers() > 0 ? "/" + game.getMaxPlayers() : "") %>)</td>
                         <td><%= game.getModeratorList() %></td>
                     </tr>
                     <% } %>
