@@ -15,7 +15,6 @@ public class BotTB extends GameBot
 {
     private static final Logger LOGGER = new Logger(BotTB.class);
 
-    private int NoP;
     private String[][] hands;
     private int success, safe, turn, round;
 
@@ -75,13 +74,19 @@ public class BotTB extends GameBot
             player = players[i];
             role = roles.get(i);
 
-            modMessage += player + " - " + role + "\n";
-
             subject = game.getPrefix() + " - YOU ARE " + role.toUpperCase();
             if (role.equals("good"))
+            {
                 message = goodMessage;
+                modMessage += "g{" + player + " - " + role + "}g\n";
+            }
             else
+            {
                 message = evilMessage;
+                modMessage += "r{" + player + " - " + role + "}r\n";
+            }
+
+            message = "[color=purple][b]" + message + "[/color][/b]";
 
             try
             {
@@ -108,7 +113,6 @@ public class BotTB extends GameBot
     {
         String player, message, modMessage;
         String subject = game.getPrefix() + " - Round " + round + " Hand";
-        final int nameLen = 20;
         int success, safe, boom;
         modMessage = "[c]";
         for (int i = 0; i < NoP; i++)
@@ -119,7 +123,7 @@ public class BotTB extends GameBot
             safe = 0;
             boom = 0;
 
-            modMessage += String.format("%-" + nameLen + "s", player);
+            modMessage += Utils.lPadUsername(player);
 
             for (String card : hands[i])
             {
@@ -136,7 +140,7 @@ public class BotTB extends GameBot
                 else if (card.equals("boom"))
                 {
                     boom++;
-                    modMessage += " [b]r{B}r[/b]";
+                    modMessage += " [b][i]r{B}r[/i][/b]";
                 }
                 else
                 {
@@ -164,6 +168,8 @@ public class BotTB extends GameBot
             }
         }
 
+        modMessage += "[/c]";
+
         subject = game.getPrefix() + " - Round " + round + " Hands";
         try
         {
@@ -185,14 +191,16 @@ public class BotTB extends GameBot
             return;
         }
 
-        List<Long> deck = (List<Long>)game.getDataProperty("round" + round + "deck");
+        List<Number> deck = (List<Number>)game.getDataProperty("round" + round + "deck");
 
         int pl = 0, ind = 0;
         int cards = 6 - round;
         String cardName;
+        hands = new String[NoP][];
         hands[0] = new String[cards];
-        for (long card : deck)
+        for (Number cardnum : deck)
         {
+            int card = cardnum.intValue();
             if (card == -1)
                 cardName = "boom";
             else if (card <= success)
@@ -203,7 +211,9 @@ public class BotTB extends GameBot
             hands[pl][ind++] = cardName;
             if (ind == cards)
             {
-                hands[++pl] = new String[cards];
+                pl++;
+                if (pl < NoP)
+                    hands[pl] = new String[cards];
                 ind = 0;
             }
         }
@@ -402,8 +412,8 @@ public class BotTB extends GameBot
 
         for (int i = 0; i < NoP; i++)
         {
-            message += String.format("\n%-15s", players[i]);
-            for (int j = 0; j < hands.length; j++)
+            message += "\n" + Utils.lPadUsername(players[i]);
+            for (int j = 0; j < hands[i].length; j++)
             {
                 if (hands[i][j].equals("drawn"))
                     message += " -";
@@ -411,7 +421,7 @@ public class BotTB extends GameBot
                     message += " " + (j + 1);
             }
         }
-        message += "[/c]";
+        message += "[/c][/color]";
         return message;
     }
 
