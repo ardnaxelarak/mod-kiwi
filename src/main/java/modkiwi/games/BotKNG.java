@@ -194,9 +194,212 @@ public class BotKNG extends GameBot
         }
     }
 
+    private int scoreCastle(int row, int col, int mult, StringBuilder message)
+    {
+        if (message != null)
+            message.append("\n- Castle at " + (((char)row + 'A') + "") + (col + 1) + ": ");
+
+        int start, end;
+        int mine;
+        int value;
+        int total = 0;
+        boolean dragon, first;
+        String tile;
+
+        // score row
+        mine = mult;
+        dragon = false;
+        first = true;
+        start = col;
+        end = col;
+
+        // find start of scoring area
+        while ((tile = getTile(row, start - 1)) != null && !tile.equals("mountain"))
+        {
+            start--;
+            if (tile.equals("dragon"))
+                dragon = true;
+            if (tile.equals("goldmine"))
+                mine <<= 1;
+        }
+
+        // find end of scoring area
+        while ((tile = getTile(row, end + 1)) != null && !tile.equals("mountain"))
+        {
+            end++;
+            if (tile.equals("dragon"))
+                dragon = true;
+            if (tile.equals("goldmine"))
+                mine <<= 1;
+        }
+
+        for (int i = start; i <= end; i++)
+        {
+            tile = getTile(row, i);
+            if (tile.charAt(0) == '+' && !dragon)
+            {
+                value = Integer.parseInt(tile);
+                if (message != null)
+                {
+                    if (first)
+                    {
+                        message.append("(");
+                        first = false;
+                    }
+                    else
+                        message.append(" + ");
+                    message.append(value);
+                }
+                total += value * mine;
+            }
+            else if (tile.charAt(0) == '-')
+            {
+                value = Integer.parseInt(tile);
+                if (message != null)
+                {
+                    if (first)
+                    {
+                        message.append("(-");
+                        first = false;
+                    }
+                    else
+                        message.append(" - ");
+                    message.append(-value);
+                }
+                total += value * mine;
+            }
+        }
+
+        if (message != null)
+        {
+            if (first)
+                message.append("0 * ");
+            else
+                message.append(") * ");
+            message.append(mine + " + ");
+        }
+
+        // score column
+        mine = mult;
+        dragon = false;
+        first = true;
+        start = row;
+        end = row;
+
+        // find start of scoring area
+        while ((tile = getTile(start - 1, col)) != null && !tile.equals("mountain"))
+        {
+            start--;
+            if (tile.equals("dragon"))
+                dragon = true;
+            if (tile.equals("goldmine"))
+                mine <<= 1;
+        }
+
+        // find end of scoring area
+        while ((tile = getTile(end + 1, col)) != null && !tile.equals("mountain"))
+        {
+            end++;
+            if (tile.equals("dragon"))
+                dragon = true;
+            if (tile.equals("goldmine"))
+                mine <<= 1;
+        }
+
+        for (int i = start; i <= end; i++)
+        {
+            tile = getTile(i, col);
+            if (tile.charAt(0) == '+' && !dragon)
+            {
+                value = Integer.parseInt(tile);
+                if (message != null)
+                {
+                    if (first)
+                    {
+                        message.append("(");
+                        first = false;
+                    }
+                    else
+                        message.append(" + ");
+                    message.append(value);
+                }
+                total += value * mine;
+            }
+            else if (tile.charAt(0) == '-')
+            {
+                value = Integer.parseInt(tile);
+                if (message != null)
+                {
+                    if (first)
+                    {
+                        message.append("(-");
+                        first = false;
+                    }
+                    else
+                        message.append(" - ");
+                    message.append(-value);
+                }
+                total += value * mine;
+            }
+        }
+
+        if (message != null)
+        {
+            if (first)
+                message.append("0 * ");
+            else
+                message.append(") * ");
+            message.append(mine + " = " + total);
+        }
+
+        return total;
+    }
+
     private void scoreRound(boolean fresh)
     {
+        StringBuilder message = null;
 
+        if (fresh)
+            message = new StringBuilder(getCurrentBoard());
+
+        String tile;
+        int mult;
+
+        for (int i = 0; i < NoP; i++)
+        {
+            if (fresh)
+                message.append("\n\n[color=#008800]Scoring " + players[i] + ":");
+
+            String color = colors[i];
+
+            for (int row = 0; row < board.length; row++)
+            {
+                for (int col = 0; col < board[row].length; col++)
+                {
+                    tile = board[row][col];
+                    if (tile.startsWith(color))
+                    {
+                        mult = Integer.parseInt(tile.substring(color.length()));
+                        scores[i] += scoreCastle(row, col, mult, message);
+                    }
+                }
+            }
+
+            if (fresh)
+                message.append("[/color]");
+        }
+
+        if (fresh)
+        {
+            try
+            {
+                helper.replyThread(game.getThread(), null, new String(message));
+            }
+            catch (IOException e)
+            {
+                LOGGER.throwing("update()", e);
+            }
+        }
     }
 
     private boolean hasCastles(int player)
@@ -311,8 +514,8 @@ public class BotKNG extends GameBot
 
     private String getTile(int row, int col)
     {
-        if (row < 0 || row > board.length ||
-            col < 0 || col > board[row].length)
+        if (row < 0 || row >= board.length ||
+            col < 0 || col >= board[row].length)
             return null;
 
         return board[row][col];
