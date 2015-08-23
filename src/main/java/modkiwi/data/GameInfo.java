@@ -122,6 +122,28 @@ public class GameInfo
         return players;
     }
 
+    public List<String> getNonPlayerMods()
+    {
+        LinkedList<String> ret = new LinkedList<String>(getMods());
+        ListIterator<String> li = ret.listIterator(0);
+        List<String> players = getPlayers();
+        String current;
+        while (li.hasNext())
+        {
+            current = li.next();
+            for (String player : players)
+            {
+                if (current.equals(player))
+                {
+                    li.remove();
+                    break;
+                }
+            }
+        }
+
+        return ret;
+    }
+
     public List<String> getMoves()
     {
         return moves;
