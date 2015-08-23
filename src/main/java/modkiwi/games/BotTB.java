@@ -6,6 +6,7 @@ import modkiwi.util.Logger;
 import modkiwi.util.Utils;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -328,9 +329,9 @@ public class BotTB extends GameBot
             else if (success == NoP)
                 endGame(fresh, true);
             else if ((success + safe) % NoP == 0)
-                turn = pl;
-            else
                 newRound(fresh);
+            else
+                turn = pl;
         }
         else
         {
@@ -406,6 +407,8 @@ public class BotTB extends GameBot
                 message += success + " x g{SUCCESS}g\n";
             if (safe > 0)
                 message += safe + " x b{SAFE}b\n";
+
+            message += "\n";
         }
 
         message += "[u]Cards remaining:[/u][c]";
