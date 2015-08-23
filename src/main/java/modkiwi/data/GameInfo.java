@@ -32,7 +32,7 @@ public class GameInfo
         lastScanned = (String)ent.getProperty("last_scanned");
 
         if (ent.getProperty("max_players") != null)
-            maxPlayers = (int)(long)ent.getProperty("max_players");
+            maxPlayers = ((Number)ent.getProperty("max_players")).intValue();
         else
             maxPlayers = -1;
 
