@@ -355,7 +355,7 @@ public class BotTB extends GameBot
                 return;
             }
             name = command.substring(7, command.lastIndexOf(" "));
-            position = command.substring(command.lastIndexOf(" "));
+            position = command.substring(command.lastIndexOf(" ") + 1);
 
             int pl = Utils.getUser(name, players);
             if (pl == -1)
