@@ -1,5 +1,7 @@
 package modkiwi.util;
 
+import static modkiwi.util.Constants.*;
+
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -46,7 +48,6 @@ public final class Utils
 
     public static String lPadUsername(String name)
     {
-        final int MAX_USERNAME_LENGTH = 15;
         return lPad(name, MAX_USERNAME_LENGTH);
     }
 
