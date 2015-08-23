@@ -344,7 +344,7 @@ public class BotTB extends GameBot
     {
         String name, position;
         int index;
-        if (command.startsWith("choose "))
+        if (command.toLowerCase().startsWith("choose "))
         {
             if (!username.equals(players[turn]))
                 return;
