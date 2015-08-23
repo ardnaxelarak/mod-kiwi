@@ -9,6 +9,7 @@ import modkiwi.net.NetConnection;
 import modkiwi.util.DatastoreUtils;
 import modkiwi.util.Logger;
 import modkiwi.util.Utils;
+import static modkiwi.util.Constants.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -35,7 +36,7 @@ public class ScanServlet extends HttpServlet
             Helper h = new Helper(new NetConnection());
             h.login();
 
-            for (GameInfo game : DatastoreUtils.gamesByStatus("signups"))
+            for (GameInfo game : DatastoreUtils.gamesByStatus(STATUS_IN_SIGNUPS))
             {
                 LOGGER.fine("Scanning %s (in signups)", game.getFullTitle());
                 GameBot bot = BotManager.getBot(game);
@@ -96,7 +97,7 @@ public class ScanServlet extends HttpServlet
                 game.save();
             }
 
-            for (GameInfo game : DatastoreUtils.gamesByStatus("progress"))
+            for (GameInfo game : DatastoreUtils.gamesByStatus(STATUS_IN_PROGRESS))
             {
                 LOGGER.fine("Scanning %s (in progress)", game.getFullTitle());
                 GameBot bot = BotManager.getBot(game);

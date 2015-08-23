@@ -4,6 +4,7 @@ import modkiwi.Helper;
 import modkiwi.data.GameInfo;
 import modkiwi.util.Logger;
 import modkiwi.util.Utils;
+import static modkiwi.util.Constants.*;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -27,7 +28,7 @@ public abstract class GameBot
 
         getPlayerData();
 
-        if (game.getGameStatus().equals("progress"))
+        if (game.getGameStatus().equals(STATUS_IN_PROGRESS))
             loadGame();
     }
 
@@ -183,6 +184,6 @@ public abstract class GameBot
             LOGGER.throwing("endGame()", e);
         }
 
-        game.setGameStatus("finished");
+        game.setGameStatus(STATUS_FINISHED);
     }
 }

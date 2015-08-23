@@ -1,6 +1,7 @@
 package modkiwi;
 
 import modkiwi.data.GameInfo;
+import static modkiwi.util.Constants.*;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -36,7 +37,7 @@ public class IndexServlet extends HttpServlet
         Query q;
         PreparedQuery pq;
 
-        q = new Query("Game").addFilter("game_status", Query.FilterOperator.EQUAL, "signups");
+        q = new Query("Game").addFilter("game_status", Query.FilterOperator.EQUAL, STATUS_IN_SIGNUPS);
         pq = datastore.prepare(q);
 
         for (Entity ent : pq.asIterable())
@@ -44,7 +45,7 @@ public class IndexServlet extends HttpServlet
             signups.add(new GameInfo(ent));
         }
 
-        q = new Query("Game").addFilter("game_status", Query.FilterOperator.EQUAL, "progress");
+        q = new Query("Game").addFilter("game_status", Query.FilterOperator.EQUAL, STATUS_IN_PROGRESS);
         pq = datastore.prepare(q);
 
         for (Entity ent : pq.asIterable())

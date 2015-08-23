@@ -1,6 +1,7 @@
 package modkiwi;
 
 import modkiwi.util.Logger;
+import static modkiwi.util.Constants.*;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -64,7 +65,7 @@ public class CreateGameServlet extends HttpServlet
             {
                 LOGGER.info("no value for max_players");
             }
-            ent.setProperty("game_status", "signups");
+            ent.setProperty("game_status", STATUS_IN_SIGNUPS);
             datastore.put(ent);
             txn.commit();
             resp.sendRedirect("/game/" + id);
