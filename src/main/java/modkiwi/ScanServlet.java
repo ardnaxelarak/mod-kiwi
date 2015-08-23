@@ -117,8 +117,6 @@ public class ScanServlet extends HttpServlet
                 if (ti.getArticles().length == 0)
                     continue;
 
-                boolean changed = false;
-
                 ArticleInfo[] articles = ti.getArticles();
                 for (ArticleInfo article : articles)
                 {
@@ -127,7 +125,7 @@ public class ScanServlet extends HttpServlet
                         continue;
                     for (String command : article.getCommands())
                     {
-                        bot.processCommand(username, command);
+                        bot.parseCommand(username, command);
                     }
                 }
 

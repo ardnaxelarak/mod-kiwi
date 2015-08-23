@@ -95,6 +95,18 @@ public abstract class GameBot
 
     public abstract void processCommand(String username, String command);
 
+    public void parseCommand(String username, String command)
+    {
+        if (command.equalsIgnoreCase("show status"))
+        {
+            update();
+        }
+        else
+        {
+            processCommand(username, command);
+        }
+    }
+
     public abstract String getCurrentStatus();
 
     public void updateStatus()
