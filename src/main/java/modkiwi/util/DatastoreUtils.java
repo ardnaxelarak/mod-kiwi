@@ -5,6 +5,9 @@ import modkiwi.data.GameInfo;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 
@@ -31,5 +34,22 @@ public final class DatastoreUtils
         }
 
         return list;
+    }
+
+    public static GameInfo loadGame(String gameid)
+    {
+        Key key = KeyFactory.createKey("Game", gameid);
+        Entity ent = null;
+
+        try
+        {
+            ent = datastore.get(key);
+        }
+        catch (EntityNotFoundException e)
+        {
+            return null;
+        }
+
+        return new GameInfo(ent);
     }
 }
