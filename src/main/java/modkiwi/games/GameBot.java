@@ -27,7 +27,7 @@ public abstract class GameBot
 
         getPlayerData();
 
-        if (game.getStatus().equals("progress"))
+        if (game.getGameStatus().equals("progress"))
             loadGame();
     }
 
