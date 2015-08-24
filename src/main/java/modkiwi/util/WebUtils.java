@@ -211,13 +211,4 @@ public class WebUtils
         WebResponse response = conn.execute(request);
         return new ThreadInfo(response.parse().select("thread").first());
     }
-
-    public synchronized WebResponse testCookies() throws IOException
-    {
-        WebRequest request = RequestBuilder.get()
-                .setUrl("http://boardgamegeek.com/")
-                .build();
-
-        return conn.execute(request);
-    }
 }
