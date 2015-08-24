@@ -22,9 +22,8 @@ public class BotKNG extends GameBot
 
     private String[][] board;
     private int[][] castles;
-    private String[] hand, colors, players;
+    private String[] hand, colors;
     private int[] scores;
-    private int NoP;
     private Map<String, Integer> revColors;
     private String step;
     private int turn;
@@ -475,18 +474,12 @@ public class BotKNG extends GameBot
     @Override
     public void initialize(boolean fresh)
     {
-        NoP = game.getPlayers().size();
-        players = new String[NoP];
         board = new String[5][6];
         castles = new int[NoP][4];
         scores = new int[NoP];
         hand = new String[NoP];
         colors = new String[NoP];
         revColors = new HashMap<String, Integer>();
-
-        int k = 0;
-        for (String player : game.getPlayers())
-            players[k++] = player;
 
         for (String[] row : board)
             Arrays.fill(row, "empty");
