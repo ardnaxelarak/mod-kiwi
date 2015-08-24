@@ -18,7 +18,7 @@
 </servlet>
 <servlet-mapping>
     <servlet-name>CreateGameServlet</servlet-name>
-    <url-pattern>/a/create</url-pattern>
+    <url-pattern>/create</url-pattern>
 </servlet-mapping>
 
 <security-constraint>

@@ -2,40 +2,19 @@
 <%@ page import="com.google.appengine.api.users.User" %>
 <%@ page import="com.google.appengine.api.users.UserService" %>
 <%@ page import="com.google.appengine.api.users.UserServiceFactory" %>
-<%@ page import="org.reflections.Reflections" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
-<%@ page import="java.util.Set" %>
-<%@ page import="java.util.regex.Pattern" %>
-<%@ page import="java.util.regex.Matcher" %>
-<%@ page import="modkiwi.games.GameBot" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
-<%
-    Reflections reflections = new Reflections("modkiwi.games");
-    Set<Class<? extends GameBot>> subTypes = reflections.getSubTypesOf(GameBot.class);
-    Map<String, String> gametypes = new HashMap<String, String>();
-    Pattern p = Pattern.compile("^modkiwi\\.games\\.Bot(.*)$");
-    for (Class<? extends GameBot> cl : subTypes)
-    {
-        Matcher m = p.matcher(cl.getName());
-        if (m.find())
-        {
-            String fullname = cl.getField("LONG_NAME").get(null).toString();
-            gametypes.put(m.group(1), fullname);
-        }
-    }
-%>
+<% Map<String, String> gametypes = (Map<String, String>)request.getAttribute("gametypes"); %>
 
 <html>
 <head>
-    <link type="text/css" rel="stylesheet" href="main.css" />
-    <script src="webjars/jquery/2.1.4/jquery.min.js"> </script>
+    <link type="text/css" rel="stylesheet" href="../main.css" />
+    <script src="../webjars/jquery/2.1.4/jquery.min.js"> </script>
 </head>
 
 <body>
-    <form action="a/create" method="post">
+    <form action="create" method="post">
         Game Type:
         <select name="gametype">
             <% for (Map.Entry<String, String> entry : gametypes.entrySet()) { %>
