@@ -5,6 +5,7 @@ import modkiwi.data.ThreadInfo;
 import modkiwi.net.GAEConnection;
 import modkiwi.net.NetConnection;
 import modkiwi.net.WebResponse;
+import modkiwi.util.WebUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -21,20 +22,20 @@ public class AdminServlet extends HttpServlet
         resp.setContentType("text/plain");
         PrintWriter pw = resp.getWriter();
         pw.println("Creating Helper...");
-        Helper h = new Helper(new NetConnection(pw));
+        WebUtils web = new WebUtils(new NetConnection(pw));
 
         pw.println("Logging in...");
-        response = h.login();
+        response = web.login();
         pw.println(response.getFinalUrl());
 
         pw.println("Sending geekmail...");
-        response = h.geekmail("Kiwi13cubed", "Test", "silly fruits!");
+        response = web.geekmail("Kiwi13cubed", "Test", "silly fruits!");
         pw.println(response.getFinalUrl());
 
         pw.println("geekmail sent...");
         /*
-        h.replyThread("1140569", null, "huh?");
-        ThreadInfo t = h.getThread("1140569");
+        web.replyThread("1140569", null, "huh?");
+        ThreadInfo t = web.getThread("1140569");
         ArticleInfo[] a = t.getArticles();
         System.out.println(a[a.length - 1].getBody());
         */

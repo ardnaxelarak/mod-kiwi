@@ -1,6 +1,5 @@
 package modkiwi.games;
 
-import modkiwi.Helper;
 import modkiwi.data.GameInfo;
 import modkiwi.util.Logger;
 import modkiwi.util.Utils;
@@ -92,7 +91,7 @@ public class BotTB extends GameBot
 
             try
             {
-                helper.geekmail(player, subject, message);
+                web.geekmail(player, subject, message);
             }
             catch (IOException e)
             {
@@ -103,7 +102,7 @@ public class BotTB extends GameBot
         subject = game.getPrefix() + " - Player Roles";
         try
         {
-            helper.geekmail(game.getNonPlayerMods(), subject, modMessage);
+            web.geekmail(game.getNonPlayerMods(), subject, modMessage);
         }
         catch (IOException e)
         {
@@ -162,7 +161,7 @@ public class BotTB extends GameBot
 
             try
             {
-                helper.geekmail(player, subject, message);
+                web.geekmail(player, subject, message);
             }
             catch (IOException e)
             {
@@ -175,7 +174,7 @@ public class BotTB extends GameBot
         subject = game.getPrefix() + " - Round " + round + " Hands";
         try
         {
-            helper.geekmail(game.getNonPlayerMods(), subject, modMessage);
+            web.geekmail(game.getNonPlayerMods(), subject, modMessage);
         }
         catch (IOException e)
         {
@@ -225,7 +224,7 @@ public class BotTB extends GameBot
             sendHands();
             try
             {
-                helper.replyThread(game.getThread(), null, "[color=purple][b]Round " + round + " has begun. Hands have been geekmailed to all players.[/b][/color]");
+                web.replyThread(game.getThread(), null, "[color=purple][b]Round " + round + " has begun. Hands have been geekmailed to all players.[/b][/color]");
             }
             catch (IOException e)
             {
@@ -261,7 +260,7 @@ public class BotTB extends GameBot
 
             try
             {
-                helper.replyThread(game.getThread(), null, message);
+                web.replyThread(game.getThread(), null, message);
             }
             catch (IOException e)
             {
@@ -285,7 +284,7 @@ public class BotTB extends GameBot
             message += Utils.join(winners, ", ") + ") wins![/b][/color]";
             try
             {
-                helper.replyThread(game.getThread(), null, message);
+                web.replyThread(game.getThread(), null, message);
             }
             catch (IOException e)
             {
@@ -330,7 +329,7 @@ public class BotTB extends GameBot
             {
                 try
                 {
-                    helper.replyThread(game.getThread(), null, message);
+                    web.replyThread(game.getThread(), null, message);
                 }
                 catch (IOException e)
                 {

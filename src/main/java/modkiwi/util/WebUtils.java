@@ -1,4 +1,4 @@
-package modkiwi;
+package modkiwi.util;
 
 import modkiwi.data.ThreadInfo;
 import modkiwi.net.NetConnection;
@@ -16,17 +16,17 @@ import java.util.regex.Pattern;
 import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.urlfetch.*;
 
-public class Helper
+public class WebUtils
 {
     private String username;
     private WebConnection conn;
 
-    public Helper()
+    public WebUtils()
     {
         conn = new NetConnection();
     }
 
-    public Helper(WebConnection conn)
+    public WebUtils(WebConnection conn)
     {
         this.conn = conn;
     }

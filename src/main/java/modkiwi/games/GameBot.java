@@ -1,9 +1,9 @@
 package modkiwi.games;
 
-import modkiwi.Helper;
 import modkiwi.data.GameInfo;
 import modkiwi.util.Logger;
 import modkiwi.util.Utils;
+import modkiwi.util.WebUtils;
 import static modkiwi.util.Constants.*;
 
 import java.io.IOException;
@@ -16,15 +16,15 @@ public abstract class GameBot
     private static final Logger LOGGER = new Logger(GameBot.class);
 
     protected GameInfo game;
-    protected final Helper helper;
+    protected final WebUtils web;
     protected int NoP;
     protected String[] players;
 
     protected GameBot(GameInfo game) throws IOException
     {
         this.game = game;
-        helper = new Helper();
-        helper.login();
+        web = new WebUtils();
+        web.login();
 
         getPlayerData();
 
@@ -116,7 +116,7 @@ public abstract class GameBot
         {
             try
             {
-                helper.edit(game.getStatusPost(), "Current Status", getCurrentStatus());
+                web.edit(game.getStatusPost(), "Current Status", getCurrentStatus());
             }
             catch (IOException e)
             {
@@ -154,7 +154,7 @@ public abstract class GameBot
 
         try
         {
-            helper.edit(game.getSignupPost(), "Player List", listText);
+            web.edit(game.getSignupPost(), "Player List", listText);
         }
         catch (IOException e)
         {
@@ -189,7 +189,7 @@ public abstract class GameBot
         // should probably print something more informative
         try
         {
-            helper.replyThread(game.getThread(), null, "[color=purple][b]Game is over.[/b][/color]");
+            web.replyThread(game.getThread(), null, "[color=purple][b]Game is over.[/b][/color]");
         }
         catch (IOException e)
         {

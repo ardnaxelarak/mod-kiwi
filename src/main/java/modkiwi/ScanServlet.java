@@ -5,10 +5,10 @@ import modkiwi.data.GameInfo;
 import modkiwi.data.ThreadInfo;
 import modkiwi.games.BotManager;
 import modkiwi.games.GameBot;
-import modkiwi.net.NetConnection;
 import modkiwi.util.DatastoreUtils;
 import modkiwi.util.Logger;
 import modkiwi.util.Utils;
+import modkiwi.util.WebUtils;
 import static modkiwi.util.Constants.*;
 
 import java.io.IOException;
@@ -33,8 +33,8 @@ public class ScanServlet extends HttpServlet
             resp.setContentType("text/plain");
             PrintWriter pw = resp.getWriter();
 
-            Helper h = new Helper(new NetConnection());
-            h.login();
+            WebUtils web = new WebUtils();
+            web.login();
 
             for (GameInfo game : DatastoreUtils.gamesByStatus(STATUS_IN_SIGNUPS))
             {
@@ -44,11 +44,11 @@ public class ScanServlet extends HttpServlet
                 ThreadInfo ti;
                 if (game.getLastScanned() != null)
                 {
-                    ti = h.getThread(game.getThread(), Integer.toString(Integer.parseInt(game.getLastScanned()) + 1));
+                    ti = web.getThread(game.getThread(), Integer.toString(Integer.parseInt(game.getLastScanned()) + 1));
                 }
                 else
                 {
-                    ti = h.getThread(game.getThread());
+                    ti = web.getThread(game.getThread());
                 }
 
                 LOGGER.finer("%d new articles for %s", ti.getArticles().length, game.getFullTitle());
@@ -63,7 +63,7 @@ public class ScanServlet extends HttpServlet
                 for (ArticleInfo article : articles)
                 {
                     String username = article.getUsername();
-                    if (username.equals(h.getUsername()))
+                    if (username.equals(web.getUsername()))
                         continue;
                     for (String command : article.getCommands())
                     {
@@ -74,7 +74,7 @@ public class ScanServlet extends HttpServlet
 
                 if (!guesses.isEmpty())
                 {
-                    h.replyThread(game.getThread(), null, Utils.join(guesses, "\n"));
+                    web.replyThread(game.getThread(), null, Utils.join(guesses, "\n"));
                 }
 
                 // Update post containing signup list
@@ -105,11 +105,11 @@ public class ScanServlet extends HttpServlet
                 ThreadInfo ti;
                 if (game.getLastScanned() != null)
                 {
-                    ti = h.getThread(game.getThread(), Integer.toString(Integer.parseInt(game.getLastScanned()) + 1));
+                    ti = web.getThread(game.getThread(), Integer.toString(Integer.parseInt(game.getLastScanned()) + 1));
                 }
                 else
                 {
-                    ti = h.getThread(game.getThread());
+                    ti = web.getThread(game.getThread());
                 }
 
                 LOGGER.finer("%d new articles for %s", ti.getArticles().length, game.getFullTitle());
@@ -121,7 +121,7 @@ public class ScanServlet extends HttpServlet
                 for (ArticleInfo article : articles)
                 {
                     String username = article.getUsername();
-                    if (username.equals(h.getUsername()))
+                    if (username.equals(web.getUsername()))
                         continue;
                     for (String command : article.getCommands())
                     {
