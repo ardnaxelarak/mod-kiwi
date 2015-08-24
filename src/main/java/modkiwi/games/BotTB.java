@@ -14,6 +14,8 @@ import java.util.List;
 
 public class BotTB extends GameBot
 {
+    public static final String LONG_NAME = "TimeBomb";
+
     private static final Logger LOGGER = new Logger(BotTB.class);
 
     private String[][] hands;

@@ -15,6 +15,8 @@ import java.util.Map;
 
 public class BotKNG extends GameBot
 {
+    public static final String LONG_NAME = "Kingdoms";
+
     private static final Logger LOGGER = new Logger(BotKNG.class);
 
     private static final Map<String, String> IMAGES = createImageMap();
