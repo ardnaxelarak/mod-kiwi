@@ -4,6 +4,7 @@ import modkiwi.Helper;
 import modkiwi.data.GameInfo;
 import modkiwi.util.Logger;
 import modkiwi.util.Utils;
+import static modkiwi.util.Constants.*;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -220,7 +221,17 @@ public class BotTB extends GameBot
         }
 
         if (fresh)
+        {
             sendHands();
+            try
+            {
+                helper.replyThread(game.getThread(), null, "[color=purple][b]Round " + round + " has begun. Hands have been geekmailed to all players.[/b][/color]");
+            }
+            catch (IOException e)
+            {
+                LOGGER.throwing("newRound()", e);
+            }
+        }
 
         turn = round - 1;
     }
@@ -242,17 +253,20 @@ public class BotTB extends GameBot
     @Override
     protected void update()
     {
-        String message = getCurrentStatus() + "\n\n";
-        message += "[color=purple][b]" + players[turn] + " is up.[/b][/color]\n";
-        message += "[color=#008800]Please [b]choose [i]player[/i] [i]position[/i][/b][/color]";
+        if (game.getGameStatus().equals(STATUS_IN_PROGRESS))
+        {
+            String message = getCurrentStatus() + "\n\n";
+            message += "[color=purple][b]" + players[turn] + " is up.[/b][/color]\n";
+            message += "[color=#008800]Please [b]choose [i]player[/i] [i]position[/i][/b][/color]";
 
-        try
-        {
-            helper.replyThread(game.getThread(), null, message);
-        }
-        catch (IOException e)
-        {
-            LOGGER.throwing("update()", e);
+            try
+            {
+                helper.replyThread(game.getThread(), null, message);
+            }
+            catch (IOException e)
+            {
+                LOGGER.throwing("update()", e);
+            }
         }
     }
 
@@ -295,17 +309,17 @@ public class BotTB extends GameBot
 
             if (card.equals("success"))
             {
-                message = "[color=green]" + players[turn] + "has drawn a [b]g{SUCCESS}g[/b] card![/color]";
+                message = "[color=green]" + players[turn] + " has drawn a [b]g{SUCCESS}g[/b] card![/color]";
                 success++;
             }
             else if (card.equals("safe"))
             {
-                message = "[color=green]" + players[turn] + "has drawn a [b]b{SAFE}b[/b] card.[/color]";
+                message = "[color=green]" + players[turn] + " has drawn a [b]b{SAFE}b[/b] card.[/color]";
                 safe++;
             }
             else if (card.equals("boom"))
             {
-                message = "[color=green]" + players[turn] + "has drawn a [b][i]r{BOOM}r[/i][/b] card![/color]";
+                message = "[color=green]" + players[turn] + " has drawn a [b][i]r{BOOM}r[/i][/b] card![/color]";
             }
             else
             {
@@ -400,6 +414,7 @@ public class BotTB extends GameBot
     public String getCurrentStatus()
     {
         String message = "[color=#008800]";
+        message += "[size=14]Round " + round + " (" + (NoP * round - success - safe) + " cards remaining)[/size]\n\n";
         if (success + safe > 0)
         {
             message += "[u]Cards drawn:[/u]\n";
