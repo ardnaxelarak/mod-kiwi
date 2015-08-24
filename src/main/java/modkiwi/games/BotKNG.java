@@ -394,7 +394,7 @@ public class BotKNG extends GameBot
         {
             try
             {
-                web.replyThread(game.getThread(), null, new String(message));
+                web.replyThread(game, new String(message));
             }
             catch (IOException e)
             {
@@ -464,7 +464,7 @@ public class BotKNG extends GameBot
         {
             try
             {
-                web.replyThread(game.getThread(), null, message);
+                web.replyThread(game, message);
             }
             catch (IOException e)
             {
@@ -550,7 +550,7 @@ public class BotKNG extends GameBot
                 {
                     try
                     {
-                        web.replyThread(game.getThread(), null, "[color=#008800]" + players[turn] + " cannot make a legal move and must pass.[/color]");
+                        web.replyThread(game, "[color=#008800]" + players[turn] + " cannot make a legal move and must pass.[/color]");
                     }
                     catch (IOException e)
                     {

@@ -1,5 +1,6 @@
 package modkiwi.util;
 
+import modkiwi.data.GameInfo;
 import modkiwi.data.ThreadInfo;
 import modkiwi.net.NetConnection;
 import modkiwi.net.RequestBuilder;
@@ -160,6 +161,11 @@ public class WebUtils
             return matcher.group(1);
         else
             return null;
+    }
+
+    public synchronized String replyThread(GameInfo game, String content) throws IOException
+    {
+        return replyThread(game.getThread(), null, content);
     }
 
     public synchronized ThreadInfo getThread(String thread, String article, int max) throws IOException
