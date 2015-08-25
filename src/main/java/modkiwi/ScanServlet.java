@@ -129,6 +129,7 @@ public class ScanServlet extends HttpServlet
                     }
                 }
 
+                bot.finishedScanning();
                 game.setLastScanned(articles[articles.length - 1].getId());
                 game.save();
             }

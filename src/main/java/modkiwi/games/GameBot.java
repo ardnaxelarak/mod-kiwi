@@ -53,6 +53,10 @@ public abstract class GameBot
     {
         processMove(true, move);
         game.getMoves().add(Utils.join(move, " "));
+    }
+
+    public void finishedScanning()
+    {
         update();
         updateStatus();
     }
