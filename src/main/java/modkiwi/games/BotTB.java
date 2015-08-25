@@ -438,25 +438,24 @@ public class BotTB extends GameBot
             message += "\n";
         }
 
-        message += "[u]Cards remaining:[/u][c]";
+        message += "[u]Cards remaining:[/u][/color]";
 
         for (int i = 0; i < NoP; i++)
         {
-            message += "\n" + Utils.lPadUsername(players[i]);
+            message += "\n[color=#008800][c]" + Utils.lPadUsername(players[i]);
             for (int j = 0; j < hands[i].length; j++)
             {
                 if (!drawn[i][j])
                     message += " " + (j + 1);
                 else if (hands[i][j].equals("safe"))
-                    message += " b{-}b";
+                    message += " [b]b{-}b[/b]";
                 else if (hands[i][j].equals("success"))
                     message += " [b]g{S}g[/b]";
                 else if (hands[i][j].equals("boom"))
                     message += " [b][i]r{F}r[/i][/b]";
             }
-            message += " (" + claims[i] + ")";
+            message += "  [/c][/color] (" + claims[i] + ")";
         }
-        message += "[/c][/color]";
         return message;
     }
 
