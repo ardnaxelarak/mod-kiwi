@@ -19,6 +19,7 @@ public abstract class GameBot
     protected final WebUtils web;
     protected int NoP;
     protected String[] players;
+    private boolean changed;
 
     protected GameBot(GameInfo game) throws IOException
     {
@@ -53,12 +54,22 @@ public abstract class GameBot
     {
         processMove(true, move);
         game.getMoves().add(Utils.join(move, " "));
+        changed = true;
+    }
+
+    public void startScanning()
+    {
+        changed = false;
     }
 
     public void finishedScanning()
     {
-        update();
-        updateStatus();
+        if (changed)
+        {
+            update();
+            updateStatus();
+            changed = false;
+        }
     }
 
     public boolean processSignupCommand(String username, String command, List<String> guesses)
@@ -103,7 +114,7 @@ public abstract class GameBot
     {
         if (command.equalsIgnoreCase("show status"))
         {
-            update();
+            changed = true;
         }
         else
         {

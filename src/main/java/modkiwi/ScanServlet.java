@@ -101,6 +101,7 @@ public class ScanServlet extends HttpServlet
             {
                 LOGGER.fine("Scanning %s (in progress)", game.getFullTitle());
                 GameBot bot = BotManager.getBot(game);
+                bot.startScanning();
 
                 ThreadInfo ti;
                 if (game.getLastScanned() != null)
