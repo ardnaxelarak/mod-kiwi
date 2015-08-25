@@ -442,7 +442,7 @@ public class BotTB extends GameBot
 
         for (int i = 0; i < NoP; i++)
         {
-            message += "\n[color=#008800][c]" + Utils.lPadUsername(players[i]);
+            message += "\n[color=#008800][size=12][c]" + Utils.lPadUsername(players[i]);
             for (int j = 0; j < hands[i].length; j++)
             {
                 if (!drawn[i][j])
@@ -454,7 +454,7 @@ public class BotTB extends GameBot
                 else if (hands[i][j].equals("boom"))
                     message += " [b][i]r{F}r[/i][/b]";
             }
-            message += "  [/c][/color] (" + claims[i] + ")";
+            message += "  [/c][/size][/color] (" + claims[i] + ")";
         }
         return message;
     }
