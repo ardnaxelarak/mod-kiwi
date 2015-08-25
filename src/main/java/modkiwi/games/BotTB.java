@@ -19,6 +19,7 @@ public class BotTB extends GameBot
     private static final Logger LOGGER = new Logger(BotTB.class);
 
     private String[][] hands;
+    private boolean[][] drawn;
     private String[] claims;
     private int success, safe, turn, round;
 
@@ -196,8 +197,8 @@ public class BotTB extends GameBot
         int pl = 0, ind = 0;
         int cards = 6 - round;
         String cardName;
-        hands = new String[NoP][];
-        hands[0] = new String[cards];
+        hands = new String[NoP][cards];
+        drawn = new boolean[NoP][cards];
         for (Number cardnum : deck)
         {
             int card = cardnum.intValue();
@@ -212,8 +213,6 @@ public class BotTB extends GameBot
             if (ind == cards)
             {
                 pl++;
-                if (pl < NoP)
-                    hands[pl] = new String[cards];
                 ind = 0;
             }
         }
@@ -306,7 +305,7 @@ public class BotTB extends GameBot
             String card = hands[pl][ind];
             String message = null;
 
-            hands[pl][ind] = "drawn";
+            drawn[pl][ind] = true;
 
             if (card.equals("success"))
             {
@@ -406,7 +405,7 @@ public class BotTB extends GameBot
                 return;
             }
 
-            if (hands[pl][pos].equals("drawn"))
+            if (drawn[pl][pos])
             {
                 LOGGER.info("%s attempted to draw an already-drawn card", players[turn]);
                 return;
@@ -446,10 +445,14 @@ public class BotTB extends GameBot
             message += "\n" + Utils.lPadUsername(players[i]);
             for (int j = 0; j < hands[i].length; j++)
             {
-                if (hands[i][j].equals("drawn"))
-                    message += " -";
-                else
+                if (!drawn[i][j])
                     message += " " + (j + 1);
+                else if (hands[i][j].equals("safe"))
+                    message += " b{-}b";
+                else if (hands[i][j].equals("success"))
+                    message += " [b]g{S}g[/b]";
+                else if (hands[i][j].equals("boom"))
+                    message += " [b][i]r{F}r[/i][/b]";
             }
             message += " (" + claims[i] + ")";
         }
