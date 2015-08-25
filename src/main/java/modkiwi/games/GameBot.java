@@ -202,4 +202,13 @@ public abstract class GameBot
 
         game.setGameStatus(STATUS_FINISHED);
     }
+
+    public int getPlayerIndex(String username)
+    {
+        for (int i = 0; i < NoP; i++)
+            if (username.equalsIgnoreCase(players[i]))
+                return i;
+
+        return -1;
+    }
 }

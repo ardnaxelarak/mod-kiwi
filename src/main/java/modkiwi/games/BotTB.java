@@ -19,6 +19,7 @@ public class BotTB extends GameBot
     private static final Logger LOGGER = new Logger(BotTB.class);
 
     private String[][] hands;
+    private String[] claims;
     private int success, safe, turn, round;
 
     protected BotTB(GameInfo game) throws IOException
@@ -217,6 +218,8 @@ public class BotTB extends GameBot
             }
         }
 
+        Arrays.fill(claims, "no claim");
+
         if (fresh)
         {
             sendHands();
@@ -237,6 +240,7 @@ public class BotTB extends GameBot
     public void initialize(boolean fresh)
     {
         hands = new String[NoP][];
+        claims = new String[NoP];
         success = 0;
         safe = 0;
         round = 0;
@@ -344,6 +348,11 @@ public class BotTB extends GameBot
             else
                 turn = pl;
         }
+        else if (move[0].equals("claim"))
+        {
+            int pnum = Integer.parseInt(move[1]);
+            claims[pnum] = Utils.join(Arrays.copyOfRange(move, 2, move.length), " ");
+        }
         else
         {
             LOGGER.warning("Invalid move string '%s'", Utils.join(move, " "));
@@ -405,6 +414,13 @@ public class BotTB extends GameBot
 
             processAndAddMove("snip", Integer.toString(pl), Integer.toString(pos));
         }
+        else if (command.toLowerCase().startsWith("claim "))
+        {
+            String claim = command.substring(6);
+            index = getPlayerIndex(username);
+            if (index != -1)
+                processAndAddMove("claim", Integer.toString(index), claim);
+        }
     }
 
     @Override
@@ -435,6 +451,7 @@ public class BotTB extends GameBot
                 else
                     message += " " + (j + 1);
             }
+            message += " (" + claims[i] + ")";
         }
         message += "[/c][/color]";
         return message;
