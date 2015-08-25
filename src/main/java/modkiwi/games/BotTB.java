@@ -29,14 +29,10 @@ public class BotTB extends GameBot
     @Override
     public void createGame()
     {
-        NoP = game.getPlayers().size();
         int evil, good;
-        if (NoP <= 7)
-            evil = 2;
-        else
-            evil = 3;
+        evil = (NoP + 2) / 3;
         good = NoP - evil;
-        if (NoP == 4)
+        if (NoP % 3 == 1)
             good++;
 
         List<String> roles = new ArrayList<String>(good + evil);
