@@ -1,6 +1,7 @@
 package modkiwi.util;
 
 import modkiwi.data.GameInfo;
+import modkiwi.data.GeekMailInfo;
 import modkiwi.data.ThreadInfo;
 import modkiwi.net.NetConnection;
 import modkiwi.net.RequestBuilder;
@@ -11,16 +12,21 @@ import modkiwi.util.Utils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.appengine.api.datastore.*;
 import com.google.appengine.api.urlfetch.*;
 
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 public class WebUtils
 {
     private String username;
     private WebConnection conn;
+    private static final Pattern REPLY_PATTERN = Pattern.compile("^\\[q=\"[^\"]*\"\\](.*)\\[/q\\]$", Pattern.CASE_INSENSITIVE);
 
     public WebUtils()
     {
@@ -216,5 +222,43 @@ public class WebUtils
     {
         WebResponse response = conn.execute(request);
         return new ThreadInfo(response.parse().select("thread").first());
+    }
+
+    public synchronized List<GeekMailInfo> getMail(String gameId) throws IOException
+    {
+        WebRequest request = RequestBuilder.get()
+                .setUrl("http://boardgamegeek.com/geekmail_controller.php")
+                .addParameter("action", "search")
+                .addParameter("folder", "inbox")
+                .addParameter("search", "\\[" + gameId + "\\]")
+                .build();
+
+        WebResponse response = conn.execute(request);
+
+        Elements tables = response.parse().select("div#mychecks table.gm_messages");
+
+        List<GeekMailInfo> list = new LinkedList<GeekMailInfo>();
+        for (Element e : tables)
+        {
+            list.add(new GeekMailInfo(this, e));
+        }
+
+        return list;
+    }
+
+    public synchronized String getMailContent(String messageid) throws IOException
+    {
+        WebRequest request = RequestBuilder.get()
+                .setUrl("http://boardgamegeek.com/geekmail_controller.php")
+                .addParameter("action", "reply")
+                .addParameter("messageid", messageid)
+                .build();
+
+        String text = conn.execute(request).parse().select("textarea#body").first().text();
+        Matcher m = REPLY_PATTERN.matcher(text);
+        if (m.find())
+            return m.group(1);
+        else
+            return null;
     }
 }

@@ -1,6 +1,7 @@
 package modkiwi;
 
 import modkiwi.data.ArticleInfo;
+import modkiwi.data.GeekMailInfo;
 import modkiwi.data.ThreadInfo;
 import modkiwi.net.GAEConnection;
 import modkiwi.net.NetConnection;
@@ -9,6 +10,7 @@ import modkiwi.util.WebUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import javax.servlet.http.*;
 
 public class AdminServlet extends HttpServlet
@@ -21,23 +23,16 @@ public class AdminServlet extends HttpServlet
 
         resp.setContentType("text/plain");
         PrintWriter pw = resp.getWriter();
-        pw.println("Creating Helper...");
-        WebUtils web = new WebUtils(new NetConnection(pw));
 
-        pw.println("Logging in...");
-        response = web.login();
-        pw.println(response.getFinalUrl());
+        WebUtils web = new WebUtils();
+        web.login();
 
-        pw.println("Sending geekmail...");
-        response = web.geekmail("Kiwi13cubed", "Test", "silly fruits!");
-        pw.println(response.getFinalUrl());
+        String id = req.getParameter("id");
+        List<GeekMailInfo> list = web.getMail(id);
 
-        pw.println("geekmail sent...");
-        /*
-        web.replyThread("1140569", null, "huh?");
-        ThreadInfo t = web.getThread("1140569");
-        ArticleInfo[] a = t.getArticles();
-        System.out.println(a[a.length - 1].getBody());
-        */
+        for (GeekMailInfo mail : list)
+        {
+            pw.printf("From: %s\nSubject: %s\nID: %s\n%s\n--------------------\n", mail.getSender(), mail.getSubject(), mail.getId(), mail.getContent());
+        }
     }
 }
