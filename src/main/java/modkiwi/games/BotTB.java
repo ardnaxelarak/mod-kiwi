@@ -194,6 +194,8 @@ public class BotTB extends GameBot
 
         List<Number> deck = (List<Number>)game.getDataProperty("round" + round + "deck");
 
+        Arrays.fill(claims, null);
+
         int pl = 0, ind = 0;
         int cards = 6 - round;
         String cardName;
@@ -216,8 +218,6 @@ public class BotTB extends GameBot
                 ind = 0;
             }
         }
-
-        Arrays.fill(claims, "no claim");
 
         if (fresh)
         {
@@ -454,7 +454,10 @@ public class BotTB extends GameBot
                 else if (hands[i][j].equals("boom"))
                     message += " [b][i]r{F}r[/i][/b]";
             }
-            message += "  [/c][/size][/color] (" + claims[i] + ")";
+            if (claims[i] == null)
+                message += "  [/c][/size][/color][ooc](no claim)[/ooc]";
+            else
+                message += "  [/c][/size][/color](" + claims[i] + ")";
         }
         return message;
     }
