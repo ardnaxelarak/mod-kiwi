@@ -15,6 +15,7 @@ public class GameInfo
     private List<String> mods, players, moves;
     private EmbeddedEntity data;
     private int maxPlayers;
+    private boolean autoStart;
     private final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
     public GameInfo(Entity ent)
@@ -30,6 +31,11 @@ public class GameInfo
         index = (String)ent.getProperty("index");
         title = (String)ent.getProperty("title");
         lastScanned = (String)ent.getProperty("last_scanned");
+
+        if (ent.getProperty("auto_start") != null)
+            autoStart = (boolean)ent.getProperty("auto_start");
+        else
+            autoStart = false;
 
         if (ent.getProperty("max_players") != null)
             maxPlayers = ((Number)ent.getProperty("max_players")).intValue();
@@ -212,6 +218,7 @@ public class GameInfo
         ent.setProperty("index", index);
         ent.setProperty("title", title);
         ent.setProperty("last_scanned", lastScanned);
+        ent.setProperty("auto_start", autoStart);
 
         if (maxPlayers > 0)
             ent.setProperty("max_players", maxPlayers);
@@ -235,9 +242,19 @@ public class GameInfo
         lastScanned = id;
     }
 
+    public void setAutoStart(boolean autoStart)
+    {
+        this.autoStart = autoStart;
+    }
+
+    public void setMaxPlayers(int max)
+    {
+        maxPlayers = max;
+    }
+
     public boolean readyToStart()
     {
-        return maxPlayers > 0 && players.size() == maxPlayers;
+        return autoStart && maxPlayers > 0 && players.size() == maxPlayers;
     }
 
     public void setDataProperty(String key, Object value)
@@ -248,5 +265,10 @@ public class GameInfo
     public Object getDataProperty(String key)
     {
         return data.getProperty(key);
+    }
+
+    public boolean isModerator(String username)
+    {
+        return getMods().contains(username);
     }
 }

@@ -22,8 +22,7 @@ public abstract class GameBot
     private static final Pattern P_GUESS = Utils.pat("^guess\\w+(\\W.*)$");
     private static final Pattern P_START = Utils.pat("^start$");
     private static final Pattern P_AUTOSTART = Utils.pat("^autostart\\w+(on|off)$");
-    private static final Pattern P_MOD = Utils.pat("^become\\w+mod$");
-    private static final Pattern P_UNMOD = Utils.pat("^relinquish\\w+mod$");
+    private static final Pattern P_MOD = Utils.pat("^(become|relinquish)\\w+mod$");
     private static final Pattern P_COUNT = Utils.pat("^player\\w+count\\w+(\\d+)$");
     private static final Pattern P_STATUS = Utils.pat("^show\\w+status$");
 
@@ -128,6 +127,7 @@ public abstract class GameBot
     public void parseCommand(String username, String command)
     {
         Matcher m;
+        boolean mod = game.isModerator(username);
         if (game.getAcronym() != null &&
                 (m = P_GUESS.matcher(command)).matches())
         {
@@ -142,6 +142,13 @@ public abstract class GameBot
 
             addMessage("[q=\"%s\"][b]%s[/b][/q][color=#008800]%d / %d[/color]", username, guess, count, aparts.length);
         }
+        else if ((m = P_MOD.matcher(command)).matches())
+        {
+            if (m.group(1).equalsIgnoreCase("relinquish"))
+                game.getMods().remove(username);
+            else if (!game.isModerator(username))
+                game.getMods().add(username);
+        }
         else if (game.getGameStatus().equals(STATUS_IN_SIGNUPS))
         {
             if (P_SIGNUP.matcher(command).matches())
@@ -150,12 +157,29 @@ public abstract class GameBot
                 {
                     game.getPlayers().add(username);
                     changed = true;
+                    if (game.readyToStart())
+                        startGame();
                 }
             }
             else if (P_REMOVE.matcher(command).matches())
             {
                 if (game.getPlayers().remove(username))
                     changed = true;
+            }
+            else if (mod && (m = P_AUTOSTART.matcher(command)).matches())
+            {
+                if (m.group(1).equalsIgnoreCase("on"))
+                    game.setAutoStart(true);
+                else
+                    game.setAutoStart(false);
+            }
+            else if (mod && (m = P_COUNT.matcher(command)).matches())
+            {
+                game.setMaxPlayers(Integer.parseInt(m.group(1)));
+            }
+            else if (mod && P_START.matcher(command).matches())
+            {
+                startGame();
             }
             else
             {

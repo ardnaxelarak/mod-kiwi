@@ -70,16 +70,6 @@ public class ScanServlet extends HttpServlet
                     }
                 }
 
-                if (game.readyToStart())
-                {
-                    LOGGER.config("%s is full! Beginning game.", game.getFullTitle());
-                    bot.startGame();
-                }
-                else if (game.getMaxPlayers() > 0)
-                {
-                    LOGGER.config("%s has %d / %d players.", game.getFullTitle(), game.getPlayers().size(), game.getMaxPlayers());
-                }
-
                 bot.finishedScanning();
                 game.setLastScanned(articles[articles.length - 1].getId());
                 game.save();
