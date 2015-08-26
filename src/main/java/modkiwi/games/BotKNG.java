@@ -426,41 +426,47 @@ public class BotKNG extends GameBot
     @Override
     protected CharSequence update()
     {
-        String message = null;
         if (step.equals("place"))
         {
-            message = getCurrentStatus() + "\n\n";
-            message += "[color=purple][b]" + players[turn] + " is up.[/b][/color]\n[color=#008800]Current options:";
+            StringBuilder message = new StringBuilder(getCurrentStatus());
+            message.append('\n').append('\n');
+            message.append("[color=purple][b]").append(players[turn]).append(" is up.[/b][/color]\n[color=#008800]Current options:");
             if (deck.size() > 0)
-                message += "\n[b]draw[/b]";
+                message.append("\n[b]draw[/b]");
             if (hand[turn] != null)
-                message += "\n[b]hand [i]location[/i][/b]";
+                message.append("\n[b]hand [i]location[/i][/b]");
             if (hasCastles(turn))
-                message += "\n[b]castle [i]size[/i] [i]location[/i][/b]";
-            message += "[/color]";
+                message.append("\n[b]castle [i]size[/i] [i]location[/i][/b]");
+            message.append("[/color]");
+            return message;
         }
         else if (step.equals("drawn"))
         {
-            message = String.format("[color=#008800]%s draws %s[/color]\n%s\n\n[color=#008800]Please [b]place [i]location[/i][/b][/color]", players[turn], deck.get(0), getImage(deck.get(0), "original"));
+            return String.format("[color=#008800]%s draws %s[/color]\n%s\n\n[color=#008800]Please [b]place [i]location[/i][/b][/color]", players[turn], deck.get(0), getImage(deck.get(0), "original"));
         }
         else if (step.equals("colors"))
         {
-            message = String.format("[color=purple][b]%s, please choose a color.[/b][/color]\n[color=#008800]Current options:", players[turn]);
+            StringBuilder message = new StringBuilder("[color=purple][b]");
+            message.append(players[turn]);
+            message.append(", please choose a color.[/b][/color]\n[color=#008800]Current options:");
 
             boolean taken;
             for (String color : ALL_COLORS)
             {
                 if (revColors.get(color) == null)
-                    message += "\n[b]choose " + color + "[/b]";
+                {
+                    message.append("\n[b]choose ");
+                    message.append(color).append("[/b]");
+                }
             }
-            message += "[/color]";
+            message.append("[/color]");
+            return message;
         }
         else
         {
             LOGGER.warning("Unrecognized step '%s'", step);
+            return null;
         }
-
-        return message;
     }
 
     @Override
@@ -721,60 +727,61 @@ public class BotKNG extends GameBot
     }
 
     @Override
-    public String getCurrentStatus()
+    public CharSequence getCurrentStatus()
     {
         if (step.equals("colors"))
             return null;
 
-        String message = getCurrentBoard() + "\n" + getCurrentCastles();
+        StringBuilder message = new StringBuilder(getCurrentBoard());
+        message.append('\n').append(getCurrentCastles());
 
         return message;
     }
 
-    private String getCurrentBoard()
+    private CharSequence getCurrentBoard()
     {
-        String message = "";
+        StringBuilder message = new StringBuilder();
 
         // print board
-        message += getImage("header", "original", "inline");
+        message.append(getImage("header", "original", "inline"));
         for (int i = 0; i < board.length; i++)
         {
-            message += "\n" + getImage("row" + (char)('A' + (char)i), "original", "inline");
+            message.append('\n');
+            message.append(getImage("row" + (char)('A' + (char)i), "original", "inline"));
             for (String item : board[i])
             {
-                message += getImage(item, "original", "inline");
+                message.append(getImage(item, "original", "inline"));
             }
         }
 
         return message;
     }
 
-    private String getCurrentCastles()
+    private CharSequence getCurrentCastles()
     {
-        String message = "";
+        StringBuilder message = new StringBuilder();
 
         // print scores and castles
         for (int i = 0; i < NoP; i++)
         {
             // start new row for third and fourth players
             if (i == 2)
-                message += "[clear]";
+                message.append("[clear]");
 
-            message += String.format("[floatleft][center][size=16]%s\n[c]%d[/c][/size]", players[i], scores[i]);
+            message.append(String.format("[floatleft][center][size=16]%s\n[c]%d[/c][/size]", players[i], scores[i]));
             for (int j = 0; j < castles[i].length; j++)
             {
                 if (castles[i][j] > 0)
-                    message += "\n";
+                    message.append('\n');
                 for (int k = 0; k < castles[i][j]; k++)
                 {
-
-                    message += getImage(colors[i] + (j + 1), "original", "inline");
+                    message.append(getImage(colors[i] + (j + 1), "original", "inline"));
                 }
             }
-            message += "[/center][/floatleft]";
+            message.append("[/center][/floatleft]");
         }
 
-        message += "[clear]";
+        message.append("[clear]");
 
         return message;
     }

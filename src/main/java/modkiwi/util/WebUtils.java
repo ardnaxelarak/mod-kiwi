@@ -70,7 +70,7 @@ public class WebUtils
         return username;
     }
 
-    public synchronized WebResponse geekmail(String user, String subject, String content) throws IOException
+    public synchronized WebResponse geekmail(String user, String subject, CharSequence content) throws IOException
     {
         WebRequest request = RequestBuilder.post()
                 .setUrl("http://boardgamegeek.com/geekmail_controller.php")
@@ -85,7 +85,7 @@ public class WebUtils
         return conn.execute(request);
     }
 
-    public synchronized WebResponse geekmail(List<String> users, String subject, String content) throws IOException
+    public synchronized WebResponse geekmail(List<String> users, String subject, CharSequence content) throws IOException
     {
         if (users == null || users.size() == 0)
             return null;
@@ -108,7 +108,7 @@ public class WebUtils
         WebResponse response = conn.execute(request);
     }
 
-    public synchronized void edit(String article, String subject, String content) throws IOException
+    public synchronized void edit(String article, String subject, CharSequence content) throws IOException
     {
         WebRequest request = RequestBuilder.post()
                 .setUrl("https://boardgamegeek.com/article/save")
@@ -122,7 +122,7 @@ public class WebUtils
         WebResponse response = conn.execute(request);
     }
 
-    public synchronized String replyArticle(String article, String subject, String content) throws IOException
+    public synchronized String replyArticle(String article, String subject, CharSequence content) throws IOException
     {
         WebRequest request = RequestBuilder.post()
                 .setUrl("https://boardgamegeek.com/article/save")
@@ -142,7 +142,7 @@ public class WebUtils
             return null;
     }
 
-    public synchronized String replyThread(String thread, String subject, String content) throws IOException
+    public synchronized String replyThread(String thread, String subject, CharSequence content) throws IOException
     {
         ThreadInfo t = getThread(thread, 1);
         String sub = subject;
@@ -169,7 +169,7 @@ public class WebUtils
             return null;
     }
 
-    public synchronized String replyThread(GameInfo game, String content) throws IOException
+    public synchronized String replyThread(GameInfo game, CharSequence content) throws IOException
     {
         return replyThread(game.getThread(), null, content);
     }

@@ -11,20 +11,23 @@ public final class Utils
     {
     }
 
-    public static String join(Object[] array, String joiner)
+    public static String join(Object[] array, CharSequence joiner)
     {
         if (array == null || array.length == 0)
             return "";
 
-        String result = array[0].toString();
+        StringBuilder result = new StringBuilder(array[0].toString());
         int len = array.length;
         for (int i = 1; i < array.length; i++)
-            result += joiner + array[i].toString();
+        {
+            result.append(joiner);
+            result.append(array[i].toString());
+        }
 
-        return result;
+        return result.toString();
     }
 
-    public static String join(Iterable<?> array, String joiner)
+    public static String join(Iterable<?> array, CharSequence joiner)
     {
         if (array == null)
             return "";
@@ -34,11 +37,14 @@ public final class Utils
         if (!it.hasNext())
             return "";
 
-        String result = it.next().toString();
+        StringBuilder result = new StringBuilder(it.next().toString());
         while (it.hasNext())
-            result += joiner + it.next().toString();
+        {
+            result.append(joiner);
+            result.append(it.next().toString());
+        }
 
-        return result;
+        return result.toString();
     }
 
     public static String lPad(String text, int len)

@@ -72,7 +72,7 @@ public abstract class GameBot
         {
             try
             {
-                web.replyThread(game, post.toString());
+                web.replyThread(game, post);
             }
             catch (IOException e)
             {
@@ -166,16 +166,16 @@ public abstract class GameBot
         }
     }
 
-    public abstract String getCurrentStatus();
+    public abstract CharSequence getCurrentStatus();
 
     public void updateStatus()
     {
-        String status = getCurrentStatus();
+        CharSequence status = getCurrentStatus();
         if (game.getStatusPost() != null && status != null)
         {
             try
             {
-                web.edit(game.getStatusPost(), "Current Status", getCurrentStatus());
+                web.edit(game.getStatusPost(), "Current Status", status);
             }
             catch (IOException e)
             {

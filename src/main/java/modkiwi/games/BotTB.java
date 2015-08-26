@@ -398,41 +398,47 @@ public class BotTB extends GameBot
     }
 
     @Override
-    public String getCurrentStatus()
+    public CharSequence getCurrentStatus()
     {
-        String message = "[color=#008800]";
-        message += "[size=14]Round " + round + " (" + (NoP * round - success - safe) + " cards remaining)[/size]\n\n";
+        StringBuilder message = new StringBuilder("[color=#008800]");
+        message.append("[size=14]Round ").append(round);
+        message.append("(").append(NoP * round - success - safe);
+        message.append(" cards remaining)[/size]\n\n");
         if (success + safe > 0)
         {
-            message += "[u]Cards drawn:[/u]\n";
+            message.append("[u]Cards drawn:[/u]\n");
             if (success > 0)
-                message += success + " x g{SUCCESS}g\n";
+                message.append(success + " x g{SUCCESS}g\n");
             if (safe > 0)
-                message += safe + " x b{SAFE}b\n";
+                message.append(safe + " x b{SAFE}b\n");
 
-            message += "\n";
+            message.append('\n');
         }
 
-        message += "[u]Cards remaining:[/u][/color]";
+        message.append("[u]Cards remaining:[/u][/color]");
 
         for (int i = 0; i < NoP; i++)
         {
-            message += "\n[color=#008800][size=12][c]" + Utils.lPadUsername(players[i]);
+            message.append("\n[color=#008800][size=12][c]");
+            message.append(Utils.lPadUsername(players[i]));
             for (int j = 0; j < hands[i].length; j++)
             {
+                message.append(' ');
                 if (!drawn[i][j])
-                    message += " " + (j + 1);
+                    message.append(j + 1);
                 else if (hands[i][j].equals("safe"))
-                    message += " [b]b{-}b[/b]";
+                    message.append("[b]b{-}b[/b]");
                 else if (hands[i][j].equals("success"))
-                    message += " [b]g{S}g[/b]";
+                    message.append("[b]g{S}g[/b]");
                 else if (hands[i][j].equals("boom"))
-                    message += " [b][i]r{F}r[/i][/b]";
+                    message.append("[b][i]r{F}r[/i][/b]");
+                else
+                    message.append('?');
             }
             if (claims[i] == null)
-                message += "  [/c][/size][/color][ooc](no claim)[/ooc]";
+                message.append("  [/c][/size][/color][ooc](no claim)[/ooc]");
             else
-                message += "  [/c][/size][/color](" + claims[i] + ")";
+                message.append("  [/c][/size][/color](" + claims[i] + ")");
         }
         return message;
     }

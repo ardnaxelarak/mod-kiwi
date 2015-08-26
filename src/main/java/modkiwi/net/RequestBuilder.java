@@ -38,23 +38,23 @@ public class RequestBuilder
         return this;
     }
 
-    public RequestBuilder addParameter(String key, String value)
+    public RequestBuilder addParameter(String key, CharSequence value)
     {
-        params.put(key, value);
+        params.put(key, value.toString());
         return this;
     }
 
     public WebRequest build() throws IOException
     {
-        String query = "";
+        StringBuilder query = new StringBuilder();
         for (Map.Entry<String, String> entry : params.entrySet())
         {
-            if (!query.equals(""))
-                query += "&";
-            query += String.format("%s=%s",
-                        URLEncoder.encode(entry.getKey(), charset),
-                        URLEncoder.encode(entry.getValue(), charset));
+            if (query.length() > 0)
+                query.append('&');
+            query.append(URLEncoder.encode(entry.getKey(), charset));
+            query.append('=');
+            query.append(URLEncoder.encode(entry.getValue(), charset));
         }
-        return new WebRequest(url, query, requestType, charset);
+        return new WebRequest(url, query.toString(), requestType, charset);
     }
 }
