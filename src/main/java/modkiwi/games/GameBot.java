@@ -10,10 +10,22 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class GameBot
 {
     private static final Logger LOGGER = new Logger(GameBot.class);
+
+    private static final Pattern P_SIGNUP = Utils.pat("^signup$");
+    private static final Pattern P_REMOVE = Utils.pat("^remove$");
+    private static final Pattern P_GUESS = Utils.pat("^guess\\w+(\\W.*)$");
+    private static final Pattern P_START = Utils.pat("^start$");
+    private static final Pattern P_AUTOSTART = Utils.pat("^autostart\\w+(on|off)$");
+    private static final Pattern P_MOD = Utils.pat("^become\\w+mod$");
+    private static final Pattern P_UNMOD = Utils.pat("^relinquish\\w+mod$");
+    private static final Pattern P_COUNT = Utils.pat("^player\\w+count\\w+(\\d+)$");
+    private static final Pattern P_STATUS = Utils.pat("^show\\w+status$");
 
     protected GameInfo game;
     protected final WebUtils web;
@@ -115,10 +127,11 @@ public abstract class GameBot
 
     public void parseCommand(String username, String command)
     {
-        if (command.toLowerCase().startsWith("guess") &&
-                game.getAcronym() != null)
+        Matcher m;
+        if (game.getAcronym() != null &&
+                (m = P_GUESS.matcher(command)).matches())
         {
-            String guess = command.substring(6);
+            String guess = m.group(1);
             String[] parts = guess.split(" ");
             String[] aparts = game.getAcronym().split(" ");
             int count = 0;
@@ -131,7 +144,7 @@ public abstract class GameBot
         }
         else if (game.getGameStatus().equals(STATUS_IN_SIGNUPS))
         {
-            if (command.equalsIgnoreCase("signup"))
+            if (P_SIGNUP.matcher(command).matches())
             {
                 if (!game.getPlayers().contains(username))
                 {
@@ -139,7 +152,7 @@ public abstract class GameBot
                     changed = true;
                 }
             }
-            else if (command.equalsIgnoreCase("remove"))
+            else if (P_REMOVE.matcher(command).matches())
             {
                 if (game.getPlayers().remove(username))
                     changed = true;
@@ -151,7 +164,7 @@ public abstract class GameBot
         }
         else if (game.getGameStatus().equals(STATUS_IN_PROGRESS))
         {
-            if (command.equalsIgnoreCase("show status"))
+            if (P_STATUS.matcher("show status").matches())
             {
                 changed = true;
             }

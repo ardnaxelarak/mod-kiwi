@@ -4,6 +4,7 @@ import static modkiwi.util.Constants.*;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.regex.Pattern;
 
 public final class Utils
 {
@@ -73,5 +74,18 @@ public final class Utils
             index++;
         }
         return -1;
+    }
+
+    public static Pattern pat(String regex, boolean caseSensitive)
+    {
+        if (caseSensitive)
+            return Pattern.compile(regex);
+        else
+            return Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+    }
+
+    public static Pattern pat(String regex)
+    {
+        return pat(regex, false);
     }
 }
