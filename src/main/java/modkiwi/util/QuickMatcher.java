@@ -1,11 +1,14 @@
 package modkiwi.util;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class QuickMatcher
 {
     private final Pattern pattern;
+    private final AtomicBoolean lock;
+
     private Matcher matcher;
 
     public QuickMatcher(String regex, boolean caseSensitive)
@@ -15,6 +18,7 @@ public class QuickMatcher
         else
             pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         matcher = null;
+        lock = new AtomicBoolean(false);
     }
 
     public QuickMatcher(String regex)
@@ -24,8 +28,33 @@ public class QuickMatcher
 
     public boolean matches(CharSequence input)
     {
+        while (!lock.compareAndSet(false, true))
+        {
+            try
+            {
+                lock.wait();
+            }
+            catch (InterruptedException e)
+            {
+            }
+        }
+
         matcher = pattern.matcher(input);
-        return matcher.matches();
+        if (matcher.matches())
+        {
+            return true;
+        }
+        else
+        {
+            release();
+            return false;
+        }
+    }
+
+    public void release()
+    {
+        lock.set(false);
+        lock.notifyAll();
     }
 
     public String group(int group)
