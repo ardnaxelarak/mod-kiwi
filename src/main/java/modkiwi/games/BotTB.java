@@ -3,7 +3,6 @@ package modkiwi.games;
 import modkiwi.data.GameInfo;
 import modkiwi.util.Logger;
 import modkiwi.util.Utils;
-import static modkiwi.util.Constants.*;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -247,7 +246,7 @@ public class BotTB extends GameBot
     @Override
     protected CharSequence update()
     {
-        if (game.getGameStatus().equals(STATUS_IN_PROGRESS))
+        if (game.inProgress())
         {
             String message = getCurrentStatus() + "\n\n";
             message += "[color=purple][b]" + players[turn] + " is up.[/b][/color]\n";
@@ -400,7 +399,7 @@ public class BotTB extends GameBot
     @Override
     public CharSequence getCurrentStatus()
     {
-        if (game.getGameStatus().equals(STATUS_IN_PROGRESS))
+        if (game.inProgress())
         {
             StringBuilder message = new StringBuilder("[color=#008800]");
             message.append("[size=14]Round ").append(round);

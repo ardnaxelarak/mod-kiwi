@@ -1,5 +1,7 @@
 package modkiwi.data;
 
+import static modkiwi.util.Constants.*;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -270,5 +272,20 @@ public class GameInfo
     public boolean isModerator(String username)
     {
         return getMods().contains(username);
+    }
+
+    public boolean inSignups()
+    {
+        return STATUS_IN_SIGNUPS.equals(getGameStatus());
+    }
+
+    public boolean inProgress()
+    {
+        return STATUS_IN_PROGRESS.equals(getGameStatus());
+    }
+
+    public boolean finished()
+    {
+        return STATUS_FINISHED.equals(getGameStatus());
     }
 }

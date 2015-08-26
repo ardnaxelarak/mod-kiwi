@@ -3,7 +3,6 @@ package modkiwi.games;
 import modkiwi.data.GameInfo;
 import modkiwi.util.Logger;
 import modkiwi.util.Utils;
-import static modkiwi.util.Constants.*;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -81,7 +80,7 @@ public class BotMdC extends GameBot
     @Override
     protected CharSequence update()
     {
-        if (game.getGameStatus().equals(STATUS_IN_PROGRESS))
+        if (game.inProgress())
         {
             if (step.equals(STEP_PASSING))
             {

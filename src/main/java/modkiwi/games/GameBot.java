@@ -101,7 +101,7 @@ public abstract class GameBot
 
     public void startScanning()
     {
-        if (game.getGameStatus().equals(STATUS_IN_PROGRESS))
+        if (game.inProgress())
             loadGame();
 
         changed = false;
@@ -149,7 +149,7 @@ public abstract class GameBot
             else if (!game.isModerator(username))
                 game.getMods().add(username);
         }
-        else if (game.getGameStatus().equals(STATUS_IN_SIGNUPS))
+        else if (game.inSignups())
         {
             if (P_SIGNUP.matcher(command).matches())
             {
@@ -186,7 +186,7 @@ public abstract class GameBot
                 processCommand(username, command);
             }
         }
-        else if (game.getGameStatus().equals(STATUS_IN_PROGRESS))
+        else if (game.inSignups())
         {
             if (P_STATUS.matcher("show status").matches())
             {

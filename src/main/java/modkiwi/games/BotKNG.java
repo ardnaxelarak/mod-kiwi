@@ -426,6 +426,8 @@ public class BotKNG extends GameBot
     @Override
     protected CharSequence update()
     {
+        if (!game.inProgress())
+            return null;
         if (step.equals("place"))
         {
             StringBuilder message = new StringBuilder(getCurrentStatus());
@@ -729,13 +731,17 @@ public class BotKNG extends GameBot
     @Override
     public CharSequence getCurrentStatus()
     {
-        if (step.equals("colors"))
-            return null;
+        if (game.inProgress())
+        {
+            if (step.equals("colors"))
+                return null;
 
-        StringBuilder message = new StringBuilder(getCurrentBoard());
-        message.append('\n').append(getCurrentCastles());
+            StringBuilder message = new StringBuilder(getCurrentBoard());
+            message.append('\n').append(getCurrentCastles());
 
-        return message;
+            return message;
+        }
+        return null;
     }
 
     private CharSequence getCurrentBoard()
