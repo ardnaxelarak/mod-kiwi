@@ -46,7 +46,7 @@ public abstract class GameBot
             loadGame();
     }
 
-    private void getPlayerData()
+    protected void getPlayerData()
     {
         NoP = game.getPlayers().size();
         players = new String[NoP];
@@ -261,9 +261,9 @@ public abstract class GameBot
     public void startGame()
     {
         Collections.shuffle(game.getPlayers());
-        game.setGameStatus("progress");
-        updatePlayerList();
+        game.setGameStatus(STATUS_IN_PROGRESS);
         getPlayerData();
+        updatePlayerList();
         createGame();
         initialize(true);
         changed = true;
@@ -298,7 +298,7 @@ public abstract class GameBot
     public int getPlayerIndex(String username)
     {
         for (int i = 0; i < NoP; i++)
-            if (username.equalsIgnoreCase(players[i]))
+            if (players[i].equalsIgnoreCase(username))
                 return i;
 
         return -1;
