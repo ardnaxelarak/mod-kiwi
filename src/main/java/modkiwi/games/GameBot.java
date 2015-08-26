@@ -20,6 +20,8 @@ public abstract class GameBot
     protected int NoP;
     protected String[] players;
     private boolean changed;
+    protected List<String> messages = null;
+    protected List<String> secretMessages = null;
 
     protected GameBot(GameInfo game) throws IOException
     {
@@ -46,7 +48,39 @@ public abstract class GameBot
 
     public abstract void initialize(boolean fresh);
 
-    protected abstract void update();
+    protected abstract CharSequence update();
+
+    private void postUpdate()
+    {
+        StringBuilder post = new StringBuilder();
+        if (messages != null && !messages.isEmpty())
+        {
+            for (String message : messages)
+            {
+                post.append(message);
+                post.append('\n');
+                post.append('\n');
+            }
+            post.append('\n');
+        }
+
+        CharSequence update = update();
+        if (update != null)
+            post.append(update);
+
+        if (post.length() > 0)
+        {
+            try
+            {
+                web.replyThread(game, post.toString());
+            }
+            catch (IOException e)
+            {
+                LOGGER.throwing("postUpdate()", e);
+            }
+        }
+        messages.clear();
+    }
 
     protected abstract void processMove(boolean fresh, String... move);
 
@@ -60,33 +94,28 @@ public abstract class GameBot
     public void startScanning()
     {
         changed = false;
+        messages = new LinkedList<String>();
+        secretMessages = new LinkedList<String>();
     }
 
     public void finishedScanning()
     {
         if (changed)
         {
-            update();
+            postUpdate();
+            updatePlayerList();
             updateStatus();
             changed = false;
+            messages = null;
+            secretMessages = null;
         }
     }
 
-    public boolean processSignupCommand(String username, String command, List<String> guesses)
+    public abstract void processCommand(String username, String command);
+
+    public void parseCommand(String username, String command)
     {
-        if (command.equalsIgnoreCase("signup"))
-        {
-            if (!game.getPlayers().contains(username))
-            {
-                game.getPlayers().add(username);
-                return true;
-            }
-        }
-        else if (command.equalsIgnoreCase("remove"))
-        {
-            return game.getPlayers().remove(username);
-        }
-        else if (command.toLowerCase().startsWith("guess") &&
+        if (command.toLowerCase().startsWith("guess") &&
                 game.getAcronym() != null)
         {
             String guess = command.substring(6);
@@ -98,23 +127,38 @@ public abstract class GameBot
                 if (parts[i].equalsIgnoreCase(aparts[i]))
                     count++;
 
-            guesses.add(String.format("[q=\"%s\"][b]%s[/b][/q][color=#008800]%d / %d[/color]", username, guess, count, aparts.length));
+            addMessage("[q=\"%s\"][b]%s[/b][/q][color=#008800]%d / %d[/color]", username, guess, count, aparts.length);
         }
-        else
+        else if (game.getGameStatus().equals(STATUS_IN_SIGNUPS))
         {
-            LOGGER.finest("unregonized command '%s'", command);
+            if (command.equalsIgnoreCase("signup"))
+            {
+                if (!game.getPlayers().contains(username))
+                {
+                    game.getPlayers().add(username);
+                    changed = true;
+                }
+            }
+            else if (command.equalsIgnoreCase("remove"))
+            {
+                if (game.getPlayers().remove(username))
+                    changed = true;
+            }
+            else
+            {
+                processCommand(username, command);
+            }
         }
-
-        return false;
-    }
-
-    public abstract void processCommand(String username, String command);
-
-    public void parseCommand(String username, String command)
-    {
-        if (command.equalsIgnoreCase("show status"))
+        else if (game.getGameStatus().equals(STATUS_IN_PROGRESS))
         {
-            changed = true;
+            if (command.equalsIgnoreCase("show status"))
+            {
+                changed = true;
+            }
+            else
+            {
+                processCommand(username, command);
+            }
         }
         else
         {
@@ -185,7 +229,7 @@ public abstract class GameBot
         getPlayerData();
         createGame();
         initialize(true);
-        update();
+        changed = true;
     }
 
     public void loadGame()
@@ -221,5 +265,22 @@ public abstract class GameBot
                 return i;
 
         return -1;
+    }
+
+    protected void addMessage(String format, Object... args)
+    {
+        if (messages != null)
+            messages.add(String.format(format, args));
+    }
+
+    protected void addSecretMessage(String format, Object... args)
+    {
+        if (secretMessages != null)
+            secretMessages.add(String.format(format, args));
+    }
+
+    protected List<String> getSecretReceivers()
+    {
+        return game.getNonPlayerMods();
     }
 }

@@ -424,7 +424,7 @@ public class BotKNG extends GameBot
     }
 
     @Override
-    protected void update()
+    protected CharSequence update()
     {
         String message = null;
         if (step.equals("place"))
@@ -460,17 +460,7 @@ public class BotKNG extends GameBot
             LOGGER.warning("Unrecognized step '%s'", step);
         }
 
-        if (message != null)
-        {
-            try
-            {
-                web.replyThread(game, message);
-            }
-            catch (IOException e)
-            {
-                LOGGER.throwing("update()", e);
-            }
-        }
+        return message;
     }
 
     @Override

@@ -36,10 +36,9 @@ public class ScanServlet extends HttpServlet
             WebUtils web = new WebUtils();
             web.login();
 
-            for (GameInfo game : DatastoreUtils.gamesByStatus(STATUS_IN_SIGNUPS))
+            for (GameInfo game : DatastoreUtils.gamesByStatus(STATUS_IN_SIGNUPS, STATUS_IN_PROGRESS))
             {
-                LOGGER.fine("Scanning %s (in signups)", game.getFullTitle());
-                GameBot bot = BotManager.getBot(game);
+                LOGGER.fine("Scanning %s", game.getFullTitle());
 
                 ThreadInfo ti;
                 if (game.getLastScanned() != null)
@@ -56,67 +55,8 @@ public class ScanServlet extends HttpServlet
                 if (ti.getArticles().length == 0)
                     continue;
 
-                boolean changed = false;
-
-                ArticleInfo[] articles = ti.getArticles();
-                List<String> guesses = new LinkedList<String>();
-                for (ArticleInfo article : articles)
-                {
-                    String username = article.getUsername();
-                    if (username.equals(web.getUsername()))
-                        continue;
-                    for (String command : article.getCommands())
-                    {
-                        if (bot.processSignupCommand(username, command, guesses))
-                            changed = true;
-                    }
-                }
-
-                if (!guesses.isEmpty())
-                {
-                    web.replyThread(game.getThread(), null, Utils.join(guesses, "\n"));
-                }
-
-                // Update post containing signup list
-                if (changed)
-                {
-                    bot.updatePlayerList();
-                }
-
-                if (game.readyToStart())
-                {
-                    LOGGER.config("%s is full! Beginning game.", game.getFullTitle());
-                    bot.startGame();
-                }
-                else if (game.getMaxPlayers() > 0)
-                {
-                    LOGGER.config("%s has %d / %d players.", game.getFullTitle(), game.getPlayers().size(), game.getMaxPlayers());
-                }
-
-                game.setLastScanned(articles[articles.length - 1].getId());
-                game.save();
-            }
-
-            for (GameInfo game : DatastoreUtils.gamesByStatus(STATUS_IN_PROGRESS))
-            {
-                LOGGER.fine("Scanning %s (in progress)", game.getFullTitle());
                 GameBot bot = BotManager.getBot(game);
                 bot.startScanning();
-
-                ThreadInfo ti;
-                if (game.getLastScanned() != null)
-                {
-                    ti = web.getThread(game.getThread(), Integer.toString(Integer.parseInt(game.getLastScanned()) + 1));
-                }
-                else
-                {
-                    ti = web.getThread(game.getThread());
-                }
-
-                LOGGER.finer("%d new articles for %s", ti.getArticles().length, game.getFullTitle());
-
-                if (ti.getArticles().length == 0)
-                    continue;
 
                 ArticleInfo[] articles = ti.getArticles();
                 for (ArticleInfo article : articles)
@@ -128,6 +68,16 @@ public class ScanServlet extends HttpServlet
                     {
                         bot.parseCommand(username, command);
                     }
+                }
+
+                if (game.readyToStart())
+                {
+                    LOGGER.config("%s is full! Beginning game.", game.getFullTitle());
+                    bot.startGame();
+                }
+                else if (game.getMaxPlayers() > 0)
+                {
+                    LOGGER.config("%s has %d / %d players.", game.getFullTitle(), game.getPlayers().size(), game.getMaxPlayers());
                 }
 
                 bot.finishedScanning();

@@ -222,17 +222,11 @@ public class BotTB extends GameBot
         if (fresh)
         {
             sendHands();
-            try
-            {
-                web.replyThread(game, "[color=purple][b]Round " + round + " has begun. Hands have been geekmailed to all players.[/b][/color]");
-            }
-            catch (IOException e)
-            {
-                LOGGER.throwing("newRound()", e);
-            }
         }
 
-        turn = round - 1;
+        addMessage("[color=purple][b]Round %d has begun. Hands have been geekmailed to all players.[/b][/color]", round);
+
+        turn = (round - 1) % NoP;
     }
 
     @Override
@@ -251,23 +245,17 @@ public class BotTB extends GameBot
     }
 
     @Override
-    protected void update()
+    protected CharSequence update()
     {
         if (game.getGameStatus().equals(STATUS_IN_PROGRESS))
         {
             String message = getCurrentStatus() + "\n\n";
             message += "[color=purple][b]" + players[turn] + " is up.[/b][/color]\n";
             message += "[color=#008800]Please [b]choose [i]player[/i] [i]position[/i][/b][/color]";
-
-            try
-            {
-                web.replyThread(game, message);
-            }
-            catch (IOException e)
-            {
-                LOGGER.throwing("update()", e);
-            }
+            return message;
         }
+
+        return null;
     }
 
     private void endGame(boolean fresh, boolean goodWin)
@@ -303,39 +291,26 @@ public class BotTB extends GameBot
             int pl = Integer.parseInt(move[1]);
             int ind = Integer.parseInt(move[2]);
             String card = hands[pl][ind];
-            String message = null;
 
             drawn[pl][ind] = true;
 
             if (card.equals("success"))
             {
-                message = "[color=green]" + players[turn] + " has drawn a [b]g{SUCCESS}g[/b] card![/color]";
+                addMessage("[color=green]%s has drawn a [b]g{SUCCESS}g[/b] card![/color]", players[turn]);
                 success++;
             }
             else if (card.equals("safe"))
             {
-                message = "[color=green]" + players[turn] + " has drawn a [b]b{SAFE}b[/b] card.[/color]";
+                addMessage("[color=green]%s has drawn a [b]b{SAFE}b[/b] card.[/color]", players[turn]);
                 safe++;
             }
             else if (card.equals("boom"))
             {
-                message = "[color=green]" + players[turn] + " has drawn a [b][i]r{BOOM}r[/i][/b] card![/color]";
+                addMessage("[color=green]%s has drawn the [b][i]r{BOOM}r[/i][/b] card![/color]", players[turn]);
             }
             else
             {
                 LOGGER.warning("Unrecognized card '%s'", card);
-            }
-
-            if (fresh)
-            {
-                try
-                {
-                    web.replyThread(game, message);
-                }
-                catch (IOException e)
-                {
-                    LOGGER.throwing("processMove()", e);
-                }
             }
 
             if (card.equals("boom"))

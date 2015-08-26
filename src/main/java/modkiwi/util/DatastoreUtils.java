@@ -10,7 +10,11 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.Filter;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,10 +26,11 @@ public final class DatastoreUtils
     {
     }
 
-    public static List<GameInfo> gamesByStatus(String status)
+    public static List<GameInfo> gamesByStatus(String... status)
     {
         List<GameInfo> list = new LinkedList<GameInfo>();
-        Query q = new Query("Game").addFilter("game_status", Query.FilterOperator.EQUAL, status);
+        Filter statusFilter = new FilterPredicate("game_status", FilterOperator.IN, Arrays.asList(status));
+        Query q = new Query("Game").setFilter(statusFilter);
         PreparedQuery pq = datastore.prepare(q);
 
         for (Entity ent : pq.asIterable())
