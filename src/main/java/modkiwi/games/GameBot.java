@@ -41,9 +41,6 @@ public abstract class GameBot
         web.login();
 
         getPlayerData();
-
-        if (game.getGameStatus().equals(STATUS_IN_PROGRESS))
-            loadGame();
     }
 
     protected void getPlayerData()
@@ -104,6 +101,9 @@ public abstract class GameBot
 
     public void startScanning()
     {
+        if (game.getGameStatus().equals(STATUS_IN_PROGRESS))
+            loadGame();
+
         changed = false;
         messages = new LinkedList<String>();
         secretMessages = new LinkedList<String>();

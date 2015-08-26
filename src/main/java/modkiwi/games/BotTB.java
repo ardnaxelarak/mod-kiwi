@@ -232,7 +232,7 @@ public class BotTB extends GameBot
     @Override
     public void initialize(boolean fresh)
     {
-        hands = new String[NoP][];
+        hands = new String[NoP][0];
         claims = new String[NoP];
         success = 0;
         safe = 0;
@@ -400,47 +400,54 @@ public class BotTB extends GameBot
     @Override
     public CharSequence getCurrentStatus()
     {
-        StringBuilder message = new StringBuilder("[color=#008800]");
-        message.append("[size=14]Round ").append(round);
-        message.append("(").append(NoP * round - success - safe);
-        message.append(" cards remaining)[/size]\n\n");
-        if (success + safe > 0)
+        if (game.getGameStatus().equals(STATUS_IN_PROGRESS))
         {
-            message.append("[u]Cards drawn:[/u]\n");
-            if (success > 0)
-                message.append(success + " x g{SUCCESS}g\n");
-            if (safe > 0)
-                message.append(safe + " x b{SAFE}b\n");
-
-            message.append('\n');
-        }
-
-        message.append("[u]Cards remaining:[/u][/color]");
-
-        for (int i = 0; i < NoP; i++)
-        {
-            message.append("\n[color=#008800][size=12][c]");
-            message.append(Utils.lPadUsername(players[i]));
-            for (int j = 0; j < hands[i].length; j++)
+            StringBuilder message = new StringBuilder("[color=#008800]");
+            message.append("[size=14]Round ").append(round);
+            message.append("(").append(NoP * round - success - safe);
+            message.append(" cards remaining)[/size]\n\n");
+            if (success + safe > 0)
             {
-                message.append(' ');
-                if (!drawn[i][j])
-                    message.append(j + 1);
-                else if (hands[i][j].equals("safe"))
-                    message.append("[b]b{-}b[/b]");
-                else if (hands[i][j].equals("success"))
-                    message.append("[b]g{S}g[/b]");
-                else if (hands[i][j].equals("boom"))
-                    message.append("[b][i]r{F}r[/i][/b]");
-                else
-                    message.append('?');
+                message.append("[u]Cards drawn:[/u]\n");
+                if (success > 0)
+                    message.append(success + " x g{SUCCESS}g\n");
+                if (safe > 0)
+                    message.append(safe + " x b{SAFE}b\n");
+
+                message.append('\n');
             }
-            if (claims[i] == null)
-                message.append("  [/c][/size][/color][ooc](no claim)[/ooc]");
-            else
-                message.append("  [/c][/size][/color](" + claims[i] + ")");
+
+            message.append("[u]Cards remaining:[/u][/color]");
+
+            for (int i = 0; i < NoP; i++)
+            {
+                message.append("\n[color=#008800][size=12][c]");
+                message.append(Utils.lPadUsername(players[i]));
+                for (int j = 0; j < hands[i].length; j++)
+                {
+                    message.append(' ');
+                    if (!drawn[i][j])
+                        message.append(j + 1);
+                    else if (hands[i][j].equals("safe"))
+                        message.append("[b]b{-}b[/b]");
+                    else if (hands[i][j].equals("success"))
+                        message.append("[b]g{S}g[/b]");
+                    else if (hands[i][j].equals("boom"))
+                        message.append("[b][i]r{F}r[/i][/b]");
+                    else
+                        message.append('?');
+                }
+                if (claims[i] == null)
+                    message.append("  [/c][/size][/color][ooc](no claim)[/ooc]");
+                else
+                    message.append("  [/c][/size][/color](" + claims[i] + ")");
+            }
+            return message;
         }
-        return message;
+        else
+        {
+            return null;
+        }
     }
 
     @Override
