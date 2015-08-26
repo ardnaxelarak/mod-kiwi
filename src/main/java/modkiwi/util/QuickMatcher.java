@@ -59,6 +59,14 @@ public class QuickMatcher
 
     public String group(int group)
     {
-        return matcher.group(group);
+        return group(group, false);
+    }
+
+    public String group(int group, boolean release)
+    {
+        String res = matcher.group(group);
+        if (release)
+            release();
+        return res;
     }
 }
