@@ -19,12 +19,12 @@ public abstract class GameBot
 
     private static final Pattern P_SIGNUP = Utils.pat("^signup$");
     private static final Pattern P_REMOVE = Utils.pat("^remove$");
-    private static final Pattern P_GUESS = Utils.pat("^guess\\w+(\\W.*)$");
+    private static final Pattern P_GUESS = Utils.pat("^guess\\s+(\\S.*)$");
     private static final Pattern P_START = Utils.pat("^start$");
-    private static final Pattern P_AUTOSTART = Utils.pat("^autostart\\w+(on|off)$");
-    private static final Pattern P_MOD = Utils.pat("^(become|relinquish)\\w+mod$");
-    private static final Pattern P_COUNT = Utils.pat("^player\\w+count\\w+(\\d+)$");
-    private static final Pattern P_STATUS = Utils.pat("^show\\w+status$");
+    private static final Pattern P_AUTOSTART = Utils.pat("^autostart\\s+(on|off)$");
+    private static final Pattern P_MOD = Utils.pat("^(become|relinquish)\\s+mod$");
+    private static final Pattern P_COUNT = Utils.pat("^player\\s+count\\s+(\\d+)$");
+    private static final Pattern P_STATUS = Utils.pat("^show\\s+status$");
 
     protected GameInfo game;
     protected final WebUtils web;
@@ -127,6 +127,7 @@ public abstract class GameBot
     public void parseCommand(String username, String command)
     {
         Matcher m;
+        LOGGER.fine("Parsing command '%s' by %s", command, username);
         boolean mod = game.isModerator(username);
         if (game.getAcronym() != null &&
                 (m = P_GUESS.matcher(command)).matches())
@@ -144,10 +145,17 @@ public abstract class GameBot
         }
         else if ((m = P_MOD.matcher(command)).matches())
         {
+            LOGGER.info("matched mod command");
             if (m.group(1).equalsIgnoreCase("relinquish"))
+            {
                 game.getMods().remove(username);
+                LOGGER.info("removing mod %s", username);
+            }
             else if (!game.isModerator(username))
+            {
                 game.getMods().add(username);
+                LOGGER.info("adding mod %s", username);
+            }
         }
         else if (game.inSignups())
         {
