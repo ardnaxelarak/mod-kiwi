@@ -25,6 +25,7 @@ public abstract class GameBot
     private static final Pattern P_MOD = Utils.pat("^(become|relinquish)\\s+mod$");
     private static final Pattern P_COUNT = Utils.pat("^player\\s+count\\s+(\\d+)$");
     private static final Pattern P_STATUS = Utils.pat("^show\\s+status$");
+    private static final Pattern P_REPLACE = Utils.pat("^replace\\s+(.*\\S)\\s+with\\s+(.+)$");
 
     protected GameInfo game;
     protected final WebUtils web;
@@ -156,6 +157,12 @@ public abstract class GameBot
                 game.getMods().add(username);
                 LOGGER.info("adding mod %s", username);
             }
+        }
+        else if (mod && (m = P_REPLACE.matcher(command)).matches())
+        {
+            int index = getPlayerIndex(m.group(1));
+            if (index >= 0)
+                processAndAddMove("replace", Integer.toString(index), m.group(2));
         }
         else if (game.inSignups())
         {

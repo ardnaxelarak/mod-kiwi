@@ -282,10 +282,21 @@ public class BotTB extends GameBot
         super.endGame();
     }
 
+    protected void replace(int index, String newPlayer, boolean fresh)
+    {
+        game.getPlayers().set(index, newPlayer);
+        addMessage("[color=purple][b]%s has replaced %s.[/b][/color]", newPlayer, players[index]);
+        getPlayerData();
+    }
+
     @Override
     protected void processMove(boolean fresh, String... move)
     {
-        if (move[0].equals("snip"))
+        if (move[0].equals("replace"))
+        {
+            replace(Integer.parseInt(move[1]), move[2], fresh);
+        }
+        else if (move[0].equals("snip"))
         {
             int pl = Integer.parseInt(move[1]);
             int ind = Integer.parseInt(move[2]);
