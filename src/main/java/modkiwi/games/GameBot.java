@@ -201,7 +201,7 @@ public abstract class GameBot
                 processCommand(username, command);
             }
         }
-        else if (game.inSignups())
+        else if (game.inProgress())
         {
             if (P_STATUS.matcher("show status").matches())
             {
