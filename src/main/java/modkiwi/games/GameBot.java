@@ -7,6 +7,7 @@ import modkiwi.util.WebUtils;
 import static modkiwi.util.Constants.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -91,11 +92,31 @@ public abstract class GameBot
         messages.clear();
     }
 
+    protected void replace(int index, String newPlayer, boolean fresh)
+    {
+        game.getPlayers().set(index, newPlayer);
+        addMessage("[color=purple][b]%s has replaced %s.[/b][/color]", newPlayer, players[index]);
+        getPlayerData();
+    }
+
+    protected void globalProcessMove(boolean fresh, String... move)
+    {
+        if (move[0].equals("replace"))
+        {
+            String newPlayer = Utils.join(Arrays.copyOfRange(move, 2, move.length), " ");
+            replace(Integer.parseInt(move[1]), newPlayer, fresh);
+        }
+        else
+        {
+            processMove(fresh, move);
+        }
+    }
+
     protected abstract void processMove(boolean fresh, String... move);
 
     protected void processAndAddMove(String... move)
     {
-        processMove(true, move);
+        globalProcessMove(true, move);
         game.getMoves().add(Utils.join(move, " "));
         changed = true;
     }
@@ -289,7 +310,7 @@ public abstract class GameBot
         initialize(false);
         for (String move : game.getMoves())
         {
-            processMove(false, move.split(" "));
+            globalProcessMove(false, move.split(" "));
         }
     }
 
