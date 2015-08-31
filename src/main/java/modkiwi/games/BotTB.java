@@ -414,7 +414,7 @@ public class BotTB extends GameBot
         {
             StringBuilder message = new StringBuilder("[color=#008800]");
             message.append("[size=14]Round ").append(round);
-            message.append("(").append(NoP * round - success - safe);
+            message.append(" (").append(NoP * round - success - safe);
             message.append(" cards remaining)[/size]\n\n");
             if (success + safe > 0)
             {
