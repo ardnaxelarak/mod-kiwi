@@ -1,6 +1,7 @@
 package modkiwi.games;
 
 import modkiwi.data.GameInfo;
+import modkiwi.util.DatastoreUtils;
 import modkiwi.util.Logger;
 import modkiwi.util.Utils;
 
@@ -12,8 +13,11 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.google.appengine.api.datastore.EmbeddedEntity;
 
 public class BotMdC extends GameBot
 {
@@ -21,6 +25,7 @@ public class BotMdC extends GameBot
 
     private static final Logger LOGGER = new Logger(BotMdC.class);
 
+    private static final Pattern P_GODFATHER = Utils.pat("^godfather\\w+(\\d+)$");
     private static final Pattern P_DIAMONDS = Utils.pat("^take\\w+(\\d+)\\w+diamonds");
 
     private static final String STEP_PASSING = "passing";
@@ -30,11 +35,14 @@ public class BotMdC extends GameBot
     private int turn;
     private String[] taken;
     private boolean[] accused;
+    private boolean removed;
     private String step;
 
     protected BotMdC(GameInfo game) throws IOException
     {
         super(game);
+        if (game.getDataProperty("godfather") == null)
+            game.setDataProperty("godfather", new EmbeddedEntity());
     }
 
     @Override
@@ -192,6 +200,56 @@ public class BotMdC extends GameBot
     @Override
     public void processCommand(String username, String command)
     {
+        Matcher m;
+        if (game.inSignups())
+        {
+            if ((m = P_GODFATHER.matcher(command)).matches())
+            {
+                int weight = Integer.parseInt(m.group(1));
+                if (weight < 0 || weight > 10)
+                    return;
+
+                EmbeddedEntity ent = (EmbeddedEntity)game.getDataProperty("godfather");
+                ent.setProperty(username, weight);
+            }
+        }
+    }
+
+    @Override
+    protected void shufflePlayers()
+    {
+        List<String> players = game.getPlayers();
+        int NoP = players.size();
+        int[] weights = new int[NoP];
+        EmbeddedEntity ent = (EmbeddedEntity)game.getDataProperty("godfather");
+        int total = 0;
+        for (int i = 0; i < NoP; i++)
+        {
+            weights[i] = DatastoreUtils.getInt(ent.getProperty(players.get(i)), 1);
+            total += weights[i];
+        }
+        Random r = new Random();
+        String godfather = null;
+        if (total > 0)
+        {
+            int num = r.nextInt(total);
+            for (int i = 0; i < NoP; i++)
+            {
+                num -= weights[i];
+                if (num < 0)
+                {
+                    godfather = players.get(i);
+                    break;
+                }
+            }
+        }
+        if (godfather == null)
+        {
+            godfather = players.get(r.nextInt(NoP));
+        }
+        Collections.shuffle(players);
+        players.remove(godfather);
+        players.add(0, godfather);
     }
 
     @Override
