@@ -57,4 +57,30 @@ public final class DatastoreUtils
 
         return new GameInfo(ent);
     }
+
+    public static int getInt(Object object)
+    {
+        return ((Number)object).intValue();
+    }
+
+    public static int getInt(Object object, int def)
+    {
+        if (object == null)
+            return def;
+        else
+            return getInt(object);
+    }
+
+    public static long getLong(Object object)
+    {
+        return ((Number)object).longValue();
+    }
+
+    public static long getLong(Object object, long def)
+    {
+        if (object == null)
+            return def;
+        else
+            return getLong(object);
+    }
 }
