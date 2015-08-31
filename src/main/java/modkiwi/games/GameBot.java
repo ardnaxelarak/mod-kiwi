@@ -239,6 +239,15 @@ public abstract class GameBot
         }
     }
 
+    public void processGeekmail(String username, String subject, String message)
+    {
+    }
+
+    public void parseGeekmail(String username, String subject, String message)
+    {
+        processGeekmail(username, subject, message);
+    }
+
     public abstract CharSequence getCurrentStatus();
 
     public void updateStatus()
@@ -296,13 +305,18 @@ public abstract class GameBot
 
     public void startGame()
     {
-        Collections.shuffle(game.getPlayers());
+        shufflePlayers();
         game.setGameStatus(STATUS_IN_PROGRESS);
         getPlayerData();
         updatePlayerList();
         createGame();
         initialize(true);
         changed = true;
+    }
+
+    protected void shufflePlayers()
+    {
+        Collections.shuffle(game.getPlayers());
     }
 
     public void loadGame()
