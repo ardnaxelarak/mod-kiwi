@@ -94,9 +94,8 @@ public abstract class GameBot
 
     protected void replace(int index, String newPlayer, boolean fresh)
     {
-        game.getPlayers().set(index, newPlayer);
         addMessage("[color=purple][b]%s has replaced %s.[/b][/color]", newPlayer, players[index]);
-        getPlayerData();
+        players[index] = newPlayer;
     }
 
     protected void globalProcessMove(boolean fresh, String... move)
@@ -224,7 +223,7 @@ public abstract class GameBot
         }
         else if (game.inProgress())
         {
-            if (P_STATUS.matcher("show status").matches())
+            if (P_STATUS.matcher(command).matches())
             {
                 changed = true;
             }
