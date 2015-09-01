@@ -337,6 +337,7 @@ public class BotTB extends GameBot
     {
         String name, position;
         int index;
+        LOGGER.fine("processing command '%s' by '%s' in TB", command, username);
         if (command.toLowerCase().startsWith("choose "))
         {
             if (!username.equals(players[turn]))
