@@ -63,18 +63,14 @@ public abstract class GameBot
     private void postUpdate()
     {
         StringBuilder post = new StringBuilder();
+        CharSequence update = update();
         if (messages != null && !messages.isEmpty())
         {
-            for (String message : messages)
-            {
-                post.append(message);
-                post.append('\n');
-                post.append('\n');
-            }
-            post.append('\n');
+            post.append(Utils.join(messages, "\n\n"));
+            if (update != null)
+                post.append("\n\n");
         }
 
-        CharSequence update = update();
         if (update != null)
             post.append(update);
 
