@@ -163,6 +163,7 @@ public abstract class GameBot
                     count++;
 
             addMessage("[q=\"%s\"][b]%s[/b][/q][color=#008800]%d / %d[/color]", username, guess, count, aparts.length);
+            changed = true;
         }
         else if ((m = P_MOD.matcher(command)).matches())
         {
