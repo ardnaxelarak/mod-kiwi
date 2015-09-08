@@ -335,6 +335,9 @@ public class BotTB extends GameBot
     @Override
     public void processCommand(String username, String command)
     {
+        if (!game.inProgress())
+            return;
+
         String name, position;
         int index;
         LOGGER.fine("processing command '%s' by '%s' in TB", command, username);

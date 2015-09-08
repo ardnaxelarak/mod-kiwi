@@ -36,7 +36,7 @@ public class ScanServlet extends HttpServlet
             WebUtils web = new WebUtils();
             web.login();
 
-            for (GameInfo game : DatastoreUtils.gamesByStatus(STATUS_IN_SIGNUPS, STATUS_IN_PROGRESS))
+            for (GameInfo game : DatastoreUtils.gamesByStatus(STATUS_IN_SIGNUPS, STATUS_IN_PROGRESS, STATUS_FINISHED))
             {
                 LOGGER.fine("Scanning %s", game.getFullTitle());
 
