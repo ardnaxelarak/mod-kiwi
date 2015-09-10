@@ -18,7 +18,7 @@ public abstract class GameBot
 {
     private static final Logger LOGGER = new Logger(GameBot.class);
 
-    private static final Pattern P_SIGNUP = Utils.pat("^signup$");
+    private static final Pattern P_SIGNUP = Utils.pat("^sign\\s*up$");
     private static final Pattern P_REMOVE = Utils.pat("^remove$");
     private static final Pattern P_GUESS = Utils.pat("^guess\\s+(\\S.*)$");
     private static final Pattern P_START = Utils.pat("^start$");
