@@ -18,6 +18,7 @@ public abstract class GameBot
 {
     private static final Logger LOGGER = new Logger(GameBot.class);
 
+    private static final Pattern P_OTHER = Utils.pat("^\\{([^{]+)\\}\\s*(\\S.*)$");
     private static final Pattern P_SIGNUP = Utils.pat("^sign\\s*up$");
     private static final Pattern P_REMOVE = Utils.pat("^remove$");
     private static final Pattern P_GUESS = Utils.pat("^guess\\s+(\\S.*)$");
@@ -146,7 +147,12 @@ public abstract class GameBot
         Matcher m;
         LOGGER.fine("Parsing command '%s' by %s", command, username);
         boolean mod = game.isModerator(username);
-        if (game.getAcronym() != null &&
+        if (mod && (m = P_OTHER.matcher(command)).matches())
+        {
+            parseCommand(m.group(1), m.group(2));
+            return;
+        }
+        else if (game.getAcronym() != null &&
                 (m = P_GUESS.matcher(command)).matches())
         {
             String guess = m.group(1);
