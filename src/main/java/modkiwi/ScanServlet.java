@@ -28,6 +28,7 @@ public class ScanServlet extends HttpServlet
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
         throws IOException
     {
+		GameInfo single = null;
         synchronized (scanLock)
         {
             resp.setContentType("text/plain");
@@ -36,7 +37,24 @@ public class ScanServlet extends HttpServlet
             WebUtils web = new WebUtils();
             web.login();
 
-            for (GameInfo game : DatastoreUtils.gamesByStatus(STATUS_IN_SIGNUPS, STATUS_IN_PROGRESS, STATUS_FINISHED))
+			List<GameInfo> gameList;
+
+			String id = req.getParameter("id");
+
+			if (id != null)
+			{
+				single = DatastoreUtils.loadGame(id);
+				if (single == null)
+					gameList = Collections.emptyList();
+				else
+					gameList = Collections.singletonList(single);
+			}
+			else
+			{
+				gameList = DatastoreUtils.gamesByStatus(STATUS_IN_SIGNUPS, STATUS_IN_PROGRESS, STATUS_FINISHED);
+			}
+
+            for (GameInfo game : gameList)
             {
                 LOGGER.fine("Scanning %s", game.getFullTitle());
 
@@ -70,10 +88,17 @@ public class ScanServlet extends HttpServlet
                     }
                 }
 
+				if (game == single && req.getParameter("update") != null)
+					bot.forceUpdate();
+
                 bot.finishedScanning();
                 game.setLastScanned(articles[articles.length - 1].getId());
                 game.save();
             }
         }
+		if (req.getParameter("redirect") != null && single != null)
+		{
+            resp.sendRedirect("https://boardgamegeek.com/thread/" + single.getThread() + "/new");
+		}
     }
 }

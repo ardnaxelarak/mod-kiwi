@@ -372,4 +372,9 @@ public abstract class GameBot
     {
         return game.getNonPlayerMods();
     }
+
+	public void forceUpdate()
+	{
+		changed = true;
+	}
 }
