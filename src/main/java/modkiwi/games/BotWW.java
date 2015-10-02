@@ -6,6 +6,8 @@ import modkiwi.util.DatastoreUtils;
 import modkiwi.util.Logger;
 import modkiwi.util.Utils;
 
+import static modkiwi.util.Constants.*;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -120,8 +122,16 @@ public class BotWW extends GameBot
     @Override
     public CharSequence getCurrentStatus()
     {
+		StringBuilder sb = new StringBuilder();
+
 		if (game.inProgress())
-			return "[color=#008800]" + votes.getVotes() + "[/color]";
+		{
+			sb.append("[color=#008800]");
+			sb.append(votes.getVotes());
+			sb.append("[/color]");
+			sb.append("\nTo ensure the latest tally is up-to-date, please [b][url=" + DOMAIN + "/scan?id=" + game.getId() + "&update=1&redirect=1]click here[/url][/b]");
+			return sb;
+		}
 
 		return null;
     }
