@@ -43,6 +43,11 @@ public class ArticleInfo
         return body;
     }
 
+    public String getPostDate()
+    {
+        return postdate;
+    }
+
     public List<String> getCommands()
     {
         Document d = Jsoup.parseBodyFragment(getBody());

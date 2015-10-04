@@ -21,6 +21,15 @@
     <url-pattern>/create</url-pattern>
 </servlet-mapping>
 
+<servlet>
+    <servlet-name>ThreadServlet</servlet-name>
+    <servlet-class>modkiwi.ThreadServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>ThreadServlet</servlet-name>
+    <url-pattern>/thread</url-pattern>
+</servlet-mapping>
+
 <security-constraint>
     <web-resource-collection>
        <web-resource-name>admin</web-resource-name>
