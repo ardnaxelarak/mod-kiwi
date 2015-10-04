@@ -54,5 +54,6 @@ List<GameInfo> progress = (List<GameInfo>)request.getAttribute("progress");
             </td>
         </tr>
     </table>
+	<a href='create'>Create a new game</a>
 </body>
 </html>

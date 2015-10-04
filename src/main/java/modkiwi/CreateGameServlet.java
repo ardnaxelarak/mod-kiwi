@@ -1,6 +1,7 @@
 package modkiwi;
 
 import modkiwi.util.Logger;
+import modkiwi.util.WebUtils;
 import modkiwi.games.GameBot;
 import static modkiwi.util.Constants.*;
 
@@ -84,6 +85,9 @@ public class CreateGameServlet extends HttpServlet
         throws IOException
     {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+		WebUtils web = new WebUtils();
+		web.login();
+
         Transaction txn = datastore.beginTransaction();
 
         PrintWriter pw = resp.getWriter();
@@ -97,12 +101,10 @@ public class CreateGameServlet extends HttpServlet
             ent.setProperty("index", req.getParameter("index"));
             ent.setProperty("title", req.getParameter("name"));
             ent.setProperty("acronym", req.getParameter("acronym"));
-            ent.setProperty("thread", req.getParameter("thread"));
+			String thread = req.getParameter("thread");
+            ent.setProperty("thread", thread);
             if (req.getParameter("mods") != null)
                 ent.setProperty("mods", Arrays.asList(req.getParameter("mods").split(",")));
-            ent.setProperty("signup_post", req.getParameter("signup"));
-            ent.setProperty("status_post", req.getParameter("status"));
-            ent.setProperty("history_post", req.getParameter("history"));
             if (req.getParameter("max_players") != null)
             {
                 try
@@ -119,6 +121,20 @@ public class CreateGameServlet extends HttpServlet
                 LOGGER.info("no value for max_players");
             }
             ent.setProperty("game_status", STATUS_IN_SIGNUPS);
+
+			if (req.getParameter("signup") != null)
+			{
+				ent.setProperty("signup_post", web.replyThread(thread, "signup list", "[color=#008800]signup list[/color]"));
+			}
+			if (req.getParameter("status") != null)
+			{
+				ent.setProperty("status_post", web.replyThread(thread, "status", "[color=#008800]current game status[/color]"));
+			}
+			if (req.getParameter("history") != null)
+			{
+				ent.setProperty("history_post", web.replyThread(thread, "game history", "[color=#008800]game history[/color]"));
+			}
+
             datastore.put(ent);
             txn.commit();
             resp.sendRedirect("/game/" + id);
