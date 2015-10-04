@@ -28,6 +28,8 @@ public abstract class GameBot
     private static final Pattern P_COUNT = Utils.pat("^player\\s+count\\s+(\\d+)$");
     private static final Pattern P_STATUS = Utils.pat("^show\\s+status$");
     private static final Pattern P_REPLACE = Utils.pat("^replace\\s+(.*\\S)\\s+with\\s+(.+)$");
+    private static final Pattern P_ADD_SETTING = Utils.pat("^add\\s+setting\\s+(\\S.*)$");
+    private static final Pattern P_REM_SETTING = Utils.pat("^remove\\s+setting\\s+(\\S.*)$");
 
     protected GameInfo game;
     protected final WebUtils web;
@@ -211,6 +213,14 @@ public abstract class GameBot
                 else
                     game.setAutoStart(false);
             }
+            else if (mod && (m = P_ADD_SETTING.matcher(command)).matches())
+			{
+				game.addSetting(m.group(1));
+			}
+            else if (mod && (m = P_REM_SETTING.matcher(command)).matches())
+			{
+				game.removeSetting(m.group(1));
+			}
             else if (mod && (m = P_COUNT.matcher(command)).matches())
             {
                 game.setMaxPlayers(Integer.parseInt(m.group(1)));

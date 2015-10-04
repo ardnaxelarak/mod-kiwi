@@ -14,7 +14,7 @@ import com.google.appengine.api.datastore.EmbeddedEntity;
 public class GameInfo
 {
     private String id, acronym, statusPost, gameStatus, historyPost, signupPost, thread, gametype, index, title, lastScanned;
-    private List<String> mods, players, moves;
+    private List<String> mods, players, moves, settings;
     private EmbeddedEntity data;
     private int maxPlayers;
     private boolean autoStart;
@@ -55,6 +55,10 @@ public class GameInfo
         moves = (List<String>)ent.getProperty("moves");
         if (moves == null)
             moves = new LinkedList<String>();
+
+        settings = (List<String>)ent.getProperty("settings");
+        if (settings == null)
+            settings = new LinkedList<String>();
 
         data = (EmbeddedEntity)ent.getProperty("data");
         if (data == null)
@@ -228,6 +232,7 @@ public class GameInfo
         ent.setProperty("mods", mods);
         ent.setProperty("players", players);
         ent.setProperty("moves", moves);
+		ent.setProperty("settings", settings);
 
         ent.setProperty("data", data);
 
@@ -288,4 +293,20 @@ public class GameInfo
     {
         return STATUS_FINISHED.equals(getGameStatus());
     }
+
+	public void addSetting(String setting)
+	{
+		if (!settings.contains(setting))
+			settings.add(setting);
+	}
+
+	public void removeSetting(String setting)
+	{
+		settings.remove(setting);
+	}
+
+	public boolean hasSetting(String setting)
+	{
+		return settings.contains(setting);
+	}
 }
