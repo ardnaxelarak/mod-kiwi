@@ -10,6 +10,7 @@
 <%
 List<ArticleInfo> articles = (List<ArticleInfo>)request.getAttribute("articles");
 String thread = (String)request.getAttribute("thread");
+List<String> users = (List<String>)request.getAttribute("usernames");
 %>
 
 <html>
@@ -35,7 +36,9 @@ String thread = (String)request.getAttribute("thread");
 <body class="yui-skin-sam">
   <div id='name_span'>
     <h1>Modkiwi System</h1>
-    <h2>Viewing posts for (<a href="/user/<%= article.getUsername() %>"><%= article.getUsername() %></a>)</h2>
+<% if (!users.isEmpty()) { %>
+    <h2>Viewing posts for (<a href="/user/<%= users.get(0) %>"><%= users.get(0) %></a>)</h2>
+<% } %>
   </div>
 	<div id="container">
 		<div id="maincontent">
