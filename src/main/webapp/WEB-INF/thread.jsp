@@ -73,13 +73,13 @@ Map<String, UserInfo> userinfo = (Map<String, UserInfo>)request.getAttribute("us
       <dd class="commands">
         <ul class="information">
           <li>
-            <a href="/article/<%= article.getId() %>">
+            <a href="http://boardgamegeek.com/article/<%= article.getId() %>">
               <i class="fa fa-clock-o"></i>
               Posted <%= article.getPostDate() %>
             </a>
           </li>
           <li>
-            <a href="/article/quote/<%= article.getId() %>"><i class="fa fa-quote-left"></i> Quote</a>
+            <a href="http://boardgamegeek.com/article/quote/<%= article.getId() %>"><i class="fa fa-quote-left"></i> Quote</a>
           </li>
         </ul>
       </dd>
