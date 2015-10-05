@@ -1,16 +1,19 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="modkiwi.data.ArticleInfo" %>
 <%@ page import="modkiwi.data.ThreadInfo" %>
+<%@ page import="modkiwi.data.UserInfo" %>
 <%@ page import="com.google.appengine.api.users.User" %>
 <%@ page import="com.google.appengine.api.users.UserService" %>
 <%@ page import="com.google.appengine.api.users.UserServiceFactory" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <%
 List<ArticleInfo> articles = (List<ArticleInfo>)request.getAttribute("articles");
 String thread = (String)request.getAttribute("thread");
 List<String> users = (List<String>)request.getAttribute("usernames");
+Map<String, UserInfo> userinfo = (Map<String, UserInfo>)request.getAttribute("userinfo");
 %>
 
 <html>
@@ -55,6 +58,9 @@ List<String> users = (List<String>)request.getAttribute("usernames");
 					<div class="username">
 						(<a href="/user/<%= article.getUsername() %>"><%= article.getUsername() %></a>)
 					</div>
+                    <div>
+                        <img src="<%= userinfo.get(article.getUsername()).getAvatarLink() %>"</img>
+                    </div>
 				<div>
 			</dd>
 			<dd class="right" ng-non-bindable="">

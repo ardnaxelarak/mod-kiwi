@@ -3,6 +3,7 @@ package modkiwi.util;
 import modkiwi.data.GameInfo;
 import modkiwi.data.GeekMailInfo;
 import modkiwi.data.ThreadInfo;
+import modkiwi.data.UserInfo;
 import modkiwi.net.NetConnection;
 import modkiwi.net.RequestBuilder;
 import modkiwi.net.WebConnection;
@@ -222,6 +223,17 @@ public class WebUtils
     {
         WebResponse response = conn.execute(request);
         return new ThreadInfo(response.parse().select("thread").first());
+    }
+
+    public synchronized UserInfo getUserInfo(String user) throws IOException
+    {
+        WebRequest request = RequestBuilder.get()
+                .setUrl("https://boardgamegeek.com/xmlapi2/users")
+                .addParameter("name", user)
+                .build();
+
+        WebResponse response = conn.execute(request);
+        return new UserInfo(response.parse().select("user").first());
     }
 
     public synchronized List<GeekMailInfo> getMail(String gameId) throws IOException
