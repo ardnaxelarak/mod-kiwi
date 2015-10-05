@@ -290,7 +290,9 @@ public abstract class GameBot
             Collections.sort(game.getPlayers(), String.CASE_INSENSITIVE_ORDER);
             listText = "[color=#008800][u]Player list according to ModKiwi:[/u]\n";
             for (String username : game.getPlayers())
-                listText += username + "\n";
+			{
+                listText += "[url=" + DOMAIN + "/" + WebUtils.playerThreadURL(game.getThread(), username) + "]" + username + "[/url]\n";
+			}
 
             listText += "\n" + game.getPlayers().size() + " players are signed up.\n\n";
             listText += "To sign up for this game, post [b]signup[/b] in bold.\nTo remove yourself from this game, post [b]remove[/b] in bold.[/color]";
@@ -300,7 +302,7 @@ public abstract class GameBot
             listText = "[color=#008800][u]Seating Order:[/u]";
             int k = 1;
             for (String username : game.getPlayers())
-                listText += "\n" + k++ + ". " + username;
+                listText += "\n" + k++ + ". [url=" + DOMAIN + "/" + WebUtils.playerThreadURL(game.getThread(), username) + "]" + username + "[/url]";
 
             listText += "[/color]";
         }

@@ -261,4 +261,9 @@ public class WebUtils
         else
             return null;
     }
+
+    public static String playerThreadURL(String thread, String player)
+    {
+        return "thread?thread=" + thread + "&username=" + player.replace(" ", "%20");
+    }
 }

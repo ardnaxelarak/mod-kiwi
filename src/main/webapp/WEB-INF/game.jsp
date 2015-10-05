@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="modkiwi.data.GameInfo" %>
+<%@ page import="modkiwi.util.WebUtils" %>
 <%@ page import="com.google.appengine.api.users.User" %>
 <%@ page import="com.google.appengine.api.users.UserService" %>
 <%@ page import="com.google.appengine.api.users.UserServiceFactory" %>
@@ -27,17 +28,10 @@ GameInfo game = (GameInfo)request.getAttribute("gameInfo");
             </tr>
             <% for (String player : game.getPlayers()) { %>
             <tr>
-                <td><%= player %></td>
+				<td><a href="../<%= WebUtils.playerThreadURL(game.getThread(), player) %>"><%= player %></a></td>
             </tr>
             <% } %>
         </table>
     </div>
-    <form action="https://boardgamegeek.com/article/save" method="post">
-        <input type="hidden" name="action" value="save">
-        <input type="hidden" name="replytoid" value="<%= game.getSignupPost() %>">
-        <input type="hidden" name="subject" value="test">
-        <input type="hidden" name="body" value="[b]draw[/b]">
-        <input type="submit" value="Draw">
-    </form>
 </body>
 </html>
