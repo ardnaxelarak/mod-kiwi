@@ -19,7 +19,7 @@ Map<String, UserInfo> userinfo = (Map<String, UserInfo>)request.getAttribute("us
 <html>
 <head>
   <script src="webjars/jquery/2.1.4/jquery.min.js"> </script>
-	<link rel="stylesheet" type="text/css" href="//cf.geekdo-static.com/static/css_master2_56018f7495c65.css">
+  <link rel="stylesheet" type="text/css" href="//cf.geekdo-static.com/static/css_master2_56018f7495c65.css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
     <style type="text/css">
       #name_span {
@@ -43,37 +43,41 @@ Map<String, UserInfo> userinfo = (Map<String, UserInfo>)request.getAttribute("us
     <h2>Viewing posts for (<a href="/user/<%= users.get(0) %>"><%= users.get(0) %></a>)</h2>
 <% } %>
   </div>
-	<div id="container">
-		<div id="maincontent">
-			<table width="100%">
-				<tbody>
-					<tr>
-						<td valign="top">
-							<div id="main_content">
-<% for (ArticleInfo article : articles) { %>
-	<div class="js-rollable article " data-parent_objectid="<%= thread %>" data-parent_objecttype="thread" data-objectid="<%= article.getId() %>" data-objecttype="article" >
-		<dl>
-			<dd class="left">
-				<div class = "avatarblock js-avatar divcenter">
-					<div class="username">
-						(<a href="/user/<%= article.getUsername() %>"><%= article.getUsername() %></a>)
-					</div>
+    <div id="container">
+        <div id="maincontent">
+            <table width="100%">
+                <tbody>
+                    <tr>
+                        <td valign="top">
+                            <div id="main_content">
+<% for (ArticleInfo article : articles) {
+    UserInfo ui = userinfo.get(article.getUsername());%>
+    <div class="js-rollable article " data-parent_objectid="<%= thread %>" data-parent_objecttype="thread" data-objectid="<%= article.getId() %>" data-objecttype="article" >
+        <dl>
+            <dd class="left">
+                <div class = "avatarblock js-avatar divcenter">
                     <div>
-                        <img src="<%= userinfo.get(article.getUsername()).getAvatarLink() %>"</img>
+                        <%= ui.getFirstName() %> <%= ui.getLastName() %>
                     </div>
-				<div>
-			</dd>
-			<dd class="right" ng-non-bindable="">
-				<%= article.getBody() %>
-			</dd>
-		</dl>
-		<dl>
+                    <div class="username">
+                        (<a href="/user/<%= article.getUsername() %>"><%= article.getUsername() %></a>)
+                    </div>
+                    <div>
+                        <img height="64px" width="auto" src="<%= ui.getAvatarLink() %>"</img>
+                    </div>
+                <div>
+            </dd>
+            <dd class="right" ng-non-bindable="">
+                <%= article.getBody() %>
+            </dd>
+        </dl>
+        <dl>
       <dd class="left">
       </dd>
       <dd class="commands">
         <ul class="information">
           <li>
-            <a href="http://boardgamegeek.com/article/<%= article.getId() %>">
+              <a href="http://boardgamegeek.com/article/<%= article.getId() %>#<%= article.getId() %>">
               <i class="fa fa-clock-o"></i>
               Posted <%= article.getPostDate() %>
             </a>
@@ -84,15 +88,15 @@ Map<String, UserInfo> userinfo = (Map<String, UserInfo>)request.getAttribute("us
         </ul>
       </dd>
     </dl>
-		<div class="clear"></div>
-	</div>
+        <div class="clear"></div>
+    </div>
 <% } %>
-							</div>
-						</td/>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
+                            </div>
+                        </td/>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </body>
 </html>
