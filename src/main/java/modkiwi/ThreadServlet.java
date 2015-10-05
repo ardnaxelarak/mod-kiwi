@@ -6,6 +6,7 @@ import modkiwi.util.WebUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,6 +37,10 @@ public class ThreadServlet extends HttpServlet
 
         req.setAttribute("articles", articles);
         req.setAttribute("thread", thread);
+        if (username == null)
+            req.setAttribute("usernames", Collections.emptyList());
+        else
+            req.setAttribute("usernames", Collections.singletonList(username));
 
         try
         {
