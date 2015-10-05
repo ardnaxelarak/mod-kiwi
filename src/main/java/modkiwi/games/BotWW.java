@@ -99,6 +99,7 @@ public class BotWW extends GameBot
         showClaims = !game.hasSetting("no_claims");
 
         claims = new String[NoP];
+        Arrays.fill(claims, null);
         newDawn(fresh);
 
         living = new boolean[NoP];
@@ -107,7 +108,6 @@ public class BotWW extends GameBot
 
     private void newDawn(boolean fresh)
     {
-        Arrays.fill(claims, null);
         currentState = "day";
         // notify mod if applicable
         votes.reset();
@@ -115,7 +115,6 @@ public class BotWW extends GameBot
 
     private void newDusk(boolean fresh)
     {
-        Arrays.fill(claims, null);
         currentState = "night";
         // notify mod if applicable
         votes.reset();
@@ -218,7 +217,7 @@ public class BotWW extends GameBot
 			}
             if (showClaims)
             {
-                sb.append("[color=#008800][u]Current Claims:[/u]");
+                sb.append("[color=#008800][u]Current Claims:[/u][/color]");
                 for (int i = 0; i < NoP; i++)
                 {
                     if (!living[i])
@@ -228,9 +227,8 @@ public class BotWW extends GameBot
                     if (claims[i] == null)
                         sb.append(" - [ooc](no claim)[/ooc]");
                     else
-                        sb.append(" - " + claims[i]);
+                        sb.append(" - b{" + claims[i] + "}b");
                 }
-                sb.append("[/color]");
             }
         }
 
