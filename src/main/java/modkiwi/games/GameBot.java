@@ -149,7 +149,7 @@ public abstract class GameBot
     public void parseCommand(String username, String command)
     {
         Matcher m;
-        LOGGER.info("Parsing command '%s' by %s", command, username);
+        LOGGER.fine("Parsing command '%s' by %s", command, username);
         boolean mod = game.isModerator(username);
         if (mod && (m = P_OTHER.matcher(command)).matches())
         {
