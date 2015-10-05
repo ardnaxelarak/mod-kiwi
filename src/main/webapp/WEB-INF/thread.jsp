@@ -14,13 +14,29 @@ String thread = (String)request.getAttribute("thread");
 
 <html>
 <head>
-    <script src="webjars/jquery/2.1.4/jquery.min.js"> </script>
+  <script src="webjars/jquery/2.1.4/jquery.min.js"> </script>
 	<link rel="stylesheet" type="text/css" href="//cf.geekdo-static.com/static/css_master2_56018f7495c65.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <style type="text/css">
+      #name_span {
+        padding: 10px;
+      }
+      .article .left {
+        min-height: 18px;
+      }
+      .article .information li {
+        display: inline-block;
+        margin: 0 6px;
+      }
+    </style>
     <title>Modkiwi System</title>
 </head>
 
 <body class="yui-skin-sam">
-    <h1><div id='name_span'>Modkiwi System</div></h1>
+  <div id='name_span'>
+    <h1>Modkiwi System</h1>
+    <h2>Viewing posts for (<a href="/user/<%= article.getUsername() %>"><%= article.getUsername() %></a>)</h2>
+  </div>
 	<div id="container">
 		<div id="maincontent">
 			<table width="100%">
@@ -43,28 +59,22 @@ String thread = (String)request.getAttribute("thread");
 			</dd>
 		</dl>
 		<dl>
-			<dd class="left">
-			</dd>
-			<dd class="commands">
-				<ul>
-				</ul>
-				<ul class="information">
-					<li>
-						<a href="/article/<%= article.getId() %>">
-							<img class="icon i_icon_minipost" title="" alt="" style=" height:9px;width:12px;" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="></img>
-							Posted <%= article.getPostDate() %>
-						</a>
-					</li>
-					<li>
-						<ul class=<commands">
-							<li>
-								<a href="/article/quote/<%= article.getId() %>">Quote</a>
-							</li>
-						</ul>
-					</li>
-				</ul>
-			</dd>
-		</dl>
+      <dd class="left">
+      </dd>
+      <dd class="commands">
+        <ul class="information">
+          <li>
+            <a href="/article/<%= article.getId() %>">
+              <i class="fa fa-clock-o"></i>
+              Posted <%= article.getPostDate() %>
+            </a>
+          </li>
+          <li>
+            <a href="/article/quote/<%= article.getId() %>"><i class="fa fa-quote-left"></i> Quote</a>
+          </li>
+        </ul>
+      </dd>
+    </dl>
 		<div class="clear"></div>
 	</div>
 <% } %>
