@@ -32,11 +32,13 @@ public class BotWW extends GameBot
     private static final Pattern P_DUSK = Utils.pat("^dusk$");
     private static final Pattern P_DAWN = Utils.pat("^dawn$");
     private static final Pattern P_KILL = Utils.pat("^kill(?:ed)?\\s+(\\S.*)$");
+    private static final Pattern P_CLAIM = Utils.pat("^claim\\s+(\\S.*)$");
 
-    private boolean tally, majorityDusk, notifyDusk, notifyDawn, voteDay, voteNight;
+    private boolean tally, majorityDusk, notifyDusk, notifyDawn, voteDay, voteNight, showClaims;
 
     private String currentState;
     private boolean[] living;
+    private String[] claims;
 
     private final VoteTracker votes = new VoteTracker()
     {
@@ -94,10 +96,29 @@ public class BotWW extends GameBot
         notifyDawn = game.hasSetting("geekmail_mod_on_dawn");
         voteDay = !game.hasSetting("no_vote_day");
         voteNight = game.hasSetting("vote_night");
-        currentState = "day";
+        showClaims = !game.hasSetting("no_claims");
+
+        claims = new String[NoP];
+        newDawn(fresh);
 
         living = new boolean[NoP];
         Arrays.fill(living, true);
+    }
+
+    private void newDawn(boolean fresh)
+    {
+        Arrays.fill(claims, null);
+        currentState = "day";
+        // notify mod if applicable
+        votes.reset();
+    }
+
+    private void newDusk(boolean fresh)
+    {
+        Arrays.fill(claims, null);
+        currentState = "night";
+        // notify mod if applicable
+        votes.reset();
     }
 
     @Override
@@ -112,19 +133,24 @@ public class BotWW extends GameBot
             }
             else if (first.equals("dusk"))
             {
-                currentState = "night";
-                // notify mod if applicable
-                votes.reset();
+                newDusk(fresh);
             }
             else if (first.equals("dawn"))
             {
-                currentState = "day";
-                // notify mod if applicable
-                votes.reset();
+                newDawn(fresh);
             }
             else if (first.equals("kill"))
             {
                 living[Integer.parseInt(move[1])] = false;
+            }
+            else if (first.equals("revive"))
+            {
+                living[Integer.parseInt(move[1])] = true;
+            }
+            else if (first.equals("claim"))
+            {
+                int pnum = Integer.parseInt(move[1]);
+                claims[pnum] = Utils.join(Arrays.copyOfRange(move, 2, move.length), " ");
             }
         }
     }
@@ -164,6 +190,11 @@ public class BotWW extends GameBot
                     }
                 }
             }
+            else if ((m = P_CLAIM.matcher(command)).matches())
+            {
+                if (actor != -1)
+                    processAndAddMove("claim", Integer.toString(actor), m.group(1));
+            }
         }
     }
 
@@ -180,11 +211,33 @@ public class BotWW extends GameBot
 				sb.append(votes.getVotes());
 				sb.append("[/color]");
 				sb.append("\nTo ensure the latest tally is up-to-date, please [b][url=" + DOMAIN + "/scan?id=" + game.getId() + "&update=1&redirect=1]click here[/url][/b]");
-				return sb;
+                if (showClaims)
+                {
+                    sb.append("\n\n");
+                }
 			}
+            if (showClaims)
+            {
+                sb.append("[color=#008800][u]Current Claims:[/u]");
+                for (int i = 0; i < NoP; i++)
+                {
+                    if (!living[i])
+                        continue;
+                    sb.append("\n");
+                    sb.append(players[i]);
+                    if (claims[i] == null)
+                        sb.append(" - [ooc](no claim)[/ooc]");
+                    else
+                        sb.append(" - " + claims[i]);
+                }
+                sb.append("[/color]");
+            }
         }
 
-        return null;
+        if (sb.length() == 0)
+            return null;
+        else
+            return sb;
     }
 
     @Override
