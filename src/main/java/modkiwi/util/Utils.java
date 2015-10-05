@@ -1,5 +1,7 @@
 package modkiwi.util;
 
+import modkiwi.data.GameInfo;
+
 import static modkiwi.util.Constants.*;
 
 import java.util.Arrays;
@@ -58,22 +60,40 @@ public final class Utils
         return lPad(name, MAX_USERNAME_LENGTH);
     }
 
+    public static int getUser(String username, String[] list, GameInfo nicknameList)
+    {
+        return getUser(username, Arrays.asList(list), nicknameList);
+    }
+
     public static int getUser(String username, String[] list)
     {
         return getUser(username, Arrays.asList(list));
     }
 
-    public static int getUser(String username, Iterable<String> list)
+    public static int getUser(String username, Iterable<String> list, GameInfo nicknameList)
     {
+        int nickindex = -1;
+        String fullname = null;
+        if (nicknameList != null)
+            fullname = nicknameList.getNickname(username);
+
         int index = 0;
         for (String user : list)
         {
-            if (username.equalsIgnoreCase(user))
+            if (user.equalsIgnoreCase(username))
                 return index;
+
+            if (user.equalsIgnoreCase(fullname))
+                nickindex = index;
 
             index++;
         }
-        return -1;
+        return nickindex;
+    }
+
+    public static int getUser(String username, Iterable<String> list)
+    {
+        return getUser(username, list, null);
     }
 
     public static Pattern pat(String regex, boolean caseSensitive)

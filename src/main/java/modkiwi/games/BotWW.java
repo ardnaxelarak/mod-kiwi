@@ -147,7 +147,7 @@ public class BotWW extends GameBot
             }
             else if (mod && (m = P_KILL.matcher(command)).matches())
             {
-                int dead = Utils.getUser(m.group(1), players);
+                int dead = Utils.getUser(m.group(1), players, game);
                 if (dead != -1 && living[dead])
                 {
                     processAndAddMove("kill", Integer.toString(dead));
@@ -157,7 +157,7 @@ public class BotWW extends GameBot
             {
                 if (actor >= 0 && living[actor])
                 {
-                    int votee = Utils.getUser(m.group(1), players);
+                    int votee = Utils.getUser(m.group(1), players, game);
                     if (votee != -1)
                     {
                         processAndAddMove("vote", Integer.toString(actor), Integer.toString(votee));
