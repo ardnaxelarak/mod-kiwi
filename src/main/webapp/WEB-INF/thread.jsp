@@ -14,66 +14,45 @@ String thread = (String)request.getAttribute("thread");
 
 <html>
 <head>
-    <script src="webjars/jquery/2.1.4/jquery.min.js"> </script>
-	<link rel="stylesheet" type="text/css" href="//cf.geekdo-static.com/static/css_master2_56018f7495c65.css">
     <title>Modkiwi System</title>
+    <script src="webjars/jquery/2.1.4/jquery.min.js"> </script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <style type="text/css">
+      body { padding-top: 70px; }
+    </style>
 </head>
 
-<body class="yui-skin-sam">
-    <h1><div id='name_span'>Modkiwi System</div></h1>
-	<div id="container">
-		<div id="maincontent">
-			<table width="100%">
-				<tbody>
-					<tr>
-						<td valign="top">
-							<div id="main_content">
-<% for (ArticleInfo article : articles) { %>
-	<div class="js-rollable article " data-parent_objectid="<%= thread %>" data-parent_objecttype="thread" data-objectid="<%= article.getId() %>" data-objecttype="article" >
-		<dl>
-			<dd class="left">
-				<div class = "avatarblock js-avatar divcenter">
-					<div class="username">
-						(<a href="/user/<%= article.getUsername() %>"><%= article.getUsername() %></a>)
-					</div>
-				<div>
-			</dd>
-			<dd class="right" ng-non-bindable="">
-				<%= article.getBody() %>
-			</dd>
-		</dl>
-		<dl>
-			<dd class="left">
-			</dd>
-			<dd class="commands">
-				<ul>
-				</ul>
-				<ul class="information">
-					<li>
-						<a href="/article/<%= article.getId() %>">
-							<img class="icon i_icon_minipost" title="" alt="" style=" height:9px;width:12px;" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="></img>
-							Posted <%= article.getPostDate() %>
-						</a>
-					</li>
-					<li>
-						<ul class=<commands">
-							<li>
-								<a href="/article/quote/<%= article.getId() %>">Quote</a>
-							</li>
-						</ul>
-					</li>
-				</ul>
-			</dd>
-		</dl>
-		<div class="clear"></div>
-	</div>
-<% } %>
-							</div>
-						</td/>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
+<body>
+  <nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-5" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">Modkiwi System</a>
+      </div>
+      <div class="collapse navbar-collapse">
+        <p class="navbar-text">Viewing posts for <strong><a href="/user/<%= article.getUsername() %>"><%= article.getUsername() %></a></strong></p>
+      </div>
+    </div>
+  </nav>
+  <div class="container">
+    <% for (ArticleInfo article : articles) { %>
+      <div class="panel panel-default"  data-parent_objectid="<%= thread %>" data-parent_objecttype="thread" data-objectid="<%= article.getId() %>" data-objecttype="article" >
+        <div class="panel-body">
+          <%= article.getBody() %>
+        </div>
+        <div class="panel-footer text-right">
+          <a href="/article/<%= article.getId() %>" class="btn btn-link btn-xs"><i class="fa fa-clock-o"></i> Posted <%= article.getPostDate() %></a>
+          <a href="/article/quote/<%= article.getId() %>" class="btn btn-link btn-xs"><i class="fa fa-quote-left"></i> Quote</a>
+        </ul>
+        </div>
+      </div>
+    <% } %>
+  </div>
 </body>
 </html>
