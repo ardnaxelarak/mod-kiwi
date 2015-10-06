@@ -30,6 +30,8 @@ public abstract class GameBot
     private static final Pattern P_REPLACE = Utils.pat("^replace\\s+(.*\\S)\\s+with\\s+(.+)$");
     private static final Pattern P_ADD_SETTING = Utils.pat("^add\\s+setting\\s+(\\S.*)$");
     private static final Pattern P_REM_SETTING = Utils.pat("^remove\\s+setting\\s+(\\S.*)$");
+    private static final Pattern P_NICKNAME_OTHER = Utils.pat("^nickname\\s+(.*\\S)\\s+as\\s+(.+)$");
+    private static final Pattern P_NICKNAME_SELF = Utils.pat("^nickname\\s+(.*)$");
 
     protected GameInfo game;
     protected final WebUtils web;
@@ -153,6 +155,14 @@ public abstract class GameBot
         {
             parseCommand(m.group(1), m.group(2));
             return;
+        }
+        else if (mod && (m = P_NICKNAME_OTHER.matcher(command)).matches())
+        {
+            game.addNickname(m.group(2), m.group(1));
+        }
+        else if ((m = P_NICKNAME_SELF.matcher(command)).matches())
+        {
+            game.addNickname(m.group(1), username);
         }
         else if (game.getAcronym() != null &&
                 (m = P_GUESS.matcher(command)).matches())
@@ -362,8 +372,10 @@ public abstract class GameBot
     public int getPlayerIndex(String username)
     {
         for (int i = 0; i < NoP; i++)
+        {
             if (players[i].equalsIgnoreCase(username))
                 return i;
+        }
 
         return -1;
     }

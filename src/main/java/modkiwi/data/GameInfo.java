@@ -15,7 +15,7 @@ public class GameInfo
 {
     private String id, acronym, statusPost, gameStatus, historyPost, signupPost, thread, gametype, index, title, lastScanned;
     private List<String> mods, players, moves, settings;
-    private EmbeddedEntity data;
+    private EmbeddedEntity data, nicknames;
     private int maxPlayers;
     private boolean autoStart;
     private final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -63,6 +63,10 @@ public class GameInfo
         data = (EmbeddedEntity)ent.getProperty("data");
         if (data == null)
             data = new EmbeddedEntity();
+
+        nicknames = (EmbeddedEntity)ent.getProperty("nicknames");
+        if (nicknames == null)
+            nicknames = new EmbeddedEntity();
     }
 
     public String getId()
@@ -235,6 +239,7 @@ public class GameInfo
 		ent.setProperty("settings", settings);
 
         ent.setProperty("data", data);
+        ent.setProperty("nicknames", nicknames);
 
         datastore.put(ent);
     }
@@ -309,4 +314,19 @@ public class GameInfo
 	{
 		return settings.contains(setting);
 	}
+
+    public String getNickname(String name)
+    {
+        return (String)nicknames.getProperty(name);
+    }
+
+    public void addNickname(String nickname, String username)
+    {
+        nicknames.setProperty(nickname, username);
+    }
+
+    public void removeNickname(String nickname)
+    {
+        nicknames.setProperty(nickname, null);
+    }
 }

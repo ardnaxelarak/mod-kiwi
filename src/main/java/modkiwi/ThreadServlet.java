@@ -2,12 +2,16 @@ package modkiwi;
 
 import modkiwi.data.ArticleInfo;
 import modkiwi.data.ThreadInfo;
+import modkiwi.data.UserInfo;
 import modkiwi.util.WebUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
@@ -28,14 +32,26 @@ public class ThreadServlet extends HttpServlet
         String username = req.getParameter("username");
         ThreadInfo ti = web.getThread(thread);
 
+        Map<String, UserInfo> users = new HashMap<String, UserInfo>();
+
         for (ArticleInfo article : ti.getArticles())
         {
-            if (username == null || username.equalsIgnoreCase(article.getUsername()))
+            String author = article.getUsername();
+            if (username == null || username.equalsIgnoreCase(author))
+            {
                 articles.add(article);
+                if (users.get(author) == null)
+                    users.put(author, web.getUserInfo(author));
+            }
         }
 
         req.setAttribute("articles", articles);
         req.setAttribute("thread", thread);
+        req.setAttribute("userinfo", users);
+        if (username == null)
+            req.setAttribute("usernames", Collections.emptyList());
+        else
+            req.setAttribute("usernames", Collections.singletonList(username));
 
         try
         {
