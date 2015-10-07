@@ -21,6 +21,7 @@ public class ArticleInfo
         numedits = Integer.parseInt(node.attr("numedits"));
         subject = node.select("subject").first().text();
         body = node.ownText();
+        body = Jsoup.parseBodyFragment(body).outerHtml();
     }
 
     public String getId()
