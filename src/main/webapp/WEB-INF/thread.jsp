@@ -10,20 +10,40 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <%
-List<ArticleInfo> articles = (List<ArticleInfo>)request.getAttribute("articles");
-String thread = (String)request.getAttribute("thread");
-List<String> users = (List<String>)request.getAttribute("usernames");
+ThreadInfo threadinfo = (ThreadInfo)request.getAttribute("threadinfo");
+String[] usernames = (String[])request.getAttribute("usernames");
+boolean[] show = (boolean[])request.getAttribute("showUsers");
 Map<String, UserInfo> userinfo = (Map<String, UserInfo>)request.getAttribute("userinfo");
+int len = usernames.length;
 %>
 
 <html>
 <head>
-    <title>Modkiwi System</title>
-    <script src="webjars/jquery/2.1.4/jquery.min.js"> </script>
-    <!-- <link rel="stylesheet" type="text/css" href="//cf.geekdo-static.com/static/css_master2_56018f7495c65.css"> -->
-    <link rel="stylesheet" href="webjars/bootstrap/3.3.5/css/bootstrap.min.css">
-    <link rel="stylesheet" href="webjars/font-awesome/4.4.0/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="../main.css">
+  <title>Modkiwi - <%= threadinfo.getSubject() %></title>
+  <script src="webjars/jquery/2.1.4/jquery.min.js"> </script>
+  <!-- <link rel="stylesheet" type="text/css" href="//cf.geekdo-static.com/static/css_master2_56018f7495c65.css"> -->
+  <link rel="stylesheet" href="webjars/bootstrap/3.3.5/css/bootstrap.min.css">
+  <link rel="stylesheet" href="webjars/font-awesome/4.4.0/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="../main.css">
+  <script type="text/javascript">
+    function toggle(username) {
+      setVis(username, !$('[data-toggle-author="' + username + '"]').hasClass("active"));
+    }
+    function setVis(username, show) {
+      if (show) {
+        $('li[data-toggle-author="' + username + '"]').addClass("active");
+        $('div[data-article-author="' + username + '"]').show();
+      } else {
+        $('[data-toggle-author="' + username + '"]').removeClass("active");
+        $('[data-article-author="' + username + '"]').hide();
+      }
+    }
+    $(document).ready(function() {
+<% for (int i = 0; i < len; i++) { %>
+      setVis("<%= usernames[i] %>", <%= show[i]%>);
+<% } %>
+    });
+  </script>
 </head>
 <body>
   <nav class="navbar navbar-default navbar-fixed-top">
@@ -39,18 +59,27 @@ Map<String, UserInfo> userinfo = (Map<String, UserInfo>)request.getAttribute("us
       </div>
       <div class="collapse navbar-collapse">
         <p class="navbar-text">
-          <% if (!users.isEmpty()) { %>
-            Viewing posts for <strong><%= users.get(0) %></strong>
+          <% if (false) { %>
+          <!-- Viewing posts for <strong><%= usernames[0] %></strong> -->
           <% } %>
         </p>
       </div>
     </div>
   </nav>
   <div class="container">
+      <div class="row">
+    <div class="col-md-2">
+      <ul class="nav nav-pills nav-stacked">
+<% for (int i = 0; i < len; i++) { %>
+<li role="presentation" data-toggle-author="<%= usernames[i] %>"><a onclick="toggle('<%= usernames[i] %>')" href="#"><%= usernames[i] %></a></li>
+<% } %>
+      </ul>
+    </div>
+    <div class="col-md-10">
     <div class="bgg">
-      <% for (ArticleInfo article : articles) {
+      <% for (ArticleInfo article : threadinfo.getArticles()) {
         UserInfo ui = userinfo.get(article.getUsername());%>
-        <div class="bgg-article " data-parent_objectid="<%= thread %>" data-parent_objecttype="thread" data-objectid="<%= article.getId() %>" data-objecttype="article" >
+        <div class="bgg-article " data-parent_objectid="<%= threadinfo.getId() %>" data-parent_objecttype="thread" data-objectid="<%= article.getId() %>" data-objecttype="article" data-article-author="<%= article.getUsername() %>">
           <div class = "bgg-article-avatarblock">
             <div><%= ui.getFirstName() %> <%= ui.getLastName() %></div>
             <div class="username">(<a href="/user/<%= article.getUsername() %>"><%= article.getUsername() %></a>)</div>
@@ -67,6 +96,8 @@ Map<String, UserInfo> userinfo = (Map<String, UserInfo>)request.getAttribute("us
         </div>
       <% } %>
     </div>
+    </div>
+  </div>
   </div>
 </body>
 </html>

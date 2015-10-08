@@ -7,6 +7,7 @@ import modkiwi.util.WebUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -37,21 +38,28 @@ public class ThreadServlet extends HttpServlet
         for (ArticleInfo article : ti.getArticles())
         {
             String author = article.getUsername();
-            if (username == null || username.equalsIgnoreCase(author))
-            {
-                articles.add(article);
-                if (users.get(author) == null)
-                    users.put(author, web.getUserInfo(author));
-            }
+            articles.add(article);
+            if (users.get(author) == null)
+                users.put(author, web.getUserInfo(author));
         }
 
-        req.setAttribute("articles", articles);
-        req.setAttribute("thread", thread);
+        int len = users.size();
+        String[] usernames = users.keySet().toArray(new String[len]);
+
+        Arrays.sort(usernames, String.CASE_INSENSITIVE_ORDER);
+        boolean[] show = new boolean[len];
+        for (int i = 0; i < len; i++)
+        {
+            if (username == null || username.equalsIgnoreCase(usernames[i]))
+                show[i] = true;
+            else
+                show[i] = false;
+        }
+
+        req.setAttribute("threadinfo", ti);
         req.setAttribute("userinfo", users);
-        if (username == null)
-            req.setAttribute("usernames", Collections.emptyList());
-        else
-            req.setAttribute("usernames", Collections.singletonList(username));
+        req.setAttribute("usernames", usernames);
+        req.setAttribute("showUsers", show);
 
         try
         {
