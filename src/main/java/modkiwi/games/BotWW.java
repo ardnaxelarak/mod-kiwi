@@ -32,6 +32,7 @@ public class BotWW extends GameBot
     private static final Pattern P_DUSK = Utils.pat("^dusk$");
     private static final Pattern P_DAWN = Utils.pat("^dawn$");
     private static final Pattern P_KILL = Utils.pat("^kill(?:ed)?\\s+(\\S.*)$");
+    private static final Pattern P_REVIVE = Utils.pat("^revive(?:d)?\\s+(\\S.*)$");
     private static final Pattern P_CLAIM = Utils.pat("^claim\\s+(\\S.*)$");
 
     private boolean tally, majorityDusk, notifyDusk, notifyDawn, voteDay, voteNight, showClaims;
@@ -178,6 +179,14 @@ public class BotWW extends GameBot
                     processAndAddMove("kill", Integer.toString(dead));
                 }
             }
+            else if (mod && (m = P_REVIVE.matcher(command)).matches())
+            {
+                int dead = Utils.getUser(m.group(1), players, game);
+                if (dead != -1 && !living[dead])
+                {
+                    processAndAddMove("revive", Integer.toString(dead));
+                }
+            }
             else if (canVote() && (m = P_VOTE.matcher(command)).matches())
             {
                 if (actor >= 0 && living[actor])
@@ -266,5 +275,13 @@ public class BotWW extends GameBot
                 list.add(players[i]);
         }
         return list;
+    }
+
+    @Override
+    protected void replace(int index, String newName, boolean fresh)
+    {
+        String oldName = players[index];
+        super.replace(index, newName, fresh);
+        votes.replace(oldName, newName);
     }
 }

@@ -1,5 +1,6 @@
 package modkiwi.games.util;
 
+import modkiwi.util.Logger;
 import modkiwi.util.Utils;
 
 import java.util.ArrayList;
@@ -45,6 +46,15 @@ public abstract class VoteTracker
 			else
 				return "[-]" + voter + " (" + index + ")[/-]";
 		}
+
+        public void replace(String oldName, String newName)
+        {
+            if (voter.equals(oldName))
+            {
+                LOGGER.finest("replacing voter '%s' in vote %d with '%s'", oldName, index, newName);
+                voter = newName;
+            }
+        }
 	}
 
 	private class VoteOption implements Comparable<VoteOption>
@@ -88,7 +98,17 @@ public abstract class VoteTracker
 			else
 				return 0;
 		}
+
+        public void replace(String oldName, String newName)
+        {
+            for (Vote v : votes)
+            {
+                v.replace(oldName, newName);
+            }
+        }
 	}
+
+    private static final Logger LOGGER = new Logger(VoteTracker.class);
 
 	private Map<String, Vote> latestVotes;
 	private List<Vote> votes;
@@ -165,4 +185,19 @@ public abstract class VoteTracker
 
 		return output;
 	}
+
+    public void replace(String oldName, String newName)
+    {
+        LOGGER.finer("replacing %s with %s", oldName, newName);
+        for (Vote v : votes)
+            v.replace(oldName, newName);
+
+        Vote v = latestVotes.get(oldName);
+        if (v != null)
+        {
+            v.replace(oldName, newName);
+            latestVotes.put(newName, v);
+            latestVotes.remove(oldName);
+        }
+    }
 }
