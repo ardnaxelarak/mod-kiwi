@@ -5,6 +5,7 @@ import static modkiwi.util.Constants.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -317,16 +318,27 @@ public class GameInfo
 
     public String getNickname(String name)
     {
-        return (String)nicknames.getProperty(name);
+        return (String)nicknames.getProperty(name.toLowerCase());
     }
 
     public void addNickname(String nickname, String username)
     {
-        nicknames.setProperty(nickname, username);
+        nicknames.setProperty(nickname.toLowerCase(), username);
     }
 
     public void removeNickname(String nickname)
     {
-        nicknames.setProperty(nickname, null);
+        nicknames.setProperty(nickname.toLowerCase(), null);
+    }
+
+    public void fixNicknames()
+    {
+        for (Map.Entry<String, Object> entry : nicknames.getProperties().entrySet())
+        {
+            nicknames.removeProperty(entry.getKey());
+            nicknames.setProperty(entry.getKey().toLowerCase(), entry.getValue());
+        }
+
+        save();
     }
 }

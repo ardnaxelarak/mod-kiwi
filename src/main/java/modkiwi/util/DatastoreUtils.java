@@ -26,6 +26,20 @@ public final class DatastoreUtils
     {
     }
 
+    public static List<GameInfo> allGames()
+    {
+        List<GameInfo> list = new LinkedList<GameInfo>();
+        Query q = new Query("Game");
+        PreparedQuery pq = datastore.prepare(q);
+
+        for (Entity ent : pq.asIterable())
+        {
+            list.add(new GameInfo(ent));
+        }
+
+        return list;
+    }
+
     public static List<GameInfo> gamesByStatus(String... status)
     {
         List<GameInfo> list = new LinkedList<GameInfo>();

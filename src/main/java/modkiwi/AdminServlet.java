@@ -3,9 +3,11 @@ package modkiwi;
 import modkiwi.data.ArticleInfo;
 import modkiwi.data.GeekMailInfo;
 import modkiwi.data.ThreadInfo;
+import modkiwi.data.GameInfo;
 import modkiwi.net.GAEConnection;
 import modkiwi.net.NetConnection;
 import modkiwi.net.WebResponse;
+import modkiwi.util.DatastoreUtils;
 import modkiwi.util.WebUtils;
 
 import java.io.IOException;
@@ -24,15 +26,9 @@ public class AdminServlet extends HttpServlet
         resp.setContentType("text/plain");
         PrintWriter pw = resp.getWriter();
 
-        WebUtils web = new WebUtils();
-        web.login();
-
-        String id = req.getParameter("id");
-        List<GeekMailInfo> list = web.getMail(id);
-
-        for (GeekMailInfo mail : list)
+        for (GameInfo game : DatastoreUtils.allGames())
         {
-            pw.printf("From: %s\nSubject: %s\nID: %s\n%s\n--------------------\n", mail.getSender(), mail.getSubject(), mail.getId(), mail.getContent());
+            game.fixNicknames();
         }
     }
 }
