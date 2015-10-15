@@ -156,7 +156,7 @@ public class BotWW extends GameBot
             else if (first.equals("nightfall"))
             {
                 int pnum = Integer.parseInt(move[1]);
-                voters.lock(players[pnum]);
+                votes.lock(players[pnum]);
             }
         }
     }

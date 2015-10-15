@@ -31,12 +31,12 @@ public abstract class VoteTracker
 
 		public boolean isLatest()
 		{
-			return this == latestVotes.get(voter);
+			return this == latestVotes.get(voter.toLowerCase());
 		}
 
         public boolean isLocked()
         {
-            return isLatest() && lockedVotes.contains(voter);
+            return isLatest() && VoteTracker.this.isLocked(voter);
         }
 
 		@Override
@@ -209,7 +209,7 @@ public abstract class VoteTracker
 			ListIterator<String> li = nonVoters.listIterator(0);
 			while (li.hasNext())
 			{
-				if (latestVotes.get(li.next()) != null)
+				if (isVoting(li.next()))
 					li.remove();
 			}
 
