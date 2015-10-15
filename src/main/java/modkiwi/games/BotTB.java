@@ -177,7 +177,7 @@ public class BotTB extends GameBot
         }
         catch (IOException e)
         {
-            LOGGER.throwing("sendRoles()", e);
+            LOGGER.throwing("sendHands()", e);
         }
     }
 
