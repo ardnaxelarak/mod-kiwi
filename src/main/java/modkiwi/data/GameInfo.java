@@ -341,4 +341,16 @@ public class GameInfo
 
         save();
     }
+
+    public List<String> listNicknames(String username)
+    {
+        List<String> list = new LinkedList<String>();
+        for (Map.Entry<String, Object> entry : nicknames.getProperties().entrySet())
+        {
+            String name = (String)entry.getValue();
+            if (username.equalsIgnoreCase(name))
+                list.add(entry.getKey());
+        }
+        return list;
+    }
 }

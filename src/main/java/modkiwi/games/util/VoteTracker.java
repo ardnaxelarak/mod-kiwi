@@ -6,11 +6,13 @@ import modkiwi.util.Utils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.Set;
 
 public abstract class VoteTracker
 {
@@ -32,6 +34,11 @@ public abstract class VoteTracker
 			return this == latestVotes.get(voter);
 		}
 
+        public boolean isLocked()
+        {
+            return isLatest() && lockedVotes.contains(voter);
+        }
+
 		@Override
 		public int compareTo(Vote v)
 		{
@@ -41,7 +48,9 @@ public abstract class VoteTracker
 		@Override
 		public String toString()
 		{
-			if (isLatest())
+            if (isLocked())
+				return "r{" + voter + "* (" + index + ")}r";
+            else if (isLatest())
 				return voter + " (" + index + ")";
 			else
 				return "[-]" + voter + " (" + index + ")[/-]";
@@ -111,24 +120,50 @@ public abstract class VoteTracker
     private static final Logger LOGGER = new Logger(VoteTracker.class);
 
 	private Map<String, Vote> latestVotes;
+    private Set<String> lockedVotes;
 	private List<Vote> votes;
 	private int nextVote;
 
 	public VoteTracker()
 	{
 		latestVotes = new HashMap<String, Vote>();
+        lockedVotes = new HashSet<String>();
 		votes = new LinkedList<Vote>();
 		nextVote = 1;
 	}
 
 	public abstract String getVotee(int index);
 
-	public void vote(String voter, int votee)
+	public boolean vote(String voter, int votee)
 	{
+        if (isLocked(voter))
+            return false;
+
 		Vote v = new Vote(voter, votee);
 		votes.add(v);
-		latestVotes.put(voter, v);
+		latestVotes.put(voter.toLowerCase(), v);
+        return true;
 	}
+
+    public void lock(String voter)
+    {
+        lockedVotes.add(voter.toLowerCase());
+    }
+
+    public void unlock(String voter)
+    {
+        lockedVotes.remove(voter.toLowerCase());
+    }
+
+    public boolean isLocked(String voter)
+    {
+        return lockedVotes.contains(voter.toLowerCase());
+    }
+
+    public boolean isVoting(String voter)
+    {
+        return latestVotes.get(voter.toLowerCase()) != null;
+    }
 
 	public void reset()
 	{
@@ -192,12 +227,17 @@ public abstract class VoteTracker
         for (Vote v : votes)
             v.replace(oldName, newName);
 
-        Vote v = latestVotes.get(oldName);
+        Vote v = latestVotes.get(oldName.toLowerCase());
         if (v != null)
         {
-            v.replace(oldName, newName);
-            latestVotes.put(newName, v);
-            latestVotes.remove(oldName);
+            latestVotes.put(newName.toLowerCase(), v);
+            latestVotes.remove(oldName.toLowerCase());
+
+            if (isLocked(oldName))
+            {
+                unlock(oldName);
+                lock(newName);
+            }
         }
     }
 }

@@ -31,6 +31,7 @@ public class BotWW extends GameBot
     private static final Pattern P_VOTE = Utils.pat("^vote\\s+(\\S.*)$");
     private static final Pattern P_DUSK = Utils.pat("^dusk$");
     private static final Pattern P_DAWN = Utils.pat("^dawn$");
+    private static final Pattern P_NIGHTFALL = Utils.pat("^nightfall$");
     private static final Pattern P_KILL = Utils.pat("^kill(?:ed)?\\s+(\\S.*)$");
     private static final Pattern P_REVIVE = Utils.pat("^revive(?:d)?\\s+(\\S.*)$");
     private static final Pattern P_CLAIM = Utils.pat("^claim\\s+(\\S.*)$");
@@ -152,6 +153,11 @@ public class BotWW extends GameBot
                 int pnum = Integer.parseInt(move[1]);
                 claims[pnum] = Utils.join(Arrays.copyOfRange(move, 2, move.length), " ");
             }
+            else if (first.equals("nightfall"))
+            {
+                int pnum = Integer.parseInt(move[1]);
+                voters.lock(players[pnum]);
+            }
         }
     }
 
@@ -203,6 +209,11 @@ public class BotWW extends GameBot
                 if (actor != -1)
                     processAndAddMove("claim", Integer.toString(actor), m.group(1));
             }
+            else if (canVote() && P_NIGHTFALL.matcher(command).matches())
+            {
+                if (actor != -1 && votes.isVoting(players[actor]))
+                    processAndAddMove("nightfall", Integer.toString(actor));
+            }
         }
     }
 
@@ -213,19 +224,17 @@ public class BotWW extends GameBot
 
         if (game.inProgress())
         {
-			if (canVote())
-			{
-				sb.append("[color=#008800]");
-				sb.append(votes.getVotes());
-				sb.append("[/color]");
-				sb.append("\nTo ensure the latest tally is up-to-date, please [b][url=" + DOMAIN + "/scan?id=" + game.getId() + "&update=1&redirect=1]click here[/url][/b]");
-                if (showClaims)
-                {
-                    sb.append("\n\n");
-                }
-			}
+            if (canVote())
+            {
+                sb.append("[color=#008800]");
+                sb.append(votes.getVotes());
+                sb.append("[/color]");
+                sb.append("\nTo ensure the latest tally is up-to-date, please [b][url=" + DOMAIN + "/scan?id=" + game.getId() + "&update=1&redirect=1]click here[/url][/b]");
+            }
             if (showClaims)
             {
+                if (sb.length() != 0)
+                    sb.append("\n\n");
                 sb.append("[color=#008800][u]Current Claims:[/u][/color]");
                 for (int i = 0; i < NoP; i++)
                 {
@@ -237,6 +246,22 @@ public class BotWW extends GameBot
                         sb.append(" - [ooc](no claim)[/ooc]");
                     else
                         sb.append(" - b{" + claims[i] + "}b");
+                }
+            }
+            if (true)
+            {
+                if (sb.length() != 0)
+                    sb.append("\n\n");
+                sb.append("[color=#008800][u]Nicknames:[/u][/color]");
+                for (int i = 0; i < NoP; i++)
+                {
+                    if (!living[i])
+                        continue;
+                    sb.append("\n");
+                    sb.append(players[i]);
+                    sb.append(" - b{");
+                    sb.append(Utils.join(game.listNicknames(players[i]), ", "));
+                    sb.append("}b");
                 }
             }
         }
