@@ -1,5 +1,6 @@
 package modkiwi.games;
 
+// imports
 import modkiwi.data.GameInfo;
 import modkiwi.games.util.VoteTracker;
 import modkiwi.util.DatastoreUtils;
@@ -102,23 +103,39 @@ public class BotWW extends GameBot
 
         claims = new String[NoP];
         Arrays.fill(claims, null);
-        newDawn(fresh);
+        newDawn(fresh, false);
 
         living = new boolean[NoP];
         Arrays.fill(living, true);
     }
 
-    private void newDawn(boolean fresh)
+    private void newDawn(boolean fresh, boolean unusual)
     {
         currentState = "day";
-        // notify mod if applicable
+        if (fresh && (unusual || notifyDawn))
+        {
+            String subject = game.getPrefix() + " - Dawn";
+            try {
+                web.geekmail(game.getMods(), subject, "It is now Dawn.");
+            } catch (IOException e) {
+                LOGGER.throwing("newDawn()", e);
+            }
+        }
         votes.reset();
     }
 
-    private void newDusk(boolean fresh)
+    private void newDusk(boolean fresh, boolean unusual)
     {
         currentState = "night";
-        // notify mod if applicable
+        if (fresh && (unusual || notifyDusk))
+        {
+            String subject = game.getPrefix() + " - Dusk";
+            try {
+                web.geekmail(game.getMods(), subject, "It is now Dusk.");
+            } catch (IOException e) {
+                LOGGER.throwing("newDawn()", e);
+            }
+        }
         votes.reset();
     }
 
@@ -131,14 +148,27 @@ public class BotWW extends GameBot
             if (first.equals("vote"))
             {
                 votes.vote(players[Integer.parseInt(move[1])], Integer.parseInt(move[2]));
+                if (fresh && majorityDusk)
+                {
+                    VoteTracker.VoteOption ll = votes.getLL();
+                    if (ll.isMajority(false))
+                    {
+                        String newTime = "dusk";
+                        if (currentState.equalsIgnoreCase("dusk"))
+                            newTime = "dawn";
+                        addMessage("[b][%s][/b]", newTime);
+                        addMessage("[color=#008800]%s has a majority of votes![/color]", ll.getTarget());
+                        processAndAddMove(newTime, "majority");
+                    }
+                }
             }
             else if (first.equals("dusk"))
             {
-                newDusk(fresh);
+                newDusk(fresh, move.length > 1);
             }
             else if (first.equals("dawn"))
             {
-                newDawn(fresh);
+                newDawn(fresh, move.length > 1);
             }
             else if (first.equals("kill"))
             {
@@ -157,6 +187,19 @@ public class BotWW extends GameBot
             {
                 int pnum = Integer.parseInt(move[1]);
                 votes.lock(players[pnum]);
+                if (fresh)
+                {
+                    VoteTracker.VoteOption ll = votes.getLL();
+                    if (ll.isLockedMajority(true))
+                    {
+                        String newTime = "dusk";
+                        if (currentState.equalsIgnoreCase("dusk"))
+                            newTime = "dawn";
+                        addMessage("[b][%s][/b]", newTime);
+                        addMessage("[color=#008800]%s has a majority of locked votes![/color]", ll.getTarget());
+                        processAndAddMove(newTime, "nightfall");
+                    }
+                }
             }
         }
     }

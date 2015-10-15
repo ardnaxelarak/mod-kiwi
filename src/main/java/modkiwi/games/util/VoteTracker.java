@@ -66,12 +66,12 @@ public abstract class VoteTracker
         }
 	}
 
-	private class VoteOption implements Comparable<VoteOption>
+	public class VoteOption implements Comparable<VoteOption>
 	{
-		int votee;
-		int numVotes;
-		int lastVote;
-		PriorityQueue<Vote> votes;
+		private int votee;
+		private int numVotes, numLockedVotes;
+		private int lastVote;
+		private PriorityQueue<Vote> votes;
 
 		public VoteOption(Vote v)
 		{
@@ -88,6 +88,8 @@ public abstract class VoteTracker
 			{
 				numVotes++;
 				lastVote = Math.max(lastVote, v.index);
+                if (v.isLocked())
+                    numLockedVotes++;
 			}
 
 			votes.add(v);
@@ -108,12 +110,41 @@ public abstract class VoteTracker
 				return 0;
 		}
 
-        public void replace(String oldName, String newName)
+        public String getTarget()
         {
-            for (Vote v : votes)
-            {
-                v.replace(oldName, newName);
-            }
+            return getVotee(votee);
+        }
+
+        public boolean isMajority(boolean countEqual)
+        {
+            if (voters() == null)
+                return false;
+
+            int total = voters().size();
+
+            if (numVotes > total / 2)
+                return true;
+
+            if (countEqual && numVotes == total / 2)
+                return true;
+
+            return false;
+        }
+
+        public boolean isLockedMajority(boolean countEqual)
+        {
+            if (voters() == null)
+                return false;
+
+            int total = voters().size();
+
+            if (numLockedVotes > total / 2)
+                return true;
+
+            if (countEqual && numLockedVotes == total / 2)
+                return true;
+
+            return false;
         }
 	}
 
@@ -177,8 +208,8 @@ public abstract class VoteTracker
 		return null;
 	}
 
-	public CharSequence getVotes()
-	{
+    public List<VoteOption> getVoteList()
+    {
 		Map<Integer, VoteOption> tally = new HashMap<Integer, VoteOption>();
 		for (Vote v : votes)
 		{
@@ -188,14 +219,21 @@ public abstract class VoteTracker
 				tally.get(v.votee).addVote(v);
 		}
 
+		List<VoteOption> list = new ArrayList<VoteOption>(tally.values());
+		Collections.sort(list);
+
+        return list;
+    }
+
+	public CharSequence getVotes()
+	{
 		StringBuilder output = new StringBuilder();
 
-		List<VoteOption> votees = new ArrayList<VoteOption>(tally.values());
-		Collections.sort(votees);
+        List<VoteOption> list = getVoteList();
 
 		output.append("[u]Vote Tally:[/u]");
 
-		for (VoteOption vo : votees)
+		for (VoteOption vo : list)
 		{
 			output.append("\n");
 			output.append(getVotee(vo.votee));
@@ -220,6 +258,14 @@ public abstract class VoteTracker
 
 		return output;
 	}
+
+    public VoteOption getLL()
+    {
+        List<VoteOption> list = getVoteList();
+        if (list == null || list.isEmpty())
+            return null;
+        return list.get(0);
+    }
 
     public void replace(String oldName, String newName)
     {
