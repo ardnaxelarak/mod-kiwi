@@ -159,10 +159,12 @@ public abstract class GameBot
         else if (mod && (m = P_NICKNAME_OTHER.matcher(command)).matches())
         {
             game.addNickname(m.group(2), m.group(1));
+            updatePlayerList();
         }
         else if ((m = P_NICKNAME_SELF.matcher(command)).matches())
         {
             game.addNickname(m.group(1), username);
+            updatePlayerList();
         }
         else if (game.getAcronym() != null &&
                 (m = P_GUESS.matcher(command)).matches())
@@ -309,11 +311,15 @@ public abstract class GameBot
         }
         else
         {
-            listText = "[color=#008800][u]Seating Order:[/u]";
+            listText = "[color=#008800][u]Seating Order (nicknames):[/u]";
             int k = 1;
             for (String username : game.getPlayers())
+            {
                 listText += "\n" + k++ + ". [url=" + DOMAIN + "/" + WebUtils.playerThreadURL(game.getThread(), username) + "]" + username + "[/url]";
-
+                List<String> nicknames = game.listNicknames(username);
+                if (!nicknames.isEmpty())
+                    listText += " (" + Utils.join(game.listNicknames(username), ", ") + ")";
+            }
             listText += "[/color]";
         }
 

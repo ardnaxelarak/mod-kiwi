@@ -291,22 +291,6 @@ public class BotWW extends GameBot
                         sb.append(" - b{" + claims[i] + "}b");
                 }
             }
-            if (true)
-            {
-                if (sb.length() != 0)
-                    sb.append("\n\n");
-                sb.append("[color=#008800][u]Nicknames:[/u][/color]");
-                for (int i = 0; i < NoP; i++)
-                {
-                    if (!living[i])
-                        continue;
-                    sb.append("\n");
-                    sb.append(players[i]);
-                    sb.append(" - b{");
-                    sb.append(Utils.join(game.listNicknames(players[i]), ", "));
-                    sb.append("}b");
-                }
-            }
         }
 
         if (sb.length() == 0)
