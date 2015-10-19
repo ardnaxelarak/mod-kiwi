@@ -311,9 +311,10 @@ public abstract class GameBot
         }
         else
         {
+            String[] playerList = game.getCurrentPlayers();
             listText = "[color=#008800][u]Seating Order (nicknames):[/u]";
             int k = 1;
-            for (String username : game.getPlayers())
+            for (String username : playerList)
             {
                 listText += "\n" + k++ + ". [url=" + DOMAIN + "/" + WebUtils.playerThreadURL(game.getThread(), username) + "]" + username + "[/url]";
                 List<String> nicknames = game.listNicknames(username);

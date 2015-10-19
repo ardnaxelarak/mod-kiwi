@@ -29,7 +29,7 @@ GameInfo game = (GameInfo)request.getAttribute("gameInfo");
             <tr>
                 <th>Players (<%= game.getPlayers().size() %>)</th>
             </tr>
-            <% for (String player : game.getPlayers()) { %>
+            <% for (String player : game.getCurrentPlayers()) { %>
             <tr>
 				<td><a href="../<%= WebUtils.playerThreadURL(game.getThread(), player) %>"><%= player %></a></td>
             </tr>

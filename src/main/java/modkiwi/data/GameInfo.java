@@ -140,6 +140,25 @@ public class GameInfo
         return players;
     }
 
+    public String[] getCurrentPlayers()
+    {
+        List<String> players = getPlayers();
+        String[] list = new String[players.size()];
+        for (int i = 0; i < list.length; i++)
+            list[i] = players.get(i);
+
+        for (String move : getMoves())
+        {
+            if (move.toLowerCase().startsWith("replace "))
+            {
+                String[] pieces = move.split(" ", 3);
+                list[Integer.parseInt(pieces[1])] = pieces[2];
+            }
+        }
+
+        return list;
+    }
+
     public List<String> getNonPlayerMods()
     {
         LinkedList<String> ret = new LinkedList<String>(getMods());
