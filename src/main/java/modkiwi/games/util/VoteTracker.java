@@ -141,7 +141,7 @@ public abstract class VoteTracker
             if (numLockedVotes > total / 2)
                 return true;
 
-            if (countEqual && numLockedVotes == total / 2)
+            if (countEqual && numLockedVotes * 2 == total)
                 return true;
 
             return false;
@@ -200,6 +200,7 @@ public abstract class VoteTracker
 	{
 		nextVote = 1;
 		latestVotes.clear();
+        lockedVotes.clear();
 		votes.clear();
 	}
 

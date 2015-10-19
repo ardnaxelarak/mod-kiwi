@@ -1,14 +1,10 @@
 package modkiwi;
 
-import modkiwi.data.ArticleInfo;
-import modkiwi.data.GeekMailInfo;
-import modkiwi.data.ThreadInfo;
-import modkiwi.data.GameInfo;
-import modkiwi.net.GAEConnection;
-import modkiwi.net.NetConnection;
-import modkiwi.net.WebResponse;
-import modkiwi.util.DatastoreUtils;
-import modkiwi.util.WebUtils;
+import modkiwi.data.*;
+import modkiwi.games.*;
+import modkiwi.games.util.*;
+import modkiwi.net.*;
+import modkiwi.util.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -28,7 +24,8 @@ public class AdminServlet extends HttpServlet
 
         for (GameInfo game : DatastoreUtils.allGames())
         {
-            game.fixNicknames();
+            GameBot bot = BotManager.getBot(game);
+            bot.updatePlayerList();
         }
     }
 }
