@@ -6,6 +6,7 @@ import modkiwi.games.util.VoteTracker;
 import modkiwi.util.DatastoreUtils;
 import modkiwi.util.Logger;
 import modkiwi.util.Utils;
+import modkiwi.util.WebUtils;
 
 import static modkiwi.util.Constants.*;
 
@@ -48,7 +49,7 @@ public class BotWW extends GameBot
     {
         public String getVotee(int index)
         {
-            return players[index];
+            return "[url=" + DOMAIN + "/" + WebUtils.playerThreadURL(game.getThread(), players[index]) + "]" + players[index] + "[/url]";
         }
 
         @Override
