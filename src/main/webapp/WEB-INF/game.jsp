@@ -21,6 +21,9 @@ GameInfo game = (GameInfo)request.getAttribute("gameInfo");
 
 <body>
     <h1><div id='name_span'><%= game.getFullTitle() %></div></h1>
+    <div id='links'>
+        <a href="https://boardgamegeek.com/thread/<%= game.getThread() %>">Go to game thread</a> (<a href="https://boardgamegeek.com/thread/<%= game.getThread() %>/new">latest)
+    </div>
     <div id='player_table'>
         <table border="0" class="forum_table" cellpadding="4" cellspacing="2">
             <tr>
