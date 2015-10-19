@@ -176,6 +176,11 @@ public abstract class VoteTracker
         return true;
 	}
 
+    public void unvote(String voter)
+    {
+        latestVotes.remove(voter.toLowerCase());
+    }
+
     public void lock(String voter)
     {
         lockedVotes.add(voter.toLowerCase());

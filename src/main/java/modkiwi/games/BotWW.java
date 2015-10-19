@@ -30,6 +30,7 @@ public class BotWW extends GameBot
     private static final Logger LOGGER = new Logger(BotWW.class);
 
     private static final Pattern P_VOTE = Utils.pat("^vote\\s+(\\S.*)$");
+    private static final Pattern P_UNVOTE = Utils.pat("^unvote$");
     private static final Pattern P_DUSK = Utils.pat("^dusk$");
     private static final Pattern P_DAWN = Utils.pat("^dawn$");
     private static final Pattern P_NIGHTFALL = Utils.pat("^nightfall$");
@@ -162,6 +163,10 @@ public class BotWW extends GameBot
                     }
                 }
             }
+            else if (first.equals("unvote"))
+            {
+                votes.unvote(players[Integer.parseInt(move[1])]);
+            }
             else if (first.equals("dusk"))
             {
                 newDusk(fresh, move.length > 1);
@@ -245,6 +250,13 @@ public class BotWW extends GameBot
                     {
                         processAndAddMove("vote", Integer.toString(actor), Integer.toString(votee));
                     }
+                }
+            }
+            else if (canVote() && P_UNVOTE.matcher(command).matches())
+            {
+                if (actor >= 0 && living[actor])
+                {
+                    processAndAddMove("unvote", Integer.toString(actor));
                 }
             }
             else if ((m = P_CLAIM.matcher(command)).matches())
