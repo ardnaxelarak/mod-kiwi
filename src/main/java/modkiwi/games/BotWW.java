@@ -35,6 +35,7 @@ public class BotWW extends GameBot
     private static final Pattern P_DUSK = Utils.pat("^dusk$");
     private static final Pattern P_DAWN = Utils.pat("^dawn$");
     private static final Pattern P_NIGHTFALL = Utils.pat("^nightfall$");
+    private static final Pattern P_UNLOCK = Utils.pat("^unlock\\s+(\\S.*)$");
     private static final Pattern P_KILL = Utils.pat("^kill(?:ed)?\\s+(\\S.*)$");
     private static final Pattern P_REVIVE = Utils.pat("^revive(?:d)?\\s+(\\S.*)$");
     private static final Pattern P_CLAIM = Utils.pat("^claim\\s+(\\S.*)$");
@@ -207,6 +208,11 @@ public class BotWW extends GameBot
                     }
                 }
             }
+            else if (first.equals("unlock"))
+            {
+                int pnum = Integer.parseInt(move[1]);
+                votes.unlock(players[pnum]);
+            }
         }
     }
 
@@ -269,6 +275,14 @@ public class BotWW extends GameBot
             {
                 if (actor != -1 && votes.isVoting(players[actor]))
                     processAndAddMove("nightfall", Integer.toString(actor));
+            }
+            else if (mod && (m = P_UNLOCK.matcher(command)).matches())
+            {
+                int player = Utils.getUser(m.group(1), players, game);
+                if (player != -1 && votes.isLocked(players[player]))
+                {
+                    processAndAddMove("unlock", Integer.toString(player));
+                }
             }
         }
     }
