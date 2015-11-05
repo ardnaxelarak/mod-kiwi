@@ -300,6 +300,7 @@ public class BotWW extends GameBot
                 sb.append(votes.getVotes());
                 sb.append("[/color]");
                 sb.append("\nTo ensure the latest tally is up-to-date, please [b][url=" + DOMAIN + "/scan?id=" + game.getId() + "&update=1&redirect=1]click here[/url][/b]");
+                sb.append("\n[url=" + DOMAIN + "/" + WebUtils.playerThreadURL(game.getThread(), web.getUsername()) + "]List of tallies[/url]");
             }
             if (showClaims)
             {
