@@ -9,9 +9,11 @@ import modkiwi.net.RequestBuilder;
 import modkiwi.net.WebConnection;
 import modkiwi.net.WebRequest;
 import modkiwi.net.WebResponse;
+import modkiwi.net.exceptions.UnexpectedResponseCodeException;
 import modkiwi.util.Utils;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
@@ -28,6 +30,7 @@ public class WebUtils
     private String username;
     private WebConnection conn;
     private static final Pattern REPLY_PATTERN = Pattern.compile("^\\[q=\"[^\"]*\"\\](.*)\\[/q\\]$", Pattern.CASE_INSENSITIVE);
+    private static final Logger LOGGER = new Logger(WebUtils.class);
 
     public WebUtils() {
         conn = new NetConnection();
@@ -209,8 +212,16 @@ public class WebUtils
     }
 
     public synchronized ThreadInfo getThread(WebRequest request) throws IOException {
-        WebResponse response = conn.execute(request);
-        return new ThreadInfo(response.parse().select("thread").first());
+        try {
+            WebResponse response = conn.execute(request);
+            return new ThreadInfo(response.parse().select("thread").first());
+        } catch (SocketTimeoutException e) {
+            LOGGER.warning("Request to " + request.toString() + " timed out.");
+            return new ThreadInfo();
+        } catch (UnexpectedResponseCodeException e) {
+            LOGGER.warning("Request to " + request.toString() + " resulted in unexpected response code " + e.getResponseCode());
+            return new ThreadInfo();
+        }
     }
 
     public synchronized UserInfo getUserInfo(String user) throws IOException {

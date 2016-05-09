@@ -11,6 +11,14 @@ public class ThreadInfo
     private String link;
     private ArticleInfo[] articles;
 
+    public ThreadInfo() {
+        link = "";
+        id = "";
+        subject = "";
+        count = 0;
+        articles = new ArticleInfo[0];
+    }
+
     public ThreadInfo(Element node)
     {
         id = node.attr("id");

@@ -11,6 +11,8 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 
+import modkiwi.net.exceptions.UnexpectedResponseCodeException;
+
 public class NetConnection implements WebConnection
 {
     private HttpURLConnection connection;
@@ -101,7 +103,7 @@ public class NetConnection implements WebConnection
         }
         else if (status != HttpURLConnection.HTTP_OK)
         {
-            throw new IOException("Unexpected response code: " + connection.getResponseCode());
+            throw new UnexpectedResponseCodeException(connection.getResponseCode());
         }
         else
         {

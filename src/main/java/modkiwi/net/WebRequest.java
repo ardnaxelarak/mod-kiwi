@@ -33,4 +33,9 @@ public class WebRequest
     {
         return charset;
     }
+
+    public String toString()
+    {
+        return requestType + " " + url + "?" + query;
+    }
 }
