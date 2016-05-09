@@ -19,8 +19,7 @@ import java.util.regex.Pattern;
 
 import com.google.appengine.api.datastore.EmbeddedEntity;
 
-public class BotRES extends GameBot
-{
+public class BotRES extends GameBot {
     public static final String LONG_NAME = "The Resistance";
 
     private static final Logger LOGGER = new Logger(BotRES.class);
@@ -28,54 +27,44 @@ public class BotRES extends GameBot
     private int ronud, turn;
     private String step;
 
-    protected BotRES(GameInfo game) throws IOException
-    {
+    protected BotRES(GameInfo game) throws IOException {
         super(game);
     }
 
     @Override
-    public void createGame()
-    {
+    public void createGame() {
     }
 
     @Override
-    protected CharSequence update()
-    {
-        if (game.inProgress())
-        {
+    protected CharSequence update() {
+        if (game.inProgress()) {
             return null;
         }
         return null;
     }
 
     @Override
-    public void initialize(boolean fresh)
-    {
+    public void initialize(boolean fresh) {
     }
 
     @Override
-    protected void processMove(boolean fresh, String... move)
-    {
+    protected void processMove(boolean fresh, String... move) {
     }
 
     @Override
-    public void processCommand(String username, String command)
-    {
+    public void processCommand(String username, String command) {
         Matcher m;
-        if (game.inSignups())
-        {
+        if (game.inSignups()) {
         }
     }
 
     @Override
-    public CharSequence getCurrentStatus()
-    {
+    public CharSequence getCurrentStatus() {
         return null;
     }
 
     @Override
-    public String getHistoryItem(String move)
-    {
+    public String getHistoryItem(String move) {
         return move;
     }
 }
