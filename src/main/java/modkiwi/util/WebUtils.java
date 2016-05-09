@@ -29,18 +29,15 @@ public class WebUtils
     private WebConnection conn;
     private static final Pattern REPLY_PATTERN = Pattern.compile("^\\[q=\"[^\"]*\"\\](.*)\\[/q\\]$", Pattern.CASE_INSENSITIVE);
 
-    public WebUtils()
-    {
+    public WebUtils() {
         conn = new NetConnection();
     }
 
-    public WebUtils(WebConnection conn)
-    {
+    public WebUtils(WebConnection conn) {
         this.conn = conn;
     }
 
-    public synchronized WebResponse login() throws IOException
-    {
+    public synchronized WebResponse login() throws IOException {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         Key key = KeyFactory.createKey("Credentials", "autobot");
         try {
@@ -53,8 +50,7 @@ public class WebUtils
         }
     }
 
-    public synchronized WebResponse login(String username, String password) throws IOException
-    {
+    public synchronized WebResponse login(String username, String password) throws IOException {
         WebRequest request = RequestBuilder.post()
                 .setUrl("http://boardgamegeek.com/login")
                 .addParameter("username", username)
@@ -66,13 +62,11 @@ public class WebUtils
         return resp;
     }
 
-    public String getUsername()
-    {
+    public String getUsername() {
         return username;
     }
 
-    public synchronized WebResponse geekmail(String user, String subject, CharSequence content) throws IOException
-    {
+    public synchronized WebResponse geekmail(String user, String subject, CharSequence content) throws IOException {
         WebRequest request = RequestBuilder.post()
                 .setUrl("http://boardgamegeek.com/geekmail_controller.php")
                 .addParameter("B1", "Send")
@@ -86,8 +80,7 @@ public class WebUtils
         return conn.execute(request);
     }
 
-    public synchronized WebResponse geekmail(List<String> users, String subject, CharSequence content) throws IOException
-    {
+    public synchronized WebResponse geekmail(List<String> users, String subject, CharSequence content) throws IOException {
         if (users == null || users.size() == 0)
             return null;
 
@@ -96,8 +89,7 @@ public class WebUtils
         return geekmail(userString, subject, content);
     }
 
-    public synchronized void thumb(String article) throws IOException
-    {
+    public synchronized void thumb(String article) throws IOException {
         WebRequest request = RequestBuilder.post()
                 .setUrl("https://boardgamegeek.com/geekrecommend.php")
                 .addParameter("action", "recommend")
@@ -109,8 +101,7 @@ public class WebUtils
         WebResponse response = conn.execute(request);
     }
 
-    public synchronized void edit(String article, String subject, CharSequence content) throws IOException
-    {
+    public synchronized void edit(String article, String subject, CharSequence content) throws IOException {
         WebRequest request = RequestBuilder.post()
                 .setUrl("https://boardgamegeek.com/article/save")
                 .addParameter("action", "save")
@@ -123,8 +114,7 @@ public class WebUtils
         WebResponse response = conn.execute(request);
     }
 
-    public synchronized String replyArticle(String article, String subject, CharSequence content) throws IOException
-    {
+    public synchronized String replyArticle(String article, String subject, CharSequence content) throws IOException {
         WebRequest request = RequestBuilder.post()
                 .setUrl("https://boardgamegeek.com/article/save")
                 .addParameter("action", "save")
@@ -137,18 +127,20 @@ public class WebUtils
 
         Pattern pattern = Pattern.compile("boardgamegeek.com/article/(\\d*)#(\\d*)$");
         Matcher matcher = pattern.matcher(response.getFinalUrl());
-        if (matcher.find())
+
+        if (matcher.find()) {
             return matcher.group(1);
-        else
+        } else {
             return null;
+        }
     }
 
-    public synchronized String replyThread(String thread, String subject, CharSequence content) throws IOException
-    {
+    public synchronized String replyThread(String thread, String subject, CharSequence content) throws IOException {
         ThreadInfo t = getThread(thread, 1);
         String sub = subject;
-        if (sub == null)
+        if (sub == null) {
             sub = "Re: " + t.getSubject();
+        }
 
         String article = t.getArticleId();
 
@@ -164,19 +156,19 @@ public class WebUtils
 
         Pattern pattern = Pattern.compile("boardgamegeek.com/article/(\\d*)#(\\d*)$");
         Matcher matcher = pattern.matcher(response.getFinalUrl());
-        if (matcher.find())
+
+        if (matcher.find()) {
             return matcher.group(1);
-        else
+        } else {
             return null;
+        }
     }
 
-    public synchronized String replyThread(GameInfo game, CharSequence content) throws IOException
-    {
+    public synchronized String replyThread(GameInfo game, CharSequence content) throws IOException {
         return replyThread(game.getThread(), null, content);
     }
 
-    public synchronized ThreadInfo getThread(String thread, String article, int max) throws IOException
-    {
+    public synchronized ThreadInfo getThread(String thread, String article, int max) throws IOException {
         WebRequest request = RequestBuilder.get()
                 .setUrl("https://boardgamegeek.com/xmlapi2/thread")
                 .addParameter("id", thread)
@@ -187,8 +179,7 @@ public class WebUtils
         return getThread(request);
     }
 
-    public synchronized ThreadInfo getThread(String thread, String article) throws IOException
-    {
+    public synchronized ThreadInfo getThread(String thread, String article) throws IOException {
         WebRequest request = RequestBuilder.get()
                 .setUrl("https://boardgamegeek.com/xmlapi2/thread")
                 .addParameter("id", thread)
@@ -198,8 +189,7 @@ public class WebUtils
         return getThread(request);
     }
 
-    public synchronized ThreadInfo getThread(String thread, int max) throws IOException
-    {
+    public synchronized ThreadInfo getThread(String thread, int max) throws IOException {
         WebRequest request = RequestBuilder.get()
                 .setUrl("https://boardgamegeek.com/xmlapi2/thread")
                 .addParameter("id", thread)
@@ -209,8 +199,7 @@ public class WebUtils
         return getThread(request);
     }
 
-    public synchronized ThreadInfo getThread(String thread) throws IOException
-    {
+    public synchronized ThreadInfo getThread(String thread) throws IOException {
         WebRequest request = RequestBuilder.get()
                 .setUrl("https://boardgamegeek.com/xmlapi2/thread")
                 .addParameter("id", thread)
@@ -219,14 +208,12 @@ public class WebUtils
         return getThread(request);
     }
 
-    public synchronized ThreadInfo getThread(WebRequest request) throws IOException
-    {
+    public synchronized ThreadInfo getThread(WebRequest request) throws IOException {
         WebResponse response = conn.execute(request);
         return new ThreadInfo(response.parse().select("thread").first());
     }
 
-    public synchronized UserInfo getUserInfo(String user) throws IOException
-    {
+    public synchronized UserInfo getUserInfo(String user) throws IOException {
         WebRequest request = RequestBuilder.get()
                 .setUrl("https://boardgamegeek.com/xmlapi2/users")
                 .addParameter("name", user)
@@ -236,8 +223,7 @@ public class WebUtils
         return new UserInfo(response.parse().select("user").first());
     }
 
-    public synchronized List<GeekMailInfo> getMail(String gameId) throws IOException
-    {
+    public synchronized List<GeekMailInfo> getMail(String gameId) throws IOException {
         WebRequest request = RequestBuilder.get()
                 .setUrl("http://boardgamegeek.com/geekmail_controller.php")
                 .addParameter("action", "search")
@@ -258,8 +244,7 @@ public class WebUtils
         return list;
     }
 
-    public synchronized String getMailContent(String messageid) throws IOException
-    {
+    public synchronized String getMailContent(String messageid) throws IOException {
         WebRequest request = RequestBuilder.get()
                 .setUrl("http://boardgamegeek.com/geekmail_controller.php")
                 .addParameter("action", "reply")
@@ -268,10 +253,11 @@ public class WebUtils
 
         String text = conn.execute(request).parse().select("textarea#body").first().text();
         Matcher m = REPLY_PATTERN.matcher(text);
-        if (m.find())
+        if (m.find()) {
             return m.group(1);
-        else
+        } else {
             return null;
+        }
     }
 
     public static String playerThreadURL(String thread, String player)

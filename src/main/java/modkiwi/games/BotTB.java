@@ -11,8 +11,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class BotTB extends GameBot
-{
+public class BotTB extends GameBot {
     public static final String LONG_NAME = "TimeBomb";
 
     private static final Logger LOGGER = new Logger(BotTB.class);
@@ -22,14 +21,12 @@ public class BotTB extends GameBot
     private String[] claims;
     private int success, safe, turn, round;
 
-    protected BotTB(GameInfo game) throws IOException
-    {
+    protected BotTB(GameInfo game) throws IOException {
         super(game);
     }
 
     @Override
-    public void createGame()
-    {
+    public void createGame() {
         int evil, good;
         evil = (NoP + 2) / 3;
         good = NoP - evil;
@@ -54,16 +51,14 @@ public class BotTB extends GameBot
 
         List<Integer> deck;
 
-        for (int i = 0; i < 4; i++)
-        {
+        for (int i = 0; i < 4; i++) {
             deck = new ArrayList<Integer>(initdeck.subList(0, NoP * (5 - i)));
             Collections.shuffle(deck);
             game.setDataProperty("round" + (i + 1) +  "deck", deck);
         }
     }
 
-    private void sendRoles()
-    {
+    private void sendRoles() {
         List<String> roles = (List<String>)game.getDataProperty("roles");
         String player, role, subject, message, modMessage;
         String goodMessage = "You are a virtuous member of the SWAT team trying to defuse the bomb.";
@@ -109,8 +104,7 @@ public class BotTB extends GameBot
         }
     }
 
-    private void sendHands()
-    {
+    private void sendHands() {
         String player, message, modMessage;
         String subject = game.getPrefix() + " - Round " + round + " Hand";
         int success, safe, boom;
@@ -181,8 +175,7 @@ public class BotTB extends GameBot
         }
     }
 
-    private void newRound(boolean fresh)
-    {
+    private void newRound(boolean fresh) {
         round = round + 1;
 
         if (round == 5)
@@ -229,8 +222,7 @@ public class BotTB extends GameBot
     }
 
     @Override
-    public void initialize(boolean fresh)
-    {
+    public void initialize(boolean fresh) {
         hands = new String[NoP][0];
         claims = new String[NoP];
         success = 0;
@@ -244,8 +236,7 @@ public class BotTB extends GameBot
     }
 
     @Override
-    protected CharSequence update()
-    {
+    protected CharSequence update() {
         if (game.inProgress())
         {
             String message = getCurrentStatus() + "\n\n";
@@ -257,8 +248,7 @@ public class BotTB extends GameBot
         return null;
     }
 
-    private void endGame(boolean fresh, boolean goodWin)
-    {
+    private void endGame(boolean fresh, boolean goodWin) {
         if (fresh)
         {
             String message = "[color=purple][b]The game is over. Team " + (goodWin ? "Good" : "Evil") + " (";
@@ -283,8 +273,7 @@ public class BotTB extends GameBot
     }
 
     @Override
-    protected void processMove(boolean fresh, String... move)
-    {
+    protected void processMove(boolean fresh, String... move) {
         if (move[0].equals("snip"))
         {
             int pl = Integer.parseInt(move[1]);
@@ -333,8 +322,7 @@ public class BotTB extends GameBot
     }
 
     @Override
-    public void processCommand(String username, String command)
-    {
+    public void processCommand(String username, String command) {
         if (!game.inProgress())
             return;
 
@@ -401,8 +389,7 @@ public class BotTB extends GameBot
     }
 
     @Override
-    public CharSequence getCurrentStatus()
-    {
+    public CharSequence getCurrentStatus() {
         if (game.inProgress())
         {
             StringBuilder message = new StringBuilder("[color=#008800]");
@@ -454,8 +441,7 @@ public class BotTB extends GameBot
     }
 
     @Override
-    public String getHistoryItem(String move)
-    {
+    public String getHistoryItem(String move) {
         return move;
     }
 }

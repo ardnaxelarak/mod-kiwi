@@ -13,8 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class BotKNG extends GameBot
-{
+public class BotKNG extends GameBot {
     public static final String LONG_NAME = "Kingdoms";
 
     private static final Logger LOGGER = new Logger(BotKNG.class);
@@ -30,10 +29,9 @@ public class BotKNG extends GameBot
     private String step;
     private int turn;
     private int round;
-    List<String> deck;
+    private List<String> deck;
 
-    private static Map<String, String> createImageMap()
-    {
+    private static Map<String, String> createImageMap() {
         Map<String, String> images = new HashMap<String, String>();
         images.put("blue1",   "2635465");
         images.put("blue2",   "2635466");
@@ -85,13 +83,11 @@ public class BotKNG extends GameBot
         return images;
     }
 
-    protected BotKNG(GameInfo game) throws IOException
-    {
+    protected BotKNG(GameInfo game) throws IOException {
         super(game);
     }
 
-    private static String getImage(String key, String... args)
-    {
+    private static String getImage(String key, String... args) {
         String image = "[imageid=" + IMAGES.get(key);
         for (String s : args)
             image += " " + s;
@@ -100,11 +96,9 @@ public class BotKNG extends GameBot
     }
 
     @Override
-    public void createGame()
-    {
+    public void createGame() {
         deck = new ArrayList<String>(22);
-        for (int i = 1; i <= 6; i++)
-        {
+        for (int i = 1; i <= 6; i++) {
             deck.add("+" + i);
             deck.add("+" + i);
             deck.add("-" + i);
@@ -126,34 +120,28 @@ public class BotKNG extends GameBot
         game.getData().setProperty("round3deck", deck);
     }
 
-    private void mailTiles()
-    {
-        for (int i = 0; i < NoP; i++)
-        {
+    private void mailTiles() {
+        for (int i = 0; i < NoP; i++) {
             String message = String.format("[color=#008800]Your tile for round %d is %s.[/color]\n%s", round, hand[i], getImage(hand[i], "original"));
 
             String subject = String.format("%s: Round %d starting tile",
                                 game.getPrefix(), round);
 
-            try
-            {
+            try {
                 web.geekmail(players[i], subject, message);
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 LOGGER.throwing("mailTiles()", e);
             }
         }
     }
 
-    private void newRound(boolean fresh)
-    {
+    @SuppressWarnings("unchecked")
+    private void newRound(boolean fresh) {
         round = round + 1;
 
         deck = new LinkedList<String>((List<String>)game.getData().getProperty(String.format("round%ddeck", round)));
 
-        for (int i = 0; i < NoP; i++)
-        {
+        for (int i = 0; i < NoP; i++) {
             castles[i][0] = 6 - NoP;
             hand[i] = deck.remove(0);
         }
@@ -170,33 +158,26 @@ public class BotKNG extends GameBot
         // determine starting player
         int max = scores[0];
         turn = 0;
-        for (int i = 1; i < NoP; i++)
-        {
-            if (scores[i] > max)
-            {
+        for (int i = 1; i < NoP; i++) {
+            if (scores[i] > max) {
                 turn = i;
                 max = scores[i];
             }
         }
     }
 
-    private void endRound(boolean fresh)
-    {
+    private void endRound(boolean fresh) {
         scoreRound(fresh);
 
-        if (round == 3)
-        {
+        if (round == 3) {
             step = "finished";
             endGame();
-        }
-        else
-        {
+        } else {
             newRound(fresh);
         }
     }
 
-    private int scoreCastle(int row, int col, int mult, StringBuilder message)
-    {
+    private int scoreCastle(int row, int col, int mult, StringBuilder message) {
         if (message != null)
             message.append("\n- Castle at " + (((char)row + 'A') + "") + (col + 1) + ": ");
 
@@ -215,8 +196,7 @@ public class BotKNG extends GameBot
         end = col;
 
         // find start of scoring area
-        while ((tile = getTile(row, start - 1)) != null && !tile.equals("mountain"))
-        {
+        while ((tile = getTile(row, start - 1)) != null && !tile.equals("mountain")) {
             start--;
             if (tile.equals("dragon"))
                 dragon = true;
@@ -225,8 +205,7 @@ public class BotKNG extends GameBot
         }
 
         // find end of scoring area
-        while ((tile = getTile(row, end + 1)) != null && !tile.equals("mountain"))
-        {
+        while ((tile = getTile(row, end + 1)) != null && !tile.equals("mountain")) {
             end++;
             if (tile.equals("dragon"))
                 dragon = true;
@@ -234,49 +213,41 @@ public class BotKNG extends GameBot
                 mine <<= 1;
         }
 
-        for (int i = start; i <= end; i++)
-        {
+        for (int i = start; i <= end; i++) {
             tile = getTile(row, i);
-            if (tile.charAt(0) == '+' && !dragon)
-            {
+            if (tile.charAt(0) == '+' && !dragon) {
                 value = Integer.parseInt(tile);
-                if (message != null)
-                {
-                    if (first)
-                    {
+                if (message != null) {
+                    if (first) {
                         message.append("(");
                         first = false;
-                    }
-                    else
+                    } else {
                         message.append(" + ");
+                    }
                     message.append(value);
                 }
                 total += value * mine;
-            }
-            else if (tile.charAt(0) == '-')
-            {
+            } else if (tile.charAt(0) == '-') {
                 value = Integer.parseInt(tile);
-                if (message != null)
-                {
-                    if (first)
-                    {
+                if (message != null) {
+                    if (first) {
                         message.append("(-");
                         first = false;
-                    }
-                    else
+                    } else {
                         message.append(" - ");
+                    }
                     message.append(-value);
                 }
                 total += value * mine;
             }
         }
 
-        if (message != null)
-        {
-            if (first)
+        if (message != null) {
+            if (first) {
                 message.append("0 * ");
-            else
+            } else {
                 message.append(") * ");
+            }
             message.append(mine + " + ");
         }
 
@@ -288,8 +259,7 @@ public class BotKNG extends GameBot
         end = row;
 
         // find start of scoring area
-        while ((tile = getTile(start - 1, col)) != null && !tile.equals("mountain"))
-        {
+        while ((tile = getTile(start - 1, col)) != null && !tile.equals("mountain")) {
             start--;
             if (tile.equals("dragon"))
                 dragon = true;
@@ -298,8 +268,7 @@ public class BotKNG extends GameBot
         }
 
         // find end of scoring area
-        while ((tile = getTile(end + 1, col)) != null && !tile.equals("mountain"))
-        {
+        while ((tile = getTile(end + 1, col)) != null && !tile.equals("mountain")) {
             end++;
             if (tile.equals("dragon"))
                 dragon = true;
@@ -307,173 +276,153 @@ public class BotKNG extends GameBot
                 mine <<= 1;
         }
 
-        for (int i = start; i <= end; i++)
-        {
+        for (int i = start; i <= end; i++) {
             tile = getTile(i, col);
-            if (tile.charAt(0) == '+' && !dragon)
-            {
+            if (tile.charAt(0) == '+' && !dragon) {
                 value = Integer.parseInt(tile);
-                if (message != null)
-                {
-                    if (first)
-                    {
+                if (message != null) {
+                    if (first) {
                         message.append("(");
                         first = false;
-                    }
-                    else
+                    } else {
                         message.append(" + ");
+                    }
                     message.append(value);
                 }
                 total += value * mine;
-            }
-            else if (tile.charAt(0) == '-')
-            {
+            } else if (tile.charAt(0) == '-') {
                 value = Integer.parseInt(tile);
-                if (message != null)
-                {
-                    if (first)
-                    {
+                if (message != null) {
+                    if (first) {
                         message.append("(-");
                         first = false;
-                    }
-                    else
+                    } else {
                         message.append(" - ");
+                    }
                     message.append(-value);
                 }
                 total += value * mine;
             }
         }
 
-        if (message != null)
-        {
-            if (first)
+        if (message != null) {
+            if (first) {
                 message.append("0 * ");
-            else
+            } else {
                 message.append(") * ");
+            }
             message.append(mine + " = " + total);
         }
 
         return total;
     }
 
-    private void scoreRound(boolean fresh)
-    {
+    private void scoreRound(boolean fresh) {
         StringBuilder message = null;
 
-        if (fresh)
+        if (fresh) {
             message = new StringBuilder(getCurrentBoard());
+        }
 
         String tile;
         int mult;
 
-        for (int i = 0; i < NoP; i++)
-        {
-            if (fresh)
+        for (int i = 0; i < NoP; i++) {
+            if (fresh) {
                 message.append("\n\n[color=#008800]Scoring " + players[i] + ":");
+            }
 
             String color = colors[i];
 
-            for (int row = 0; row < board.length; row++)
-            {
-                for (int col = 0; col < board[row].length; col++)
-                {
+            for (int row = 0; row < board.length; row++) {
+                for (int col = 0; col < board[row].length; col++) {
                     tile = board[row][col];
-                    if (tile.startsWith(color))
-                    {
+                    if (tile.startsWith(color)) {
                         mult = Integer.parseInt(tile.substring(color.length()));
                         scores[i] += scoreCastle(row, col, mult, message);
                     }
                 }
             }
 
-            if (fresh)
+            if (fresh) {
                 message.append("[/color]");
+            }
         }
 
-        if (fresh)
-        {
-            try
-            {
+        if (fresh) {
+            try {
                 web.replyThread(game, new String(message));
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 LOGGER.throwing("update()", e);
             }
         }
     }
 
-    private boolean hasCastles(int player)
-    {
-        for (int num : castles[player])
-        {
-            if (num > 0)
+    private boolean hasCastles(int player) {
+        for (int num : castles[player]) {
+            if (num > 0) {
                 return true;
+            }
         }
         return false;
     }
 
-    private boolean boardFull()
-    {
-        for (String[] row : board)
-            for (String tile : row)
-                if (tile.equals("empty"))
+    private boolean boardFull() {
+        for (String[] row : board) {
+            for (String tile : row) {
+                if (tile.equals("empty")) {
                     return false;
+                }
+            }
+        }
 
         return true;
     }
 
     @Override
-    protected CharSequence update()
-    {
-        if (!game.inProgress())
+    protected CharSequence update() {
+        if (!game.inProgress()) {
             return null;
-        if (step.equals("place"))
-        {
+        }
+        if (step.equals("place")) {
             StringBuilder message = new StringBuilder(getCurrentStatus());
             message.append('\n').append('\n');
             message.append("[color=purple][b]").append(players[turn]).append(" is up.[/b][/color]\n[color=#008800]Current options:");
-            if (deck.size() > 0)
+            if (deck.size() > 0) {
                 message.append("\n[b]draw[/b]");
-            if (hand[turn] != null)
+            }
+            if (hand[turn] != null) {
                 message.append("\n[b]hand [i]location[/i][/b]");
-            if (hasCastles(turn))
+            }
+            if (hasCastles(turn)) {
                 message.append("\n[b]castle [i]size[/i] [i]location[/i][/b]");
+            }
             message.append("[/color]");
             return message;
-        }
-        else if (step.equals("drawn"))
-        {
+        } else if (step.equals("drawn")) {
             return String.format("[color=#008800]%s draws %s[/color]\n%s\n\n[color=#008800]Please [b]place [i]location[/i][/b][/color]", players[turn], deck.get(0), getImage(deck.get(0), "original"));
-        }
-        else if (step.equals("colors"))
-        {
+        } else if (step.equals("colors")) {
             StringBuilder message = new StringBuilder("[color=purple][b]");
             message.append(players[turn]);
             message.append(", please choose a color.[/b][/color]\n[color=#008800]Current options:");
 
             boolean taken;
-            for (String color : ALL_COLORS)
-            {
-                if (revColors.get(color) == null)
-                {
+            for (String color : ALL_COLORS) {
+                if (revColors.get(color) == null) {
                     message.append("\n[b]choose ");
                     message.append(color).append("[/b]");
                 }
             }
             message.append("[/color]");
             return message;
-        }
-        else
-        {
+        } else {
             LOGGER.warning("Unrecognized step '%s'", step);
             return null;
         }
     }
 
     @Override
-    public void initialize(boolean fresh)
-    {
+    public void initialize(boolean fresh) {
         board = new String[5][6];
         castles = new int[NoP][4];
         scores = new int[NoP];
@@ -481,11 +430,11 @@ public class BotKNG extends GameBot
         colors = new String[NoP];
         revColors = new HashMap<String, Integer>();
 
-        for (String[] row : board)
+        for (String[] row : board) {
             Arrays.fill(row, "empty");
+        }
 
-        for (int i = 0; i < NoP; i++)
-        {
+        for (int i = 0; i < NoP; i++) {
             scores[i] = 50;
             castles[i][1] = 6 - NoP;
             castles[i][1] = 3;
@@ -497,27 +446,26 @@ public class BotKNG extends GameBot
         turn = 0;
     }
 
-    private void placeTile(String tile, String location)
-    {
+    private void placeTile(String tile, String location) {
         int r = location.charAt(0) - 'A';
         int c = location.charAt(1) - '1';
 
         board[r][c] = tile;
     }
 
-    private String getTile(int row, int col)
-    {
+    private String getTile(int row, int col) {
         if (row < 0 || row >= board.length ||
-            col < 0 || col >= board[row].length)
+            col < 0 || col >= board[row].length) {
             return null;
+        }
 
         return board[row][col];
     }
 
-    private String getTile(String location)
-    {
-        if (location.length() != 2)
+    private String getTile(String location) {
+        if (location.length() != 2) {
             return null;
+        }
 
         int r = location.charAt(0) - 'A';
         int c = location.charAt(1) - '1';
@@ -525,33 +473,25 @@ public class BotKNG extends GameBot
         return getTile(r, c);
     }
 
-    private void advanceTurn(boolean fresh)
-    {
+    private void advanceTurn(boolean fresh) {
         turn++;
-        if (step.equals("colors"))
-        {
-            if (turn == NoP)
+        if (step.equals("colors")) {
+            if (turn == NoP) {
                 newRound(fresh);
-        }
-        else if (step.equals("place") || step.equals("drawn"))
-        {
-            if (turn == NoP)
-                turn = 0;
-
-            if (boardFull())
-            {
-                endRound(fresh);
             }
-            else if (deck.size() == 0 && hand[turn] == null && !hasCastles(turn))
-            {
-                if (fresh)
-                {
+        } else if (step.equals("place") || step.equals("drawn")) {
+            if (turn == NoP) {
+                turn = 0;
+            }
+
+            if (boardFull()) {
+                endRound(fresh);
+            } else if (deck.size() == 0 && hand[turn] == null && !hasCastles(turn)) {
+                if (fresh) {
                     try
                     {
                         web.replyThread(game, "[color=#008800]" + players[turn] + " cannot make a legal move and must pass.[/color]");
-                    }
-                    catch (IOException e)
-                    {
+                    } catch (IOException e) {
                         LOGGER.throwing("advanceTurn()", e);
                     }
                 }
@@ -562,104 +502,74 @@ public class BotKNG extends GameBot
     }
 
     @Override
-    protected void processMove(boolean fresh, String... move)
-    {
+    protected void processMove(boolean fresh, String... move) {
         String first = move[0];
-        if (step.equals("colors") && first.equals("choose"))
-        {
+        if (step.equals("colors") && first.equals("choose")) {
             colors[turn] = move[1];
             revColors.put(move[1], turn);
             advanceTurn(fresh);
-        }
-        else if (step.equals("place"))
-        {
-            if (first.equals("draw"))
+        } else if (step.equals("place")) {
+            if (first.equals("draw")) {
                 step = "drawn";
-            else if (first.equals("castle"))
-            {
+            } else if (first.equals("castle")) {
                 int size = Integer.parseInt(move[1]);
                 placeTile(colors[turn] + move[1], move[2]);
                 castles[turn][size - 1]--;
                 advanceTurn(fresh);
-            }
-            else if (first.equals("hand"))
-            {
+            } else if (first.equals("hand")) {
                 placeTile(hand[turn], move[1]);
                 hand[turn] = null;
                 advanceTurn(fresh);
-            }
-            else
-            {
+            } else {
                 LOGGER.warning("Invalid move string '%s'", Utils.join(move, " "));
             }
-        }
-        else if (step.equals("drawn") && first.equals("place"))
-        {
+        } else if (step.equals("drawn") && first.equals("place")) {
             String tile = deck.remove(0);
             placeTile(tile, move[1]);
             step = "place";
             advanceTurn(fresh);
-        }
-        else
-        {
+        } else {
             LOGGER.warning("Invalid move string '%s'", Utils.join(move, " "));
         }
     }
 
     @Override
-    public void processCommand(String username, String command)
-    {
-        if (step.equals("colors"))
-        {
-            if (!username.equals(players[turn]))
+    public void processCommand(String username, String command) {
+        if (step.equals("colors")) {
+            if (!username.equals(players[turn])) {
                 return;
+            }
 
-            if (command.toLowerCase().startsWith("choose "))
-            {
+            if (command.toLowerCase().startsWith("choose ")) {
                 String color = command.toLowerCase().substring(7);
-                if (revColors.get(color) != null)
-                {
+                if (revColors.get(color) != null) {
                     LOGGER.info("%s tried to claim %s, which was taken by %s", players[turn], color, players[revColors.get(color)]);
                     return;
-                }
-                else if (Arrays.binarySearch(ALL_COLORS, color) > 0)
-                {
+                } else if (Arrays.binarySearch(ALL_COLORS, color) > 0) {
                     processAndAddMove("choose", color);
-                }
-                else
-                {
+                } else {
                     LOGGER.info("%s tried to claim '%s', an invalid color", players[turn], color);
                 }
             }
-        }
-        else if (step.equals("place"))
-        {
-            if (!username.equals(players[turn]))
+        } else if (step.equals("place")) {
+            if (!username.equals(players[turn])) {
                 return;
+            }
 
             if (command.toLowerCase().equals("draw"))
             {
                 processAndAddMove("draw");
-            }
-            else if (command.toLowerCase().startsWith("hand "))
-            {
+            } else if (command.toLowerCase().startsWith("hand ")) {
                 String location = command.substring(5);
                 String tile = getTile(location.toUpperCase());
-                if (tile == null)
-                {
+                if (tile == null) {
                     LOGGER.info("%s tried to place a tile at invalid location '%s'", players[turn], location);
-                }
-                else if (!tile.equals("empty"))
-                {
+                } else if (!tile.equals("empty")) {
                     LOGGER.info("%s tried to place a tile at occupied location '%s'", players[turn], location);
-                }
-                else
-                {
+                } else {
                     processAndAddMove("hand", location.toUpperCase());
                 }
-            }
-            else if (command.toLowerCase().startsWith("castle "))
-            {
+            } else if (command.toLowerCase().startsWith("castle ")) {
                 String[] pieces = command.substring(7).split(" ");
                 if (pieces.length != 2)
                     return;
@@ -670,58 +580,42 @@ public class BotKNG extends GameBot
                 try
                 {
                     size = Integer.parseInt(sizeStr);
-                    if (size < 1 || size > 4)
-                    {
+                    if (size < 1 || size > 4) {
                         LOGGER.info("%s tried to place a castle of invalid size '%s'", players[turn], sizeStr);
                         return;
                     }
-                }
-                catch (NumberFormatException e)
-                {
+                } catch (NumberFormatException e) {
                     LOGGER.info("%s tried to place a castle of invalid size '%s'", players[turn], sizeStr);
                     return;
                 }
 
-                if (castles[turn][size - 1] == 0)
-                {
+                if (castles[turn][size - 1] == 0) {
                     LOGGER.info("%s tried to place a castle of size '%s' but has none remaining", players[turn], sizeStr);
                     return;
                 }
 
                 String tile = getTile(location.toUpperCase());
-                if (tile == null)
-                {
+                if (tile == null) {
                     LOGGER.info("%s tried to place a tile at invalid location '%s'", players[turn], location);
-                }
-                else if (!tile.equals("empty"))
-                {
+                } else if (!tile.equals("empty")) {
                     LOGGER.info("%s tried to place a tile at occupied location '%s'", players[turn], location);
-                }
-                else
-                {
+                } else {
                     processAndAddMove("castle", sizeStr, location.toUpperCase());
                 }
             }
-        }
-        else if (step.equals("drawn"))
-        {
-            if (!username.equals(players[turn]))
+        } else if (step.equals("drawn")) {
+            if (!username.equals(players[turn])) {
                 return;
+            }
 
-            if (command.toLowerCase().startsWith("place "))
-            {
+            if (command.toLowerCase().startsWith("place ")) {
                 String location = command.substring(6);
                 String tile = getTile(location.toUpperCase());
-                if (tile == null)
-                {
+                if (tile == null) {
                     LOGGER.info("%s tried to place a tile at invalid location '%s'", players[turn], location);
-                }
-                else if (!tile.equals("empty"))
-                {
+                } else if (!tile.equals("empty")) {
                     LOGGER.info("%s tried to place a tile at occupied location '%s'", players[turn], location);
-                }
-                else
-                {
+                } else {
                     processAndAddMove("place", location.toUpperCase());
                 }
             }
@@ -729,12 +623,11 @@ public class BotKNG extends GameBot
     }
 
     @Override
-    public CharSequence getCurrentStatus()
-    {
-        if (game.inProgress())
-        {
-            if (step.equals("colors"))
+    public CharSequence getCurrentStatus() {
+        if (game.inProgress()) {
+            if (step.equals("colors")) {
                 return null;
+            }
 
             StringBuilder message = new StringBuilder(getCurrentBoard());
             message.append('\n').append(getCurrentCastles());
@@ -744,18 +637,15 @@ public class BotKNG extends GameBot
         return null;
     }
 
-    private CharSequence getCurrentBoard()
-    {
+    private CharSequence getCurrentBoard() {
         StringBuilder message = new StringBuilder();
 
         // print board
         message.append(getImage("header", "original", "inline"));
-        for (int i = 0; i < board.length; i++)
-        {
+        for (int i = 0; i < board.length; i++) {
             message.append('\n');
             message.append(getImage("row" + (char)('A' + (char)i), "original", "inline"));
-            for (String item : board[i])
-            {
+            for (String item : board[i]) {
                 message.append(getImage(item, "original", "inline"));
             }
         }
@@ -763,24 +653,22 @@ public class BotKNG extends GameBot
         return message;
     }
 
-    private CharSequence getCurrentCastles()
-    {
+    private CharSequence getCurrentCastles() {
         StringBuilder message = new StringBuilder();
 
         // print scores and castles
-        for (int i = 0; i < NoP; i++)
-        {
+        for (int i = 0; i < NoP; i++) {
             // start new row for third and fourth players
-            if (i == 2)
+            if (i == 2) {
                 message.append("[clear]");
+            }
 
             message.append(String.format("[floatleft][center][size=16]%s\n[c]%d[/c][/size]", players[i], scores[i]));
-            for (int j = 0; j < castles[i].length; j++)
-            {
-                if (castles[i][j] > 0)
+            for (int j = 0; j < castles[i].length; j++) {
+                if (castles[i][j] > 0) {
                     message.append('\n');
-                for (int k = 0; k < castles[i][j]; k++)
-                {
+                }
+                for (int k = 0; k < castles[i][j]; k++) {
                     message.append(getImage(colors[i] + (j + 1), "original", "inline"));
                 }
             }
@@ -793,8 +681,7 @@ public class BotKNG extends GameBot
     }
 
     @Override
-    public String getHistoryItem(String move)
-    {
+    public String getHistoryItem(String move) {
         return move;
     }
 }

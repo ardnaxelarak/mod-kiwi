@@ -15,20 +15,18 @@ import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 
-public class GameServlet extends HttpServlet
-{
+@SuppressWarnings("serial")
+public class GameServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
-        throws IOException
-    {
+        throws IOException {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
         PrintWriter pw = resp.getWriter();
         resp.setContentType("text/plain");
 
         String gamecode = req.getPathInfo();
-        if (gamecode == null)
-        {
+        if (gamecode == null) {
             pw.println("null gamecode");
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -38,24 +36,18 @@ public class GameServlet extends HttpServlet
         Key key = KeyFactory.createKey("Game", gamecode);
         Entity ent = null;
 
-        try
-        {
+        try {
             ent = datastore.get(key);
-        }
-        catch (EntityNotFoundException e)
-        {
+        } catch (EntityNotFoundException e) {
             pw.println("entity not found");
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
         req.setAttribute("gameInfo", new GameInfo(ent));
-        try
-        {
+        try {
             req.getRequestDispatcher("/WEB-INF/game.jsp").forward(req, resp);
-        }
-        catch (ServletException e)
-        {
+        } catch (ServletException e) {
             e.printStackTrace();
         }
 

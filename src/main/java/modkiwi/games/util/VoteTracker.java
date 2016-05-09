@@ -16,45 +16,45 @@ import java.util.Set;
 
 public abstract class VoteTracker
 {
-	private class Vote implements Comparable<Vote>
-	{
-		String voter;
-		int votee;
-		int index;
+    private class Vote implements Comparable<Vote>
+    {
+        String voter;
+        int votee;
+        int index;
 
-		public Vote(String voter, int votee)
-		{
-			this.voter = voter;
-			this.votee = votee;
-			this.index = nextVote++;
-		}
+        public Vote(String voter, int votee)
+        {
+            this.voter = voter;
+            this.votee = votee;
+            this.index = nextVote++;
+        }
 
-		public boolean isLatest()
-		{
-			return this == latestVotes.get(voter.toLowerCase());
-		}
+        public boolean isLatest()
+        {
+            return this == latestVotes.get(voter.toLowerCase());
+        }
 
         public boolean isLocked()
         {
             return isLatest() && VoteTracker.this.isLocked(voter);
         }
 
-		@Override
-		public int compareTo(Vote v)
-		{
-			return Integer.compare(index, v.index);
-		}
+        @Override
+        public int compareTo(Vote v)
+        {
+            return Integer.compare(index, v.index);
+        }
 
-		@Override
-		public String toString()
-		{
+        @Override
+        public String toString()
+        {
             if (isLocked())
-				return "r{" + voter + "* (" + index + ")}r";
+                return "r{" + voter + "* (" + index + ")}r";
             else if (isLatest())
-				return voter + " (" + index + ")";
-			else
-				return "[-]" + voter + " (" + index + ")[/-]";
-		}
+                return voter + " (" + index + ")";
+            else
+                return "[-]" + voter + " (" + index + ")[/-]";
+        }
 
         public void replace(String oldName, String newName)
         {
@@ -64,51 +64,51 @@ public abstract class VoteTracker
                 voter = newName;
             }
         }
-	}
+    }
 
-	public class VoteOption implements Comparable<VoteOption>
-	{
-		private int votee;
-		private int numVotes, numLockedVotes;
-		private int lastVote;
-		private PriorityQueue<Vote> votes;
+    public class VoteOption implements Comparable<VoteOption>
+    {
+        private int votee;
+        private int numVotes, numLockedVotes;
+        private int lastVote;
+        private PriorityQueue<Vote> votes;
 
-		public VoteOption(Vote v)
-		{
-			votee = v.votee;
-			numVotes = 0;
-			lastVote = 0;
-			this.votes = new PriorityQueue<Vote>();
-			addVote(v);
-		}
+        public VoteOption(Vote v)
+        {
+            votee = v.votee;
+            numVotes = 0;
+            lastVote = 0;
+            this.votes = new PriorityQueue<Vote>();
+            addVote(v);
+        }
 
-		public void addVote(Vote v)
-		{
-			if (v.isLatest())
-			{
-				numVotes++;
-				lastVote = Math.max(lastVote, v.index);
+        public void addVote(Vote v)
+        {
+            if (v.isLatest())
+            {
+                numVotes++;
+                lastVote = Math.max(lastVote, v.index);
                 if (v.isLocked())
                     numLockedVotes++;
-			}
+            }
 
-			votes.add(v);
-		}
+            votes.add(v);
+        }
 
-		@Override
-		public int compareTo(VoteOption vo)
-		{
-			if (this.numVotes > vo.numVotes)
-				return -1;
-			else if (this.numVotes < vo.numVotes)
-				return 1;
-			else if (this.lastVote < vo.lastVote)
-				return -1;
-			else if (this.lastVote > vo.lastVote)
-				return 1;
-			else
-				return 0;
-		}
+        @Override
+        public int compareTo(VoteOption vo)
+        {
+            if (this.numVotes > vo.numVotes)
+                return -1;
+            else if (this.numVotes < vo.numVotes)
+                return 1;
+            else if (this.lastVote < vo.lastVote)
+                return -1;
+            else if (this.lastVote > vo.lastVote)
+                return 1;
+            else
+                return 0;
+        }
 
         public String getTarget()
         {
@@ -146,35 +146,35 @@ public abstract class VoteTracker
 
             return false;
         }
-	}
+    }
 
     private static final Logger LOGGER = new Logger(VoteTracker.class);
 
-	private Map<String, Vote> latestVotes;
+    private Map<String, Vote> latestVotes;
     private Set<String> lockedVotes;
-	private List<Vote> votes;
-	private int nextVote;
+    private List<Vote> votes;
+    private int nextVote;
 
-	public VoteTracker()
-	{
-		latestVotes = new HashMap<String, Vote>();
+    public VoteTracker()
+    {
+        latestVotes = new HashMap<String, Vote>();
         lockedVotes = new HashSet<String>();
-		votes = new LinkedList<Vote>();
-		nextVote = 1;
-	}
+        votes = new LinkedList<Vote>();
+        nextVote = 1;
+    }
 
-	public abstract String getVotee(int index);
+    public abstract String getVotee(int index);
 
-	public boolean vote(String voter, int votee)
-	{
+    public boolean vote(String voter, int votee)
+    {
         if (isLocked(voter))
             return false;
 
-		Vote v = new Vote(voter, votee);
-		votes.add(v);
-		latestVotes.put(voter.toLowerCase(), v);
+        Vote v = new Vote(voter, votee);
+        votes.add(v);
+        latestVotes.put(voter.toLowerCase(), v);
         return true;
-	}
+    }
 
     public void unvote(String voter)
     {
@@ -201,69 +201,69 @@ public abstract class VoteTracker
         return latestVotes.get(voter.toLowerCase()) != null;
     }
 
-	public void reset()
-	{
-		nextVote = 1;
-		latestVotes.clear();
+    public void reset()
+    {
+        nextVote = 1;
+        latestVotes.clear();
         lockedVotes.clear();
-		votes.clear();
-	}
+        votes.clear();
+    }
 
-	public List<String> voters()
-	{
-		return null;
-	}
+    public List<String> voters()
+    {
+        return null;
+    }
 
     public List<VoteOption> getVoteList()
     {
-		Map<Integer, VoteOption> tally = new HashMap<Integer, VoteOption>();
-		for (Vote v : votes)
-		{
-			if (tally.get(v.votee) == null)
-				tally.put(v.votee, new VoteOption(v));
-			else
-				tally.get(v.votee).addVote(v);
-		}
+        Map<Integer, VoteOption> tally = new HashMap<Integer, VoteOption>();
+        for (Vote v : votes)
+        {
+            if (tally.get(v.votee) == null)
+                tally.put(v.votee, new VoteOption(v));
+            else
+                tally.get(v.votee).addVote(v);
+        }
 
-		List<VoteOption> list = new ArrayList<VoteOption>(tally.values());
-		Collections.sort(list);
+        List<VoteOption> list = new ArrayList<VoteOption>(tally.values());
+        Collections.sort(list);
 
         return list;
     }
 
-	public CharSequence getVotes()
-	{
-		StringBuilder output = new StringBuilder();
+    public CharSequence getVotes()
+    {
+        StringBuilder output = new StringBuilder();
 
         List<VoteOption> list = getVoteList();
 
-		output.append("[u]Vote Tally:[/u]");
+        output.append("[u]Vote Tally:[/u]");
 
-		for (VoteOption vo : list)
-		{
-			output.append("\n");
-			output.append(getVotee(vo.votee));
-			output.append(" - " + vo.numVotes + " - ");
-			output.append(Utils.join(vo.votes, ", "));
-		}
+        for (VoteOption vo : list)
+        {
+            output.append("\n");
+            output.append(getVotee(vo.votee));
+            output.append(" - " + vo.numVotes + " - ");
+            output.append(Utils.join(vo.votes, ", "));
+        }
 
-		List<String> nonVoters = voters();
-		if (nonVoters != null)
-		{
-			ListIterator<String> li = nonVoters.listIterator(0);
-			while (li.hasNext())
-			{
-				if (isVoting(li.next()))
-					li.remove();
-			}
+        List<String> nonVoters = voters();
+        if (nonVoters != null)
+        {
+            ListIterator<String> li = nonVoters.listIterator(0);
+            while (li.hasNext())
+            {
+                if (isVoting(li.next()))
+                    li.remove();
+            }
 
-			Collections.sort(nonVoters);
+            Collections.sort(nonVoters);
 
-			output.append("\nNot voting: " + Utils.join(nonVoters, ", "));
-		}
+            output.append("\nNot voting: " + Utils.join(nonVoters, ", "));
+        }
 
-		return output;
-	}
+        return output;
+    }
 
     public VoteOption getLL()
     {

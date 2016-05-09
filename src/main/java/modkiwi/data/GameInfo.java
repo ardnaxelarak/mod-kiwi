@@ -12,8 +12,7 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EmbeddedEntity;
 
-public class GameInfo
-{
+public class GameInfo {
     private String id, acronym, statusPost, gameStatus, historyPost, signupPost, thread, gametype, index, title, lastScanned;
     private List<String> mods, players, moves, settings;
     private EmbeddedEntity data, nicknames;
@@ -21,8 +20,8 @@ public class GameInfo
     private boolean autoStart;
     private final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-    public GameInfo(Entity ent)
-    {
+    @SuppressWarnings("unchecked")
+    public GameInfo(Entity ent) {
         id = ent.getKey().getName();
         acronym = (String)ent.getProperty("acronym");
         statusPost = (String)ent.getProperty("status_post");
@@ -70,87 +69,71 @@ public class GameInfo
             nicknames = new EmbeddedEntity();
     }
 
-    public String getId()
-    {
+    public String getId() {
         return id;
     }
 
-    public String getAcronym()
-    {
+    public String getAcronym() {
         return acronym;
     }
 
-    public String getStatusPost()
-    {
+    public String getStatusPost() {
         return statusPost;
     }
 
-    public String getGameStatus()
-    {
+    public String getGameStatus() {
         return gameStatus;
     }
 
-    public String getHistoryPost()
-    {
+    public String getHistoryPost() {
         return historyPost;
     }
 
-    public String getSignupPost()
-    {
+    public String getSignupPost() {
         return signupPost;
     }
 
-    public String getThread()
-    {
+    public String getThread() {
         return thread;
     }
 
-    public String getGametype()
-    {
+    public String getGametype() {
         return gametype;
     }
 
-    public String getIndex()
-    {
+    public String getIndex() {
         return index;
     }
 
-    public String getTitle()
-    {
+    public String getTitle() {
         return title;
     }
 
-    public String getLastScanned()
-    {
+    public String getLastScanned() {
         return lastScanned;
     }
 
-    public int getMaxPlayers()
-    {
+    public int getMaxPlayers() {
         return maxPlayers;
     }
 
-    public List<String> getMods()
-    {
+    public List<String> getMods() {
         return mods;
     }
 
-    public List<String> getPlayers()
-    {
+    public List<String> getPlayers() {
         return players;
     }
 
-    public String[] getCurrentPlayers()
-    {
+    public String[] getCurrentPlayers() {
         List<String> players = getPlayers();
         String[] list = new String[players.size()];
-        for (int i = 0; i < list.length; i++)
+        for (int i = 0; i < list.length; i++) {
             list[i] = players.get(i);
+        }
 
-        for (String move : getMoves())
-        {
-            if (move.toLowerCase().startsWith("replace "))
-            {
+        for (String move : getMoves()) {
+            if (move.toLowerCase().startsWith("replace ")) {
                 String[] pieces = move.split(" ", 3);
                 list[Integer.parseInt(pieces[1])] = pieces[2];
             }
@@ -159,19 +142,16 @@ public class GameInfo
         return list;
     }
 
-    public List<String> getNonPlayerMods()
-    {
+    public List<String> getNonPlayerMods() {
         LinkedList<String> ret = new LinkedList<String>(getMods());
         ListIterator<String> li = ret.listIterator(0);
         List<String> players = getPlayers();
         String current;
-        while (li.hasNext())
-        {
+
+        while (li.hasNext()) {
             current = li.next();
-            for (String player : players)
-            {
-                if (current.equals(player))
-                {
+            for (String player : players) {
+                if (current.equals(player)) {
                     li.remove();
                     break;
                 }
@@ -181,34 +161,29 @@ public class GameInfo
         return ret;
     }
 
-    public List<String> getMoves()
-    {
+    public List<String> getMoves() {
         return moves;
     }
 
-    public EmbeddedEntity getData()
-    {
+    public EmbeddedEntity getData() {
         return data;
     }
 
-    public String getFullTitle()
-    {
+    public String getFullTitle() {
         return String.format("%s #%s: %s", gametype, index, title);
     }
 
-    public String getPrefix()
-    {
+    public String getPrefix() {
         return String.format("%s #%s", gametype, index);
     }
 
-    public String getPlayerList()
-    {
-        if (getPlayers() == null)
+    public String getPlayerList() {
+        if (getPlayers() == null) {
             return "";
+        }
 
         String list = null;
-        for (String player : getPlayers())
-        {
+        for (String player : getPlayers()) {
             if (list == null)
                 list = player;
             else
@@ -218,25 +193,24 @@ public class GameInfo
         return list;
     }
 
-    public String getModeratorList()
-    {
-        if (getMods() == null)
+    public String getModeratorList() {
+        if (getMods() == null) {
             return "";
+        }
 
         String list = null;
-        for (String mod : getMods())
-        {
-            if (list == null)
+        for (String mod : getMods()) {
+            if (list == null) {
                 list = mod;
-            else
+            } else {
                 list += ", " + mod;
+            }
         }
 
         return list;
     }
 
-    public void save()
-    {
+    public void save() {
         Entity ent = new Entity("Game", id);
         ent.setProperty("acronym", acronym);
         ent.setProperty("game_status", gameStatus);
@@ -250,13 +224,14 @@ public class GameInfo
         ent.setProperty("last_scanned", lastScanned);
         ent.setProperty("auto_start", autoStart);
 
-        if (maxPlayers > 0)
+        if (maxPlayers > 0) {
             ent.setProperty("max_players", maxPlayers);
+        }
 
         ent.setProperty("mods", mods);
         ent.setProperty("players", players);
         ent.setProperty("moves", moves);
-		ent.setProperty("settings", settings);
+        ent.setProperty("settings", settings);
 
         ent.setProperty("data", data);
         ent.setProperty("nicknames", nicknames);
@@ -264,96 +239,78 @@ public class GameInfo
         datastore.put(ent);
     }
 
-    public void setGameStatus(String status)
-    {
+    public void setGameStatus(String status) {
         gameStatus = status;
     }
 
-    public void setLastScanned(String id)
-    {
+    public void setLastScanned(String id) {
         lastScanned = id;
     }
 
-    public void setAutoStart(boolean autoStart)
-    {
+    public void setAutoStart(boolean autoStart) {
         this.autoStart = autoStart;
     }
 
-    public void setMaxPlayers(int max)
-    {
+    public void setMaxPlayers(int max) {
         maxPlayers = max;
     }
 
-    public boolean readyToStart()
-    {
+    public boolean readyToStart() {
         return autoStart && maxPlayers > 0 && players.size() == maxPlayers;
     }
 
-    public void setDataProperty(String key, Object value)
-    {
+    public void setDataProperty(String key, Object value) {
         data.setProperty(key, value);
     }
 
-    public Object getDataProperty(String key)
-    {
+    public Object getDataProperty(String key) {
         return data.getProperty(key);
     }
 
-    public boolean isModerator(String username)
-    {
+    public boolean isModerator(String username) {
         return getMods().contains(username);
     }
 
-    public boolean inSignups()
-    {
+    public boolean inSignups() {
         return STATUS_IN_SIGNUPS.equals(getGameStatus());
     }
 
-    public boolean inProgress()
-    {
+    public boolean inProgress() {
         return STATUS_IN_PROGRESS.equals(getGameStatus());
     }
 
-    public boolean finished()
-    {
+    public boolean finished() {
         return STATUS_FINISHED.equals(getGameStatus());
     }
 
-	public void addSetting(String setting)
-	{
-		if (!settings.contains(setting))
-			settings.add(setting);
-	}
+    public void addSetting(String setting) {
+        if (!settings.contains(setting)) {
+            settings.add(setting);
+        }
+    }
 
-	public void removeSetting(String setting)
-	{
-		settings.remove(setting);
-	}
+    public void removeSetting(String setting) {
+        settings.remove(setting);
+    }
 
-	public boolean hasSetting(String setting)
-	{
-		return settings.contains(setting);
-	}
+    public boolean hasSetting(String setting) {
+        return settings.contains(setting);
+    }
 
-    public String getNickname(String name)
-    {
+    public String getNickname(String name) {
         return (String)nicknames.getProperty(name.toLowerCase());
     }
 
-    public void addNickname(String nickname, String username)
-    {
+    public void addNickname(String nickname, String username) {
         nicknames.setProperty(nickname.toLowerCase(), username);
     }
 
-    public void removeNickname(String nickname)
-    {
+    public void removeNickname(String nickname) {
         nicknames.setProperty(nickname.toLowerCase(), null);
     }
 
-    public void fixNicknames()
-    {
-        for (Map.Entry<String, Object> entry : nicknames.getProperties().entrySet())
-        {
+    public void fixNicknames() {
+        for (Map.Entry<String, Object> entry : nicknames.getProperties().entrySet()) {
             nicknames.removeProperty(entry.getKey());
             nicknames.setProperty(entry.getKey().toLowerCase(), entry.getValue());
         }
@@ -361,11 +318,9 @@ public class GameInfo
         save();
     }
 
-    public List<String> listNicknames(String username)
-    {
+    public List<String> listNicknames(String username) {
         List<String> list = new LinkedList<String>();
-        for (Map.Entry<String, Object> entry : nicknames.getProperties().entrySet())
-        {
+        for (Map.Entry<String, Object> entry : nicknames.getProperties().entrySet()) {
             String name = (String)entry.getValue();
             if (username.equalsIgnoreCase(name))
                 list.add(entry.getKey());
