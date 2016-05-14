@@ -6,6 +6,8 @@ import modkiwi.util.Logger;
 import modkiwi.util.Utils;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.ArrayList;
@@ -34,6 +36,7 @@ public class BotRES extends GameBot {
     };
 
     private static final Pattern[] P_PROPOSALS = createMatchers(5);
+    private static final Pattern P_VOTE = Utils.pat(".*(approve|reject)\\s+(\\d+\\.\\d+)(?:[^\\d].*)?");
 
     private int round, turn, subround;
     private int scoreGood, scoreEvil;
@@ -180,6 +183,65 @@ public class BotRES extends GameBot {
                     proposal[i] = Integer.parseInt(move[i + 1]);
                 }
                 step = "voting";
+                Arrays.fill(hasVoted, false);
+            } else if (first.equals("approve")) {
+                castVote(fresh, Integer.parseInt(move[1]), true);
+            } else if (first.equals("reject")) {
+                castVote(fresh, Integer.parseInt(move[1]), false);
+            }
+        }
+    }
+
+    private void castVote(boolean fresh, int player, boolean approve) {
+        hasVoted[player] = true;
+        vote[player] = approve;
+
+        for (boolean voted : hasVoted) {
+            if (!voted) {
+                return;
+            }
+        }
+
+        int countYes = 0, countNo = 0;
+
+        StringBuilder message = new StringBuilder();
+        message.append("\n[color=purple][b]Results for proposal " + (round + 1) + "." + (subround + 1) + ": ");
+        for (int i = 0; i < currentSize; i++) {
+            if (i > 0) {
+                message.append(", ");
+            }
+            message.append(players[proposal[i]]);
+        }
+        message.append("[/b][/color]");
+
+        for (int i = 0; i < NoP; i++) {
+            message.append("\n" + players[i] + ": ");
+            if (vote[i]) {
+                message.append("g{APPROVE}g");
+                countYes++;
+            } else {
+                message.append("r{REJECT}r");
+                countNo++;
+            }
+        }
+
+        message.append("\n\n");
+
+        if (countYes > countNo) {
+            message.append("[color=purple][b]The proposal was approved![/b][/color]");
+            step = "submission";
+        } else {
+            message.append("[color=#008800]The proposal has been rejected.[/color]");
+            subround++;
+            turn = (turn + 1) % NoP;
+            step = "proposal";
+        }
+
+        if (fresh) {
+            try {
+                web.replyThread(game.getThread(), null, message);
+            } catch (IOException e) {
+                LOGGER.throwing("endGame()", e);
             }
         }
     }
@@ -214,6 +276,48 @@ public class BotRES extends GameBot {
     }
 
     @Override
+    public void processGeekmail(String username, String subject, String message) {
+        LOGGER.info("Mail found from user '%s': %s\n%s", username, subject, message);
+
+        Matcher m;
+        int actor = Utils.getUser(username, players);
+        boolean inGame = (actor >= 0);
+        LOGGER.info("- step = %s, actor = %d, inGame = %s", step, actor, inGame ? "true" : "false");
+
+        if (game.inProgress()) {
+            if (step.equals("voting") && inGame && (m = P_VOTE.matcher(subject)).matches()) {
+                LOGGER.info("  - matches P_VOTE");
+                String stepNumber = (round + 1) + "." + (subround + 1);
+                if (stepNumber.equals(m.group(2))) {
+                    LOGGER.info("  - proposal number matches");
+                    if (m.group(1).equalsIgnoreCase("approve")) {
+                        processAndAddMove("approve", Integer.toString(actor));
+                    } else if (m.group(1).equalsIgnoreCase("reject")) {
+                        processAndAddMove("reject", Integer.toString(actor));
+                    } else {
+                        LOGGER.warning("Subject '%s' matched P_VOTE but not approve or reject.", subject);
+                    }
+                }
+            }
+        }
+    }
+
+    private CharSequence genLink(String subject) {
+        try {
+            URI uri = new URI(
+                "https",
+                "boardgamegeek.com", 
+                "/geekmail/compose",
+                "touser=" + web.getUsername() + "&subject=[" + game.getId() + "] " + subject,
+                null);
+            return uri.toString().replaceAll("\\[", "%5B").replaceAll("\\]", "%5D");
+        } catch (URISyntaxException e) {
+            LOGGER.throwing("genLink()", e);
+            return null;
+        }
+    }
+
+    @Override
     public CharSequence getCurrentStatus() {
         if (!game.inProgress()) {
             return null;
@@ -239,7 +343,9 @@ public class BotRES extends GameBot {
                     }
                     message.append(players[proposal[i]]);
                 }
-                message.append("[/color]\n[b]Voting links:[/b] [b]g{APPROVE}g[/b] / [b]r{REJECT}r[/b]");
+                String approveLink = "[url=" + genLink("APPROVE " + (round + 1) + "." + (subround + 1)) + "]g{APPROVE}g[/url]";
+                String rejectLink = "[url=" + genLink("REJECT " + (round + 1) + "." + (subround + 1)) + "]r{REJECT}r[/url]";
+                message.append("[/color]\n\n[b][color=purple]Voting links:[/color][/b] [b]g{[u]" + approveLink + "[/u]}g[/b] / [b]r{[u]" + rejectLink + "[/u]}r[/b]");
             } else if (step.equals("submission")) {
                 message.append("\n[color=#008800]Waiting for submissions for " + (round + 1) + "." + (subround + 1) + ": ");
                 message.append(players[turn] + " - ");
