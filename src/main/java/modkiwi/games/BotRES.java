@@ -355,7 +355,9 @@ public class BotRES extends GameBot {
                     }
                     message.append(players[proposal[i]]);
                 }
-                message.append("[/color]\n[b]Submission links: [b]g{PASS}g[/b] / [b]r{FAIL}r[/b]");
+                String passLink = "[url=" + genLink("PASS " + (round + 1) + "." + (subround + 1)) + "]g{PASS}g[/url]";
+                String failLink = "[url=" + genLink("FAIL " + (round + 1) + "." + (subround + 1)) + "]r{FAIL}r[/url]";
+                message.append("[/color]\n\n[b][color=purple]Submission links:[/color][/b] [b]g{[u]" + passLink + "[/u]}g[/b] / [b]r{[u]" + failLink + "[/u]}r[/b]");
             }
 
             return message;
