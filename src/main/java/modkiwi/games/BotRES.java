@@ -107,7 +107,7 @@ public class BotRES extends GameBot {
     public void initialize(boolean fresh) {
         scoreGood = 0;
         scoreEvil = 0;
-        round = 0;
+        round = -1;
         turn = -1;
 
         hasVoted = new boolean[NoP];
@@ -159,15 +159,13 @@ public class BotRES extends GameBot {
     }
 
     private void newRound(boolean fresh) {
-        proposal = null;
-        currentSize = MISSION_COUNTS[NoP - 5][round];
-        currentProposalMatcher = P_PROPOSALS[currentSize];
-
-        LOGGER.info("currentSize = %d, P_PROPOSALS[%d] = /%s/", currentSize, currentSize, currentProposalMatcher.pattern());
-
         round++;
         subround = 0;
         turn = (turn + 1) % NoP;
+
+        currentSize = MISSION_COUNTS[NoP - 5][round];
+        currentProposalMatcher = P_PROPOSALS[currentSize];
+        proposal = null;
 
         step = "proposal";
     }
@@ -192,18 +190,14 @@ public class BotRES extends GameBot {
         int actor = Utils.getUser(username, players);
         boolean mod = game.isModerator(username);
         boolean cp = (actor == turn);
-        LOGGER.info("Command '%s' found by %s (%d) -- mod? = %s, cp? = %s", command, username, actor, mod ? "true" : "false", cp ? "true" : "false");
 
         if (game.inSignups()) {
         } else if (game.inProgress()) {
             if (step.equals("proposal") && cp && (m = currentProposalMatcher.matcher(command)).matches()) {
-                LOGGER.fine("- matches P_PROPOSAL_%d", currentSize);
                 int[] members = new int[currentSize];
                 String[] smembers = new String[currentSize + 1];
                 for (int i = 0; i < currentSize; i++) {
                     int user = Utils.getUser(m.group(i + 1), players, game);
-                    LOGGER.info("  - m.group(%d) = %s", i + 1, m.group(i + 1));
-                    LOGGER.info("    - user = %d", user);
                     if (user < 0)
                         return;
                     members[i] = user;
