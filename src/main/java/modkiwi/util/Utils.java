@@ -6,11 +6,14 @@ import static modkiwi.util.Constants.*;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.regex.Pattern;
 
 public final class Utils {
     private Utils() {
     }
+
+    private static Random RAND = new Random();
 
     public static String join(Object[] array, CharSequence joiner) {
         if (array == null || array.length == 0) {
@@ -45,6 +48,18 @@ public final class Utils {
         }
 
         return result.toString();
+    }
+
+    public static <T> void shuffle(T[] array) {
+        T ob;
+        int len = array.length;
+
+        for (int i = len; i > 0; i--) {
+            int j = RAND.nextInt(i);
+            ob = array[j];
+            array[j] = array[i - 1];
+            array[i - 1] = ob;
+        }
     }
 
     public static String lPad(String text, int len) {
