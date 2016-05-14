@@ -37,6 +37,7 @@ public class BotRES extends GameBot {
 
     private static final Pattern[] P_PROPOSALS = createMatchers(5);
     private static final Pattern P_VOTE = Utils.pat(".*(approve|reject)\\s+(\\d+\\.\\d+)(?:[^\\d].*)?");
+    private static final Pattern P_SUBMIT = Utils.pat(".*(pass|fail)\\s+(\\d+\\.\\d+)(?:[^\\d].*)?");
 
     private int round, turn, subround;
     private int scoreGood, scoreEvil;
@@ -188,6 +189,10 @@ public class BotRES extends GameBot {
                 castVote(fresh, Integer.parseInt(move[1]), true);
             } else if (first.equals("reject")) {
                 castVote(fresh, Integer.parseInt(move[1]), false);
+            } else if (first.equals("pass")) {
+                submitMission(fresh, Integer.parseInt(move[1]), Submission.SUCCESS);
+            } else if (first.equals("fail")) {
+                submitMission(fresh, Integer.parseInt(move[1]), Submission.FAILURE);
             }
         }
     }
@@ -230,6 +235,8 @@ public class BotRES extends GameBot {
         if (countYes > countNo) {
             message.append("[color=purple][b]The proposal was approved![/b][/color]");
             step = "submission";
+            submissions = new Submission[currentSize];
+            Arrays.fill(submissions, Submission.NONE);
         } else {
             message.append("[color=#008800]The proposal has been rejected.[/color]");
             subround++;
@@ -241,9 +248,73 @@ public class BotRES extends GameBot {
             try {
                 web.replyThread(game.getThread(), null, message);
             } catch (IOException e) {
-                LOGGER.throwing("endGame()", e);
+                LOGGER.throwing("castVote()", e);
             }
         }
+    }
+
+    private void submitMission(boolean fresh, int player, Submission submission) {
+        submissions[player] = submission;
+
+        int countFail = 0;
+
+        for (Submission sub : submissions) {
+            if (sub == Submission.NONE) {
+                return;
+            }
+        }
+
+        Utils.shuffle(submissions);
+        String[] results = new String[submissions.length];
+        int ind = 0;
+
+        for (Submission sub : submissions) {
+            switch (sub) {
+                case SUCCESS:
+                    results[ind++] = "[b]g{SUCCESS}g[/b]";
+                    break;
+                case FAILURE:
+                    results[ind++] = "[b]r{FAILURE}r[/b]";
+                    countFail++;
+                    break;
+            }
+        }
+
+        StringBuilder message = new StringBuilder();
+        message.append("\n[color=purple][b]Results for mission " + (round + 1) + ": ");
+        for (int i = 0; i < currentSize; i++) {
+            if (i > 0) {
+                message.append(", ");
+            }
+            message.append(players[proposal[i]]);
+        }
+        message.append("[/b][/color]\n");
+        message.append(Utils.join(results, ", "));
+
+        message.append("\n\n");
+
+        int neededFailures = 1;
+        if (NoP >= 7 && round == 3) {
+            neededFailures = 2;
+        }
+
+        if (countFail >= neededFailures) {
+            message.append("[color=#C2252D][b]The mission failed![/b][/color]");
+            scoreEvil++;
+        } else {
+            message.append("[color=#48AB16][b]The mission passed![/b][/color]");
+            scoreGood++;
+        }
+
+        if (fresh) {
+            try {
+                web.replyThread(game.getThread(), null, message);
+            } catch (IOException e) {
+                LOGGER.throwing("submitMission()", e);
+            }
+        }
+
+        newRound(fresh);
     }
 
     @Override
@@ -282,20 +353,40 @@ public class BotRES extends GameBot {
         Matcher m;
         int actor = Utils.getUser(username, players);
         boolean inGame = (actor >= 0);
-        LOGGER.info("- step = %s, actor = %d, inGame = %s", step, actor, inGame ? "true" : "false");
 
         if (game.inProgress()) {
             if (step.equals("voting") && inGame && (m = P_VOTE.matcher(subject)).matches()) {
-                LOGGER.info("  - matches P_VOTE");
                 String stepNumber = (round + 1) + "." + (subround + 1);
                 if (stepNumber.equals(m.group(2))) {
-                    LOGGER.info("  - proposal number matches");
                     if (m.group(1).equalsIgnoreCase("approve")) {
                         processAndAddMove("approve", Integer.toString(actor));
                     } else if (m.group(1).equalsIgnoreCase("reject")) {
                         processAndAddMove("reject", Integer.toString(actor));
                     } else {
                         LOGGER.warning("Subject '%s' matched P_VOTE but not approve or reject.", subject);
+                    }
+                }
+            } else if (step.equals("submission") && inGame && (m = P_SUBMIT.matcher(subject)).matches()) {
+                int index = -1;
+                for (int i = 0; i < proposal.length; i++) {
+                    if (actor == proposal[i]) {
+                        index = i;
+                        break;
+                    }
+                }
+                if (index < 0) {
+                    LOGGER.info("Player '%s' is not on the mission.", username);
+                    return;
+                }
+
+                String stepNumber = (round + 1) + "." + (subround + 1);
+                if (stepNumber.equals(m.group(2))) {
+                    if (m.group(1).equalsIgnoreCase("pass")) {
+                        processAndAddMove("pass", Integer.toString(index));
+                    } else if (m.group(1).equalsIgnoreCase("fail")) {
+                        processAndAddMove("fail", Integer.toString(index));
+                    } else {
+                        LOGGER.warning("Subject '%s' matched P_SUBMIT but not pass or fail.", subject);
                     }
                 }
             }
