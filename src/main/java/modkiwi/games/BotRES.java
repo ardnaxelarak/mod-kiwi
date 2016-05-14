@@ -382,14 +382,37 @@ public class BotRES extends GameBot {
                 String stepNumber = (round + 1) + "." + (subround + 1);
                 if (stepNumber.equals(m.group(2))) {
                     if (m.group(1).equalsIgnoreCase("pass")) {
-                        processAndAddMove("pass", Integer.toString(index));
+                        addSubmissionIfLegal(actor, index, "pass");
                     } else if (m.group(1).equalsIgnoreCase("fail")) {
-                        processAndAddMove("fail", Integer.toString(index));
+                        addSubmissionIfLegal(actor, index, "fail");
                     } else {
                         LOGGER.warning("Subject '%s' matched P_SUBMIT but not pass or fail.", subject);
                     }
                 }
             }
+        }
+    }
+
+    private void addSubmissionIfLegal(int player, int index, String submit) {
+        if (checkSubmissionLegal(roles.get(player), submit)) {
+            processAndAddMove(submit, Integer.toString(index));
+        } else {
+            LOGGER.warning("Player %s tried to submit a '%s' but is not allowed to.", players[player], submit);
+        }
+    }
+
+    private boolean checkSubmissionLegal(String role, String submit) {
+        if (submit.equals("pass")) {
+            return true;
+        } else if (submit.equals("fail")) {
+            if (role.equals("good")) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            LOGGER.warning("Unrecognized submission string '%s'", submit);
+            return false;
         }
     }
 
