@@ -29,7 +29,7 @@ public class WebUtils
 {
     private String username;
     private WebConnection conn;
-    private static final Pattern REPLY_PATTERN = Pattern.compile("^\\[q=\"[^\"]*\"\\](.*)\\[/q\\]$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern REPLY_PATTERN = Pattern.compile("^\\[q=\"[^\"]*\"\\](.*)\\[/q\\]$", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     private static final Logger LOGGER = new Logger(WebUtils.class);
 
     public WebUtils() {
@@ -234,7 +234,11 @@ public class WebUtils
         return new UserInfo(response.parse().select("user").first());
     }
 
-    public synchronized List<GeekMailInfo> getMail(String gameId) throws IOException {
+    public synchronized LinkedList<GeekMailInfo> getMail(String gameId) throws IOException {
+        return getMail(gameId, null);
+    }
+
+    public synchronized LinkedList<GeekMailInfo> getMail(String gameId, String lastMessage) throws IOException {
         WebRequest request = RequestBuilder.get()
                 .setUrl("http://boardgamegeek.com/geekmail_controller.php")
                 .addParameter("action", "search")
@@ -246,10 +250,21 @@ public class WebUtils
 
         Elements tables = response.parse().select("div#mychecks table.gm_messages");
 
-        List<GeekMailInfo> list = new LinkedList<GeekMailInfo>();
-        for (Element e : tables)
-        {
-            list.add(new GeekMailInfo(this, e));
+        int minValue;
+        if (lastMessage == null) {
+            minValue = Integer.MIN_VALUE;
+        } else {
+            minValue = Integer.parseInt(lastMessage);
+        }
+
+        LinkedList<GeekMailInfo> list = new LinkedList<GeekMailInfo>();
+        for (Element e : tables) {
+            GeekMailInfo item = new GeekMailInfo(this, e);
+            if (Integer.parseInt(item.getId()) > minValue) {
+                list.addFirst(item);
+            } else {
+                break;
+            }
         }
 
         return list;

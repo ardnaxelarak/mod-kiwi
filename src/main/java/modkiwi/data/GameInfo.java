@@ -13,7 +13,7 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EmbeddedEntity;
 
 public class GameInfo {
-    private String id, acronym, statusPost, gameStatus, historyPost, signupPost, thread, gametype, index, title, lastScanned;
+    private String id, acronym, statusPost, gameStatus, historyPost, signupPost, thread, gametype, index, title, lastScanned, lastMail;
     private List<String> mods, players, moves, settings;
     private EmbeddedEntity data, nicknames;
     private int maxPlayers;
@@ -33,6 +33,7 @@ public class GameInfo {
         index = (String)ent.getProperty("index");
         title = (String)ent.getProperty("title");
         lastScanned = (String)ent.getProperty("last_scanned");
+        lastMail = (String)ent.getProperty("last_mail");
 
         if (ent.getProperty("auto_start") != null)
             autoStart = (boolean)ent.getProperty("auto_start");
@@ -111,6 +112,10 @@ public class GameInfo {
 
     public String getLastScanned() {
         return lastScanned;
+    }
+
+    public String getLastMail() {
+        return lastMail;
     }
 
     public int getMaxPlayers() {
@@ -222,6 +227,7 @@ public class GameInfo {
         ent.setProperty("index", index);
         ent.setProperty("title", title);
         ent.setProperty("last_scanned", lastScanned);
+        ent.setProperty("last_mail", lastMail);
         ent.setProperty("auto_start", autoStart);
 
         if (maxPlayers > 0) {
@@ -245,6 +251,10 @@ public class GameInfo {
 
     public void setLastScanned(String id) {
         lastScanned = id;
+    }
+
+    public void setLastMail(String id) {
+        lastMail = id;
     }
 
     public void setAutoStart(boolean autoStart) {

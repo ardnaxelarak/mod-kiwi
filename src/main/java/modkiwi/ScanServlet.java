@@ -2,6 +2,7 @@ package modkiwi;
 
 import modkiwi.data.ArticleInfo;
 import modkiwi.data.GameInfo;
+import modkiwi.data.GeekMailInfo;
 import modkiwi.data.ThreadInfo;
 import modkiwi.games.BotManager;
 import modkiwi.games.GameBot;
@@ -61,9 +62,12 @@ public class ScanServlet extends HttpServlet
                     ti = web.getThread(game.getThread());
                 }
 
-                LOGGER.finer("%d new articles for %s", ti.getArticles().length, game.getFullTitle());
+                LinkedList<GeekMailInfo> gms = web.getMail(game.getId(), game.getLastMail());
 
-                if (ti.getArticles().length == 0) {
+                LOGGER.finer("%d new articles for %s", ti.getArticles().length, game.getFullTitle());
+                LOGGER.finer("%d new mail for %s", gms.size(), game.getFullTitle());
+
+                if (ti.getArticles().length == 0 && gms.size() == 0) {
                     continue;
                 }
 
@@ -83,12 +87,23 @@ public class ScanServlet extends HttpServlet
                     }
                 }
 
+                for (GeekMailInfo gm : gms) {
+                    bot.parseGeekmail(gm.getSender(), gm.getSubject(), gm.getContent());
+                }
+
                 if (game == single && req.getParameter("update") != null) {
                     bot.forceUpdate();
                 }
 
                 bot.finishedScanning();
-                game.setLastScanned(articles[articles.length - 1].getId());
+                if (articles.length > 0) {
+                    game.setLastScanned(articles[articles.length - 1].getId());
+                }
+
+                if (gms.size() > 0) {
+                    game.setLastMail(gms.getLast().getId());
+                }
+
                 game.save();
             }
         }
