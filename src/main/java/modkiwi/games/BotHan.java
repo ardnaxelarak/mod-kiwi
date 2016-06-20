@@ -21,7 +21,7 @@ public class BotHan extends GameBot {
 
     private static final Logger LOGGER = new Logger(BotHan.class);
 
-    private static final Pattern P_CLUE    = Utils.pat("clue\\s*(\\S+)\\s+(\\S[^,]*)");
+    private static final Pattern P_CLUE    = Utils.pat("(?:clue|hint)\\s*(\\S+)\\s+(\\S[^,]*)");
     private static final Pattern P_DISCARD = Utils.pat("discard\\s*(\\d+)");
     private static final Pattern P_PLAY    = Utils.pat("play\\s*(\\d+)");
 
