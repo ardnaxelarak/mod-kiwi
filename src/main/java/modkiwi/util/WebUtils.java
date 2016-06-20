@@ -214,7 +214,12 @@ public class WebUtils
     public synchronized ThreadInfo getThread(WebRequest request) throws IOException {
         try {
             WebResponse response = conn.execute(request);
-            return new ThreadInfo(response.parse().select("thread").first());
+            Element node = response.parse().select("thread").first();
+            if (node == null) {
+                LOGGER.warning("Request to %s had no thread node.", request.toString());
+                return new ThreadInfo();
+            }
+            return new ThreadInfo(node);
         } catch (SocketTimeoutException e) {
             LOGGER.warning("Request to " + request.toString() + " timed out.");
             return new ThreadInfo();
