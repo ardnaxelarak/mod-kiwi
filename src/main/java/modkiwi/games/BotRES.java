@@ -108,7 +108,9 @@ public class BotRES extends GameBot {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void initialize(boolean fresh) {
+        roles = (List<String>)game.getDataProperty("roles");
         scoreGood = 0;
         scoreEvil = 0;
         round = -1;
@@ -124,12 +126,21 @@ public class BotRES extends GameBot {
         newRound(fresh);
     }
 
-    @SuppressWarnings("unchecked")
     private void sendRoles() {
-        List<String> roles = (List<String>)game.getDataProperty("roles");
         String player, role, subject, message, modMessage;
         String goodMessage = "You are a good player. Try to pass three missions to win the game!";
         String evilMessage = "You are an evil player. Try to fail three missions to win the game!";
+
+        ArrayList<String> evil = new ArrayList<String>(NoP / 2);
+        for (int i = 0; i < NoP; i++) {
+            player = players[i];
+            role = roles.get(i);
+            if (role.equals("evil")) {
+                evil.add(player);
+            }
+        }
+        evilMessage += "\n\nEvil players are " + Utils.join(evil, ", ") + ".";
+
         modMessage = "";
 
         for (int i = 0; i < NoP; i++) {
@@ -210,7 +221,7 @@ public class BotRES extends GameBot {
         int countYes = 0, countNo = 0;
 
         StringBuilder message = new StringBuilder();
-        message.append("\n[color=purple][b]Results for proposal " + (round + 1) + "." + (subround + 1) + ": ");
+        message.append("[color=purple][b]Results for proposal " + (round + 1) + "." + (subround + 1) + ": ");
         for (int i = 0; i < currentSize; i++) {
             if (i > 0) {
                 message.append(", ");
@@ -281,7 +292,7 @@ public class BotRES extends GameBot {
         }
 
         StringBuilder message = new StringBuilder();
-        message.append("\n[color=purple][b]Results for mission " + (round + 1) + ": ");
+        message.append("[color=purple][b]Results for mission " + (round + 1) + ": ");
         for (int i = 0; i < currentSize; i++) {
             if (i > 0) {
                 message.append(", ");
