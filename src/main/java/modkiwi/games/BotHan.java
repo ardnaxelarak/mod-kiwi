@@ -32,6 +32,7 @@ public class BotHan extends GameBot {
 
     private String[] colors;
     private String[][] hands;
+    private int[][] handClues;
     private TreeMap<String, Integer> discards;
     private int[] board;
     private int turn, round, handSize;
@@ -168,10 +169,12 @@ public class BotHan extends GameBot {
 
     private void dealHands(boolean fresh) {
         hands = new String[NoP][handSize];
+        handClues = new int[NoP][handSize];
 
         for (int i = 0; i < NoP; i++) {
             for (int j = 0; j < handSize; j++) {
                 hands[i][j] = drawCard();
+                handClues[i][j] = 0;
             }
         }
 
@@ -190,37 +193,13 @@ public class BotHan extends GameBot {
         if (first.equals("cluecolor")) {
             int color = Integer.parseInt(move[1]);
             int player = Integer.parseInt(move[2]);
-            List<Integer> positions = new LinkedList<Integer>();
 
-            for (int i = 0; i < handSize; i++) {
-                String card = hands[player][i];
-                if (getColorOfCard(card) == color) {
-                    positions.add(i + 1);
-                }
-            }
-
-            addMessage("[color=#008800]Positions %s of %s's hand are %s.[/color]", Utils.join(positions, ", "), players[player], colors[color]);
-
-            clues--;
-
-            nextTurn();
+            clueColor(color, player);
         } else if (first.equals("cluevalue")) {
             int value = Integer.parseInt(move[1]);
             int player = Integer.parseInt(move[2]);
-            List<Integer> positions = new LinkedList<Integer>();
 
-            for (int i = 0; i < handSize; i++) {
-                String card = hands[player][i];
-                if (getValueOfCard(card) == value) {
-                    positions.add(i + 1);
-                }
-            }
-
-            addMessage("[color=#008800]Positions %s of %s's hand are %ds.[/color]", Utils.join(positions, ", "), players[player], value + 1);
-
-            clues--;
-
-            nextTurn();
+            clueValue(value, player);
         } else if (first.equals("discard")) {
             int position = Integer.parseInt(move[1]);
             String card = hands[turn][position];
@@ -267,12 +246,64 @@ public class BotHan extends GameBot {
         }
     }
 
+    private void clueColor(int color, int player) {
+        List<Integer> positions = new LinkedList<Integer>();
+
+        for (int i = 0; i < handSize; i++) {
+            String card = hands[player][i];
+            if (getColorOfCard(card) == color) {
+                positions.add(i + 1);
+                for (int j = 0; j < colors.length; j++) {
+                    if (j == color)
+                        continue;
+
+                    handClues[player][i] |= BIT_COLORS[j];
+                }
+            } else {
+                handClues[player][i] |= BIT_COLORS[color];
+            }
+        }
+
+        addMessage("[color=#008800]Positions %s of %s's hand are %s.[/color]", Utils.join(positions, ", "), players[player], colors[color]);
+
+        clues--;
+
+        nextTurn();
+    }
+
+    private void clueValue(int value, int player) {
+        List<Integer> positions = new LinkedList<Integer>();
+
+        for (int i = 0; i < handSize; i++) {
+            String card = hands[player][i];
+            if (getValueOfCard(card) == value) {
+                positions.add(i + 1);
+                for (int j = 0; j < 5; j++) {
+                    if (j == value)
+                        continue;
+
+                    handClues[player][i] |= BIT_VALUES[j];
+                }
+            } else {
+                handClues[player][i] |= BIT_VALUES[value];
+            }
+        }
+
+        addMessage("[color=#008800]Positions %s of %s's hand are %ds.[/color]", Utils.join(positions, ", "), players[player], value + 1);
+
+        clues--;
+
+        nextTurn();
+    }
+
     private void redraw(int player, int position, boolean fresh) {
         for (int i = position; i < handSize - 1; i++) {
             hands[player][i] = hands[player][i + 1];
+            handClues[player][i] = handClues[player][i + 1];
         }
 
         hands[player][handSize - 1] = drawCard();
+        handClues[player][handSize - 1] = 0;
 
         nextTurn();
 
@@ -351,12 +382,94 @@ public class BotHan extends GameBot {
             for (int i = 0; i < board.length; i++) {
                 message.append("\n" + colors[i] + ": " + board[i]);
             }
-            message.append("[/color]");
+
+            message.append("\n\nHands:");
+            message.append("\n[c]+--------------------+");
+            for (int i = 0; i < handSize; i++) {
+                message.append("-------+");
+            }
+
+            message.append("\n|name                |");
+            for (int i = 0; i < handSize; i++) {
+                message.append("   " + (i + 1) + "   |");
+            }
+
+            message.append("\n+--------------------+");
+            for (int i = 0; i < handSize; i++) {
+                message.append("-------+");
+            }
+
+            for (int i = 0; i < NoP; i++) {
+                message.append(String.format("\n|%-20s|", players[i]));
+                for (int j = 0; j < handSize; j++) {
+                    message.append(" " + getColors(handClues[i][j], false) + " |");
+                }
+
+                message.append("\n|                    |");
+                for (int j = 0; j < handSize; j++) {
+                    message.append(" " + getValues(handClues[i][j], false) + " |");
+                }
+
+                message.append("\n+--------------------+");
+                for (int j = 0; j < handSize; j++) {
+                    message.append("-------+");
+                }
+            }
+
+            message.append("[/c][/color]");
 
             return message;
         }
 
         return null;
+    }
+
+    private String getColors(int card, boolean longForm) {
+        List<String> list = new LinkedList<String>();
+        for (int i = 0; i < colors.length; i++) {
+            if ((card & BIT_COLORS[i]) == 0) {
+                list.add(colors[i].substring(0, 1));
+            } else {
+                list.add(" ");
+            }
+        }
+        return Utils.join(list, "");
+    }
+
+    private String getValues(int card, boolean longForm) {
+        List<String> list = new LinkedList<String>();
+        for (int i = 0; i < 5; i++) {
+            if ((card & BIT_VALUES[i]) == 0) {
+                list.add(Integer.toString(i + 1));
+            } else {
+                list.add(" ");
+            }
+        }
+        return Utils.join(list, "");
+    }
+
+    private void endGame(boolean fresh, boolean win) {
+        if (fresh)
+        {
+            String message;
+            if (win) {
+                int score = 0;
+                for (int count : board) {
+                    score += count;
+                }
+
+                message = "[color=purple][b]The game is over. Your score is " + score + ".[/b][/color]";
+            } else {
+                message = "[color=purple][b]The game is over. You have exploded![/b][/color]";
+            }
+
+            try {
+                web.replyThread(game, message);
+            } catch (IOException e) {
+                LOGGER.throwing("endGame()", e);
+            }
+        }
+        super.endGame();
     }
 
     @Override
