@@ -35,7 +35,7 @@ public class BotHan extends GameBot {
     private int[][] handClues;
     private TreeMap<String, Integer> discards;
     private int[] board;
-    private int turn, round, handSize;
+    private int turn, round, handSize, turnsLeft;
     private int clues, fuse, maxClues;
     private LinkedList<String> deck;
 
@@ -161,6 +161,7 @@ public class BotHan extends GameBot {
 
         turn = 0;
         round = 1;
+        turnsLeft = -1;
 
         discards = new TreeMap<String, Integer>();
         deck = new LinkedList<String>( (List<String>)game.getData().getProperty("deck"));
@@ -184,7 +185,10 @@ public class BotHan extends GameBot {
     }
 
     private String drawCard() {
-        return deck.pop();
+        if (deck.isEmpty())
+            return "Nothing";
+        else
+            return deck.pop();
     }
 
     @Override
@@ -194,12 +198,12 @@ public class BotHan extends GameBot {
             int color = Integer.parseInt(move[1]);
             int player = Integer.parseInt(move[2]);
 
-            clueColor(color, player);
+            clueColor(color, player, fresh);
         } else if (first.equals("cluevalue")) {
             int value = Integer.parseInt(move[1]);
             int player = Integer.parseInt(move[2]);
 
-            clueValue(value, player);
+            clueValue(value, player, fresh);
         } else if (first.equals("discard")) {
             int position = Integer.parseInt(move[1]);
             String card = hands[turn][position];
@@ -238,6 +242,9 @@ public class BotHan extends GameBot {
                 }
 
                 fuse--;
+                if (fuse < 0) {
+                    endGame(fresh, false);
+                }
             }
 
             redraw(turn, position, fresh);
@@ -246,7 +253,7 @@ public class BotHan extends GameBot {
         }
     }
 
-    private void clueColor(int color, int player) {
+    private void clueColor(int color, int player, boolean fresh) {
         List<Integer> positions = new LinkedList<Integer>();
 
         for (int i = 0; i < handSize; i++) {
@@ -268,10 +275,10 @@ public class BotHan extends GameBot {
 
         clues--;
 
-        nextTurn();
+        nextTurn(fresh);
     }
 
-    private void clueValue(int value, int player) {
+    private void clueValue(int value, int player, boolean fresh) {
         List<Integer> positions = new LinkedList<Integer>();
 
         for (int i = 0; i < handSize; i++) {
@@ -293,7 +300,7 @@ public class BotHan extends GameBot {
 
         clues--;
 
-        nextTurn();
+        nextTurn(fresh);
     }
 
     private void redraw(int player, int position, boolean fresh) {
@@ -302,17 +309,27 @@ public class BotHan extends GameBot {
             handClues[player][i] = handClues[player][i + 1];
         }
 
+        if (deck.size() == 1) {
+            addMessage("[color=purple][b]The deck is now empty. %d turns remain.[/b][/color]", NoP);
+            turnsLeft = NoP + 1;
+        }
+
         hands[player][handSize - 1] = drawCard();
         handClues[player][handSize - 1] = 0;
 
-        nextTurn();
+        nextTurn(fresh);
 
         if (fresh) {
-            mailHands();
+            mailHands(player);
         }
     }
 
-    private void nextTurn() {
+    private void nextTurn(boolean fresh) {
+        turnsLeft--;
+
+        if (turnsLeft == 0)
+            endGame(fresh, true);
+
         turn = (turn + 1) % NoP;
         round++;
     }
@@ -371,6 +388,7 @@ public class BotHan extends GameBot {
             message.append("[color=#008800]");
             message.append("Clues: " + clues);
             message.append("\nRemaining incorrect plays: " + fuse);
+            message.append("\nCards remaining in deck: " + deck.size());
             if (!discards.isEmpty()) {
                 message.append("\n\nDiscards:");
                 for (String card : discards.keySet()) {
