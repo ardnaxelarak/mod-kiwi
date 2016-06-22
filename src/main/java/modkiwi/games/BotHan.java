@@ -98,25 +98,29 @@ public class BotHan extends GameBot {
         game.getData().setProperty("deck", deck);
     }
 
-    private void mailHands() {
+    private void mailHands(int skip) {
         String[] pmessage = new String[NoP];
         String subject = String.format("%s: Turn %d hands", game.getPrefix(), round);
         String message;
 
         for (int i = 0; i < NoP; i++) {
-            pmessage[i] = players[i] + ":";
+            pmessage[i] = "[u][b]" + players[i] + "[/b][/u]:";
             for (int j = 0; j < hands[i].length; j++) {
                 pmessage[i] += "\n" + (j + 1) + ": " + hands[i][j];
             }
         }
 
         for (int i = 0; i < NoP; i++) {
-            message = "Player hands on turn " + round + ":\n";
+            if (i == skip)
+                continue;
+
+            message = "[thread=" + game.getThread() + "][/thread]\n";
+            message += "Player hands on turn " + round + ":";
 
             for (int j = 0; j < NoP; j++) {
                 if (i == j)
                     continue;
-                message += "\n" + pmessage[j];
+                message += "\n\n" + pmessage[j];
             }
 
             try {
@@ -180,7 +184,7 @@ public class BotHan extends GameBot {
         }
 
         if (fresh) {
-            mailHands();
+            mailHands(-1);
         }
     }
 
