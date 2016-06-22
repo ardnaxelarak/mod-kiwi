@@ -222,6 +222,7 @@ public class BotRES extends GameBot {
 
         StringBuilder message = new StringBuilder();
         message.append("[color=purple][b]Results for proposal " + (round + 1) + "." + (subround + 1) + ": ");
+        message.append(players[turn] + " - ");
         for (int i = 0; i < currentSize; i++) {
             if (i > 0) {
                 message.append(", ");
