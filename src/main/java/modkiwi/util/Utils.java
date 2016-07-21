@@ -50,6 +50,10 @@ public final class Utils {
         return result.toString();
     }
 
+    public static StringBuilder append(StringBuilder str, String format, Object... args) {
+        return str.append(String.format(format, args));
+    }
+
     public static <T> void shuffle(T[] array) {
         T ob;
         int len = array.length;

@@ -39,6 +39,7 @@ public abstract class GameBot
     protected String[] players;
     private boolean changed;
     protected List<String> messages = null;
+    protected LinkedList<String> historyMessages = null;
     protected List<String> secretMessages = null;
 
     protected GameBot(GameInfo game) throws IOException {
@@ -90,6 +91,23 @@ public abstract class GameBot
         messages.clear();
     }
 
+    private void updateHistory() {
+        StringBuilder post = new StringBuilder();
+
+        if (historyMessages != null && !historyMessages.isEmpty()) {
+            post.append(Utils.join(historyMessages, "\n\n"));
+        }
+
+        if (post.length() > 0) {
+            try {
+                web.edit(game.getHistoryPost(), "Game History", post);
+            } catch (IOException e) {
+                LOGGER.throwing("postUpdate()", e);
+            }
+        }
+        messages.clear();
+    }
+
     protected void replace(int index, String newPlayer, boolean fresh) {
         addMessage("[color=purple][b]%s has replaced %s.[/b][/color]", newPlayer, players[index]);
         players[index] = newPlayer;
@@ -116,6 +134,9 @@ public abstract class GameBot
     }
 
     public void startScanning() {
+        if (historyMessages == null)
+            historyMessages = new LinkedList<String>();
+
         if (game.inProgress())
             loadGame();
 
@@ -129,6 +150,7 @@ public abstract class GameBot
             postUpdate();
             updatePlayerList();
             updateStatus();
+            updateHistory();
             changed = false;
             messages = null;
             secretMessages = null;
@@ -288,6 +310,9 @@ public abstract class GameBot
     }
 
     public void loadGame() {
+        if (historyMessages == null)
+            historyMessages = new LinkedList<String>();
+
         initialize(false);
         for (String move : game.getMoves()) {
             globalProcessMove(false, move.split(" "));
@@ -320,6 +345,23 @@ public abstract class GameBot
     protected void addMessage(String format, Object... args) {
         if (messages != null)
             messages.add(String.format(format, args));
+    }
+
+    protected void addMessageAndHistory(String format, Object... args) {
+        String message = String.format(format, args);
+        if (messages != null)
+            messages.add(message);
+        if (historyMessages != null)
+            historyMessages.add(message);
+    }
+
+    protected String popHistory() {
+        return historyMessages.removeLast();
+    }
+
+    protected void addHistory(String format, Object... args) {
+        if (historyMessages != null)
+            historyMessages.add(String.format(format, args));
     }
 
     protected void addSecretMessage(String format, Object... args) {

@@ -88,6 +88,20 @@ public class BotRES extends GameBot {
         game.getData().setProperty("roles", roles);
     }
 
+    private int neededFailures() {
+        if (NoP >= 7 && round == 3) {
+            return 2;
+        }
+        return 1;
+    }
+
+    private boolean canEndEarly() {
+        if (scoreEvil < 2)
+            return false;
+
+        return true;
+    }
+
     @Override
     protected CharSequence update() {
         if (game.inProgress()) {
@@ -191,11 +205,26 @@ public class BotRES extends GameBot {
         if (game.inProgress()) {
             if (first.equals("propose")) {
                 proposal = new int[currentSize];
+                String message = "[color=#008800]M" + (round + 1) + "." + (subround + 1) + ": " + players[turn] + " - ";
                 for (int i = 0; i < currentSize; i++) {
                     proposal[i] = Integer.parseInt(move[i + 1]);
+                    if (i != 0)
+                        message += ", ";
+                    message += players[proposal[i]];
                 }
-                step = "voting";
-                Arrays.fill(hasVoted, false);
+                message += "[/color]";
+
+                if (subround >= 4) {
+                    step = "submission";
+                    submissions = new Submission[currentSize];
+                    Arrays.fill(submissions, Submission.NONE);
+                    message += "\n[color=purple][b]The proposal is automatically sent![/b][/color]";
+                    addMessage(message);
+                } else {
+                    step = "voting";
+                    Arrays.fill(hasVoted, false);
+                }
+                addHistory(message);
             } else if (first.equals("approve")) {
                 castVote(fresh, Integer.parseInt(move[1]), true);
             } else if (first.equals("reject")) {
@@ -242,6 +271,9 @@ public class BotRES extends GameBot {
             }
         }
 
+        popHistory();
+        addHistory(message.toString());
+
         message.append("\n\n");
 
         if (countYes > countNo) {
@@ -249,6 +281,10 @@ public class BotRES extends GameBot {
             step = "submission";
             submissions = new Submission[currentSize];
             Arrays.fill(submissions, Submission.NONE);
+            if (canEndEarly()) {
+                spiesFail();
+                processMission(fresh);
+            }
         } else {
             message.append("[color=#008800]The proposal has been rejected.[/color]");
             subround++;
@@ -265,16 +301,51 @@ public class BotRES extends GameBot {
         }
     }
 
+    private boolean wouldFail() {
+        int fails = 0;
+        for (int i = 0; i < proposal.length; i++) {
+            if (roles.get(proposal[i]).equals("evil")) {
+                fails++;
+            }
+        }
+
+        return (fails >= neededFailures());
+    }
+
+    private void spiesFail() {
+        int fails = 0;
+        for (int i = 0; i < proposal.length; i++) {
+            if (roles.get(proposal[i]).equals("evil")) {
+                fails++;
+                submissions[i] = Submission.FAILURE;
+            } else {
+                submissions[i] = Submission.SUCCESS;
+            }
+        }
+
+        if (fails < neededFailures()) {
+            for (int i = 0; i < submissions.length; i++) {
+                if (submissions[i] == Submission.FAILURE) {
+                    submissions[i] = Submission.SUCCESS;
+                }
+            }
+        }
+    }
+
     private void submitMission(boolean fresh, int player, Submission submission) {
         submissions[player] = submission;
-
-        int countFail = 0;
 
         for (Submission sub : submissions) {
             if (sub == Submission.NONE) {
                 return;
             }
         }
+
+        processMission(fresh);
+    }
+
+    private void processMission(boolean fresh) {
+        int countFail = 0;
 
         Utils.shuffle(submissions);
         String[] results = new String[submissions.length];
@@ -303,14 +374,11 @@ public class BotRES extends GameBot {
         message.append("[/b][/color]\n");
         message.append(Utils.join(results, ", "));
 
+        addHistory(message.toString());
+
         message.append("\n\n");
 
-        int neededFailures = 1;
-        if (NoP >= 7 && round == 3) {
-            neededFailures = 2;
-        }
-
-        if (countFail >= neededFailures) {
+        if (countFail >= neededFailures()) {
             message.append("[color=#C2252D][b]The mission failed![/b][/color]");
             scoreEvil++;
         } else {
