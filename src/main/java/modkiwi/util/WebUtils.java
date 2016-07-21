@@ -291,8 +291,11 @@ public class WebUtils
         }
     }
 
-    public static String playerThreadURL(String thread, String player)
-    {
+    public static String playerThreadURL(String thread, String player) {
         return "thread?thread=" + thread + "&username=" + player.replace(" ", "%20");
+    }
+
+    public static String threadURLNew(String thread, String player) {
+        return "https://boardgamegeek.com/thread/" + thread + "/new";
     }
 }

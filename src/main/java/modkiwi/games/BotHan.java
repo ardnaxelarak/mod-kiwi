@@ -3,6 +3,7 @@ package modkiwi.games;
 import modkiwi.data.GameInfo;
 import modkiwi.util.Logger;
 import modkiwi.util.Utils;
+import modkiwi.util.WebUtils;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -114,7 +115,7 @@ public class BotHan extends GameBot {
             if (i == skip)
                 continue;
 
-            message = "[thread=" + game.getThread() + "][/thread]\n";
+            message = "[url=" + WebUtils.threadURLNew(game.getThread(), players[i]) + "]" + game.getFullTitle() + "[/url]\n";
             message += "Player hands on turn " + round + ":";
 
             for (int j = 0; j < NoP; j++) {
@@ -211,7 +212,7 @@ public class BotHan extends GameBot {
         } else if (first.equals("discard")) {
             int position = Integer.parseInt(move[1]);
             String card = hands[turn][position];
-            addMessage("[color=purple][b]%s discards a %s.[/b][/color]", players[turn], card);
+            addMessageAndHistory("[color=purple][b]%s discards a %s.[/b][/color]", players[turn], card);
 
             if (discards.get(card) == null) {
                 discards.put(card, 1);
@@ -229,7 +230,7 @@ public class BotHan extends GameBot {
             int position = Integer.parseInt(move[1]);
             String card = hands[turn][position];
             if (playableCard(card)) {
-                addMessage("[color=purple][b]%s successfully plays a %s.[/b][/color]", players[turn], card);
+                addMessageAndHistory("[color=purple][b]%s successfully plays a %s.[/b][/color]", players[turn], card);
                 board[getColorOfCard(card)]++;
 
                 if (getValueOfCard(card) == 4 && clues < maxClues) {
@@ -237,7 +238,7 @@ public class BotHan extends GameBot {
                     addMessage("[color=#008800]A clue is regained.[/color]");
                 }
             } else {
-                addMessage("[color=purple][b]%s fails to play a %s![/b][/color]", players[turn], card);
+                addMessageAndHistory("[color=red][b]%s fails to play a %s![/b][/color]", players[turn], card);
 
                 if (discards.get(card) == null) {
                     discards.put(card, 1);
@@ -275,7 +276,17 @@ public class BotHan extends GameBot {
             }
         }
 
-        addMessage("[color=#008800]Positions %s of %s's hand are %s.[/color]", Utils.join(positions, ", "), players[player], colors[color]);
+        StringBuilder message = new StringBuilder("[color=#008800]");
+        Utils.append(message, "%s has %s %s card", players[player], Utils.NUMBERS[positions.size()], colors[color].toLowerCase());
+        if (positions.size() == 0) {
+            message.append("s.");
+        } else if (positions.size() == 1) {
+            Utils.append(message, " in position %d.", positions.get(0));
+        } else {
+            Utils.append(message, "s in positions %s.", Utils.join(positions, ", "));
+        }
+        message.append("[/color]");
+        addMessageAndHistory(message.toString());
 
         clues--;
 
@@ -300,7 +311,17 @@ public class BotHan extends GameBot {
             }
         }
 
-        addMessage("[color=#008800]Positions %s of %s's hand are %ds.[/color]", Utils.join(positions, ", "), players[player], value + 1);
+        StringBuilder message = new StringBuilder("[color=#008800]");
+        Utils.append(message, "%s has %s %d", players[player], Utils.NUMBERS[positions.size()], value + 1);
+        if (positions.size() == 0) {
+            message.append("s.");
+        } else if (positions.size() == 1) {
+            Utils.append(message, " in position %d.", positions.get(0));
+        } else {
+            Utils.append(message, "s in positions %s.", Utils.join(positions, ", "));
+        }
+        message.append("[/color]");
+        addMessageAndHistory(message.toString());
 
         clues--;
 

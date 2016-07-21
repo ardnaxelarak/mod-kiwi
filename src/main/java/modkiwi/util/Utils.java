@@ -15,6 +15,20 @@ public final class Utils {
 
     private static Random RAND = new Random();
 
+    public static final String[] NUMBERS = new String[] {
+        "zero",
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six",
+        "seven",
+        "eight",
+        "nine",
+        "ten",
+    };
+
     public static String join(Object[] array, CharSequence joiner) {
         if (array == null || array.length == 0) {
             return "";
