@@ -95,6 +95,10 @@ public class BotRES extends GameBot {
         return 1;
     }
 
+    private int hammerIndex() {
+        return 4;
+    }
+
     private boolean canEndEarly() {
         if (scoreEvil < 2)
             return false;
@@ -214,12 +218,15 @@ public class BotRES extends GameBot {
                 }
                 message += "[/color]";
 
-                if (subround >= 4) {
+                if (subround >= hammerIndex()) {
                     step = "submission";
                     submissions = new Submission[currentSize];
                     Arrays.fill(submissions, Submission.NONE);
                     message += "\n[color=purple][b]The proposal is automatically sent![/b][/color]";
                     addMessage(message);
+                } else if (canEndEarly() && wouldFail() && !rebelProposalLeft()) {
+                    addMessage("[color=purple]The current proposal would fail, and all remaining proposers are spies.[/color]");
+                    endGame(fresh, false);
                 } else {
                     step = "voting";
                     Arrays.fill(hasVoted, false);
@@ -290,6 +297,10 @@ public class BotRES extends GameBot {
             subround++;
             turn = (turn + 1) % NoP;
             step = "proposal";
+            if (canEndEarly() && !rebelProposalLeft()) {
+                addMessage("[color=purple]All remaining proposers are spies.[/color]");
+                endGame(fresh, false);
+            }
         }
 
         if (fresh) {
@@ -330,6 +341,16 @@ public class BotRES extends GameBot {
                 }
             }
         }
+    }
+
+    private boolean rebelProposalLeft() {
+        for (int i = subround; i <= hammerIndex(); i++) {
+            int j = (turn + i - subround) % NoP;
+            if (roles.get(j).equals("good")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void submitMission(boolean fresh, int player, Submission submission) {
@@ -394,7 +415,35 @@ public class BotRES extends GameBot {
             }
         }
 
-        newRound(fresh);
+        if (scoreEvil >= 3) {
+            endGame(fresh, false);
+        } else if (scoreGood >= 3) {
+            endGame(fresh, true);
+        } else {
+            newRound(fresh);
+        }
+    }
+
+    private void endGame(boolean fresh, boolean goodWin) {
+        if (fresh) {
+            String message = "[color=purple][b]The game is over. Team " + (goodWin ? "Good" : "Evil") + " (";
+            List<String> winners = new LinkedList<String>();
+
+            for (int i = 0; i < NoP; i++) {
+                if (roles.get(i).equals("good") == goodWin)
+                    winners.add(players[i]);
+            }
+
+            message += Utils.join(winners, ", ") + ") wins![/b][/color]";
+
+            try {
+                web.replyThread(game, message);
+            } catch (IOException e) {
+                LOGGER.throwing("endGame()", e);
+            }
+        }
+
+        super.endGame();
     }
 
     @Override
