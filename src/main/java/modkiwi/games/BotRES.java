@@ -49,6 +49,8 @@ public class BotRES extends GameBot {
     private String step;
     private List<String> roles;
 
+    private boolean shortHammer;
+
     private enum Submission {
         NONE,
         SUCCESS,
@@ -96,7 +98,11 @@ public class BotRES extends GameBot {
     }
 
     private int hammerIndex() {
-        return 4;
+        if (shortHammer) {
+            return 3;
+        } else {
+            return 4;
+        }
     }
 
     private boolean canEndEarly() {
@@ -128,6 +134,8 @@ public class BotRES extends GameBot {
     @Override
     @SuppressWarnings("unchecked")
     public void initialize(boolean fresh) {
+        shortHammer = game.hasSetting("short_hammer");
+
         roles = (List<String>)game.getDataProperty("roles");
         scoreGood = 0;
         scoreEvil = 0;
