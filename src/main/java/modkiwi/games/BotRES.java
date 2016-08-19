@@ -232,7 +232,7 @@ public class BotRES extends GameBot {
                     Arrays.fill(submissions, Submission.NONE);
                     message += "\n[color=purple][b]The proposal is automatically sent![/b][/color]";
                     addMessage(message);
-                } else if (canEndEarly() && wouldFail() && !rebelProposalLeft()) {
+                } else if (canEndEarly() && wouldFail() && !rebelProposalLeft(false)) {
                     addMessage("[color=purple]The current proposal would fail, and all remaining proposers are spies.[/color]");
                     endGame(fresh, false);
                 } else {
@@ -305,7 +305,7 @@ public class BotRES extends GameBot {
             subround++;
             turn = (turn + 1) % NoP;
             step = "proposal";
-            if (canEndEarly() && !rebelProposalLeft()) {
+            if (canEndEarly() && !rebelProposalLeft(true)) {
                 addMessage("[color=purple]All remaining proposers are spies.[/color]");
                 endGame(fresh, false);
             }
@@ -351,8 +351,14 @@ public class BotRES extends GameBot {
         }
     }
 
-    private boolean rebelProposalLeft() {
-        for (int i = subround; i <= hammerIndex(); i++) {
+    private boolean rebelProposalLeft(boolean includeCurrent) {
+        int start;
+        if (includeCurrent)
+            start = subround;
+        else
+            start = subround + 1;
+
+        for (int i = start; i <= hammerIndex(); i++) {
             int j = (turn + i - subround) % NoP;
             if (roles.get(j).equals("good")) {
                 return true;
