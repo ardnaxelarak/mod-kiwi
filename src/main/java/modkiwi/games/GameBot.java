@@ -128,9 +128,14 @@ public abstract class GameBot
     protected abstract void processMove(boolean fresh, String... move);
 
     protected void processAndAddMove(String... move) {
+        processAndAddMove(true, move);
+    }
+
+    protected void processAndAddMove(boolean change, String... move) {
         globalProcessMove(true, move);
         game.getMoves().add(Utils.join(move, " "));
-        changed = true;
+        if (change)
+            changed = true;
     }
 
     public void startScanning() {

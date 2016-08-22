@@ -312,6 +312,7 @@ public class BotRES extends GameBot {
         }
 
         if (fresh) {
+            forceUpdate();
             try {
                 web.replyThread(game.getThread(), null, message);
             } catch (IOException e) {
@@ -422,6 +423,7 @@ public class BotRES extends GameBot {
         }
 
         if (fresh) {
+            forceUpdate();
             try {
                 web.replyThread(game.getThread(), null, message);
             } catch (IOException e) {
@@ -502,9 +504,9 @@ public class BotRES extends GameBot {
                 String stepNumber = (round + 1) + "." + (subround + 1);
                 if (stepNumber.equals(m.group(2))) {
                     if (m.group(1).equalsIgnoreCase("approve")) {
-                        processAndAddMove("approve", Integer.toString(actor));
+                        processAndAddMove(false, "approve", Integer.toString(actor));
                     } else if (m.group(1).equalsIgnoreCase("reject")) {
-                        processAndAddMove("reject", Integer.toString(actor));
+                        processAndAddMove(false, "reject", Integer.toString(actor));
                     } else {
                         LOGGER.warning("Subject '%s' matched P_VOTE but not approve or reject.", subject);
                     }
@@ -538,7 +540,7 @@ public class BotRES extends GameBot {
 
     private void addSubmissionIfLegal(int player, int index, String submit) {
         if (checkSubmissionLegal(roles.get(player), submit)) {
-            processAndAddMove(submit, Integer.toString(index));
+            processAndAddMove(false, submit, Integer.toString(index));
         } else {
             LOGGER.warning("Player %s tried to submit a '%s' but is not allowed to.", players[player], submit);
         }
