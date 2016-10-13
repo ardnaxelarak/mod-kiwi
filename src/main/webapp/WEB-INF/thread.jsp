@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="modkiwi.data.ArticleInfo" %>
 <%@ page import="modkiwi.data.ThreadInfo" %>
-<%@ page import="modkiwi.data.UserInfo" %>
+<%@ page import="modkiwi.data.BGGUserInfo" %>
 <%@ page import="com.google.appengine.api.users.User" %>
 <%@ page import="com.google.appengine.api.users.UserService" %>
 <%@ page import="com.google.appengine.api.users.UserServiceFactory" %>
@@ -13,7 +13,7 @@
 ThreadInfo threadinfo = (ThreadInfo)request.getAttribute("threadinfo");
 String[] usernames = (String[])request.getAttribute("usernames");
 boolean[] show = (boolean[])request.getAttribute("showUsers");
-Map<String, UserInfo> userinfo = (Map<String, UserInfo>)request.getAttribute("userinfo");
+Map<String, BGGUserInfo> userinfo = (Map<String, BGGUserInfo>)request.getAttribute("userinfo");
 int len = usernames.length;
 %>
 
@@ -78,7 +78,7 @@ int len = usernames.length;
     <div class="col-md-10">
     <div class="bgg">
       <% for (ArticleInfo article : threadinfo.getArticles()) {
-        UserInfo ui = userinfo.get(article.getUsername());%>
+        BGGUserInfo ui = userinfo.get(article.getUsername());%>
         <div class="bgg-article " data-parent_objectid="<%= threadinfo.getId() %>" data-parent_objecttype="thread" data-objectid="<%= article.getId() %>" data-objecttype="article" data-article-author="<%= article.getUsername() %>">
           <div class = "bgg-article-avatarblock">
             <div><%= ui.getFirstName() %> <%= ui.getLastName() %></div>

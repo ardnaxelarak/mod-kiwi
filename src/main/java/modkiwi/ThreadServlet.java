@@ -2,7 +2,7 @@ package modkiwi;
 
 import modkiwi.data.ArticleInfo;
 import modkiwi.data.ThreadInfo;
-import modkiwi.data.UserInfo;
+import modkiwi.data.BGGUserInfo;
 import modkiwi.util.WebUtils;
 
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class ThreadServlet extends HttpServlet
         String username = req.getParameter("username");
         ThreadInfo ti = web.getThread(thread);
 
-        Map<String, UserInfo> users = new HashMap<String, UserInfo>();
+        Map<String, BGGUserInfo> users = new HashMap<String, BGGUserInfo>();
 
         for (ArticleInfo article : ti.getArticles())
         {

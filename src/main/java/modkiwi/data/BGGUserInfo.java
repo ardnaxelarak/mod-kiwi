@@ -4,12 +4,12 @@ import org.jsoup.*;
 import org.jsoup.nodes.*;
 import org.jsoup.select.*;
 
-public class UserInfo
+public class BGGUserInfo
 {
     private String id, name;
     private String firstname, lastname, avatarlink;
 
-    public UserInfo(Element node)
+    public BGGUserInfo(Element node)
     {
         id = node.attr("id");
         name = node.attr("name");
