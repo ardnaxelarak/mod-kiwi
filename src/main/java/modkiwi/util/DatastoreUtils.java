@@ -18,80 +18,65 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public final class DatastoreUtils
-{
+public final class DatastoreUtils {
     private static final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-    private DatastoreUtils()
-    {
+    private DatastoreUtils() {
     }
 
-    public static List<GameInfo> allGames()
-    {
+    public static List<GameInfo> allGames() {
         List<GameInfo> list = new LinkedList<GameInfo>();
         Query q = new Query("Game");
         PreparedQuery pq = datastore.prepare(q);
 
-        for (Entity ent : pq.asIterable())
-        {
+        for (Entity ent : pq.asIterable()) {
             list.add(new GameInfo(ent));
         }
 
         return list;
     }
 
-    public static List<GameInfo> gamesByStatus(String... status)
-    {
-        List<GameInfo> list = new LinkedList<GameInfo>();
+    public static List<GameInfo> gamesByStatus(String... status) { List<GameInfo> list = new LinkedList<GameInfo>();
         Filter statusFilter = new FilterPredicate("game_status", FilterOperator.IN, Arrays.asList(status));
         Query q = new Query("Game").setFilter(statusFilter);
         PreparedQuery pq = datastore.prepare(q);
 
-        for (Entity ent : pq.asIterable())
-        {
+        for (Entity ent : pq.asIterable()) {
             list.add(new GameInfo(ent));
         }
 
         return list;
     }
 
-    public static GameInfo loadGame(String gameid)
-    {
+    public static GameInfo loadGame(String gameid) {
         Key key = KeyFactory.createKey("Game", gameid);
         Entity ent = null;
 
-        try
-        {
+        try {
             ent = datastore.get(key);
-        }
-        catch (EntityNotFoundException e)
-        {
+        } catch (EntityNotFoundException e) {
             return null;
         }
 
         return new GameInfo(ent);
     }
 
-    public static int getInt(Object object)
-    {
+    public static int getInt(Object object) {
         return ((Number)object).intValue();
     }
 
-    public static int getInt(Object object, int def)
-    {
+    public static int getInt(Object object, int def) {
         if (object == null)
             return def;
         else
             return getInt(object);
     }
 
-    public static long getLong(Object object)
-    {
+    public static long getLong(Object object) {
         return ((Number)object).longValue();
     }
 
-    public static long getLong(Object object, long def)
-    {
+    public static long getLong(Object object, long def) {
         if (object == null)
             return def;
         else
