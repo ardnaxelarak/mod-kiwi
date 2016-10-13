@@ -381,6 +381,9 @@ public class BotHan extends GameBot {
             if (user < 0 || (color < 0 && num < 0))
                 return;
 
+            if (clues <= 0)
+                return;
+
             if (color >= 0) {
                 processAndAddMove("cluecolor", Integer.toString(color), Integer.toString(user));
             } else if (num >= 0) {
